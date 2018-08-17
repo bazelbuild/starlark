@@ -1,11 +1,12 @@
 ---
-created: 2018-08-17
 status: Draft
-reviewers:
-  - Starlark core reviewers
-title: Genrule-setup for Starlark
+created: 2018-08-17
+updated: 2018-08-17
 authors:
   - brandjon
+reviewers:
+  - Starlark core reviewers
+discussion thread: [#2](https://github.com/bazelbuild/starlark/issues/2)
 ---
 
 # Genrule-setup for Starlark
