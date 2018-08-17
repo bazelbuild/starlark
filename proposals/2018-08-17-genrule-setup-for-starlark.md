@@ -1,13 +1,11 @@
----
-status: Draft
-created: 2018-08-17
-updated: 2018-08-17
-authors:
-  - brandjon
-reviewers:
-  - Starlark core reviewers
-discussion thread: [#2](https://github.com/bazelbuild/starlark/issues/2)
----
+<nbsp>|<nbsp>
+---|---
+status | draft
+created | 2018-08-17
+updated | 2018-08-17
+author(s) | [brandjon@](https://github.com/brandjon)
+reviewer(s) | Starlark core reviewers
+discussion thread | [#2](https://github.com/bazelbuild/starlark/issues/2)
 
 # Genrule-setup for Starlark
 
