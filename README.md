@@ -95,6 +95,7 @@ For more information, see:
 *   [Why Starlark was created](https://blog.bazel.build/2017/03/21/design-of-skylark.html)
     (previously named Skylark)
 *   The [specification](spec.md)
+*   The mailing-list: [starlark@googlegroups.com](https://groups.google.com/forum/#!forum/starlark)
 
 ## Build API
 
@@ -111,7 +112,9 @@ will be able to understand the build API and take advantage of it.
 ## Evolution
 
 Read about [the design process](process.md) if you want to suggest improvements
-to the specification.
+to the specification. Follow the
+[mailing-list](https://groups.google.com/forum/#!forum/starlark) to discuss the
+evolution of Starlark.
 
 ## Known implementations
 
