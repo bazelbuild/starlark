@@ -124,3 +124,4 @@ aim to remove the differences and provide a common test suite.
 *   in Go: https://github.com/google/skylark/
 *   in Java:
     https://github.com/bazelbuild/bazel/tree/master/src/main/java/com/google/devtools/skylark
+*   in Rust: https://github.com/google/starlark-rust/
