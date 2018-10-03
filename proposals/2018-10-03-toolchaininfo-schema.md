@@ -148,7 +148,7 @@ Have `ToolchainInfo` take in a list of provider instances instead of key-value p
 **Pros:**
 - Analogous to how modern declared/symbolic providers are returned and retrieved for ordinary dependencies.
 - No need to agree on extra field names besides those already covered by a provider's own schema.
-- If toolchain types get the ability to declare advertised/required providers, `ToolchainInfo` objects can be easily validated against these requirements.
+- If toolchain types get the ability to declare advertised/required providers, `ToolchainInfo` objects can be easily validated against these requirements. (Related GH issue: [Bazel #6015](https://github.com/bazelbuild/bazel/issues/6015))
 
 **Cons:**
 - Requires a little implementation work.
