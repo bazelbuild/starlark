@@ -119,9 +119,9 @@ This is a convention recommendation: Group values by their logical provider, and
 - More verbose.
 - User must repeat the provider name as the field name.
 
-# Option 3: Provider-keyed collection
+## Option 3: Provider-keyed collection
 
-Have `ToolchainInfo` take in a list of provider instances instead of key-value pairs. Provider instances are retrieved from a `ToolchainInfo` object by keying on the provider type. Deprecate and migrate the old struct-like construction and retrievals from `ToolchainInfo`.
+Have `ToolchainInfo` take in a list of provider instances instead of key-value pairs. Provider instances are retrieved from a `ToolchainInfo` object by keying on the provider type. We'd deprecate the old struct-like construction and retrievals from `ToolchainInfo`.
 
 ```python
     # _bar_toolchain_impl()
@@ -145,7 +145,16 @@ Have `ToolchainInfo` take in a list of provider instances instead of key-value p
     ...
 ```
 
-Pros:
+**Pros:**
 - Analogous to how modern declared/symbolic providers are returned and retrieved for ordinary dependencies.
 - No need to agree on extra field names besides those already covered by a provider's own schema.
 - If toolchain types get the ability to declare advertised/required providers, `ToolchainInfo` objects can be easily validated against these requirements.
+
+**Cons:**
+- Requires a little implementation work.
+
+## Backward compatibility
+
+To deprecate struct-style construction and access for `ToolchainInfo`, we'd just need an `--incompatible_*` flag that disables passing keyword arguments to `ToolchainInfo`. Without the ability to construct legacy `ToolchainInfo` objects, all field retrievals on `ToolchainInfo` would also become invalid (no-such-field errors). The flag would also intercept and disallow `to_json` and `to_proto` if needed.
+
+When the flag is not enabled, both the legacy and provider-keyed styles would be permitted on the same `ToolchainInfo` object, to assist with migration.
