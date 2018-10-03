@@ -7,7 +7,7 @@ authors:
   - [brandjon@](https://github.com/brandjon)
 reviewers:
   - Starlark core reviewers
-discussion thread: [#????](https://github.com/bazelbuild/starlark/issues/????)
+discussion thread: [#12](https://github.com/bazelbuild/starlark/issues/12)
 ---
 
 # ToolchainInfo Schema
