@@ -2766,11 +2766,11 @@ x.remove(2)                             # error: element not found
 <a id='string·capitalize'></a>
 ### string·capitalize
 
-`S.capitalize()` returns a copy of string S with all Unicode letters
-that begin words changed to their title case.
+`S.capitalize()` returns a copy of string S, where the first character (if any)
+is converted to uppercase; all other characters are converted to lowercase.
 
 ```python
-"hello, world!".capitalize()		# "Hello, World!"
+"hello, world!".capitalize()		# "Hello, world!"
 ```
 
 <a id='string·count'></a>
