@@ -8,7 +8,7 @@ core language.  For example, Starlark is embedded within (and was
 originally developed for) the [Bazel build tool](https://bazel.build).
 
 This document was derived from the [description of the Go
-implementation](https://github.com/google/skylark/blob/master/doc/spec.md)
+implementation](https://github.com/google/starlark-go/blob/master/doc/spec.md)
 of Starlark.
 It was influenced by the Python specification,
 Copyright 1990&ndash;2017, Python Software Foundation,
