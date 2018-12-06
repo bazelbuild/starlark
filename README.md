@@ -6,8 +6,9 @@ Starlark (formerly known as Skylark) is a language intended for use as a
 configuration language. It was designed for the [Bazel](https://bazel.build/)
 build system, but may be useful for other projects as well. This repository is
 where Starlark features are proposed, discussed, and specified. It contains
-information about the language, including the [specification](spec.md). See
-below for links to [known implementations](#known-implementations).
+information about the language, including the [specification](spec.md). There
+are [multiple implementations of Starlark](users.md).
+
 
 Starlark is a dialect of [Python](https://www.python.org/). Like Python, it is a
 dynamically typed language with high-level data types, first-class functions
@@ -116,12 +117,6 @@ to the specification. Follow the
 [mailing-list](https://groups.google.com/forum/#!forum/starlark) to discuss the
 evolution of Starlark.
 
-## Known implementations
+## Implementations, tools, and users
 
-The implementations below are not full compliant to the specification yet. We
-aim to remove the differences and provide a common test suite.
-
-*   in Go: https://github.com/google/starlark-go/
-*   in Java:
-    https://github.com/bazelbuild/bazel/tree/master/src/main/java/com/google/devtools/skylark
-*   in Rust: https://github.com/google/starlark-rust/
+See the [users.md](Starlark implementations, tools, and users) page.
