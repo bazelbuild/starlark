@@ -51,7 +51,7 @@ A Starlark program consists of one or more modules. Each module is defined by a
 single UTF-8-encoded text file.
 
 Starlark grammar is introduced gradually throughout this document as shown below,
-and a [complete Starlark grammar reference](#grammar) is provided at the end.
+and a [complete Starlark grammar reference](#grammar-reference) is provided at the end.
 
 Grammar notation:
 
