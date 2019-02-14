@@ -36,6 +36,7 @@ Otherwise, consider using a Python mode.
    Starlark was designed.
 *  [Buck](https://buckbuild.com/): Another build system, using Starlark in a
    similar way as Bazel.
+   *  [OkBuck](https://github.com/uber/okbuck/pull/757): A Gradle-to-Buck migration tool, generating Starlark for Buck.
 *  [qri](http://qri.io/): qri is versioned, scriptable, exportable,
    collaborative datasets. They use Starlark to [describe transformations](http://qri.io/docs/reference/skylark_syntax/)
 *  [Copybara](https://github.com/google/copybara): A tool for transforming and moving code between repositories.
