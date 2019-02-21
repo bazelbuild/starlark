@@ -7,7 +7,7 @@ aim to remove the differences and provide a common test suite.
 
 *   in Go: https://github.com/google/starlark-go/
 *   in Java:
-    https://github.com/bazelbuild/bazel/tree/master/src/main/java/com/google/devtools/skylark
+    https://github.com/bazelbuild/bazel/tree/master/src/main/java/com/google/devtools/starlark
 *   in Rust: https://github.com/google/starlark-rust/
 
 ## Tools
