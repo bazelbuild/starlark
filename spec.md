@@ -2696,7 +2696,7 @@ x                                       # [1, 2, 3, "foo"]
 <a id='list·index'></a>
 ### list·index
 
-`L.insert(x[, start[, end]])` finds `x` within the list L and returns its index.
+`L.index(x[, start[, end]])` finds `x` within the list L and returns its index.
 
 The optional `start` and `end` parameters restrict the portion of
 list L that is inspected.  If provided and not `None`, they must be list
@@ -2704,7 +2704,7 @@ indices of type `int`. If an index is negative, `len(L)` is effectively
 added to it, then if the index is outside the range `[0:len(L)]`, the
 nearest value within that range is used; see [Indexing](#indexing).
 
-`insert` fails if `x` is not found in L, or if `start` or `end`
+`index` fails if `x` is not found in L, or if `start` or `end`
 is not a valid index (`int` or `None`).
 
 ```python
