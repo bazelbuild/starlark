@@ -178,7 +178,7 @@ about backward compatibility at this point."
 
 # Booleans are not integers
 
-Unlike Python, Skylark booleans do not inherit from the int type.
+Unlike Python, Starlark booleans do not inherit from the int type.
 [When booleans were added](https://www.python.org/dev/peps/pep-0285/), Python
 developers didn't want to break backwards compatibility. Since comparison
 operators were previously returning 0 or 1, they decided to make True and False
