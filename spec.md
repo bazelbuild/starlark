@@ -2209,6 +2209,10 @@ reader.  Nonetheless, this rule permits names to be added to the
 universe block in later versions of the language without breaking
 existing programs.
 
+As with built-in functions, built-in methods accept only positional
+arguments except where noted.
+The parameter names serve merely as documentation.
+
 
 ### None
 
@@ -2518,10 +2522,6 @@ This section lists the methods of built-in types.  Methods are selected
 using [dot expressions](#dot-expressions).
 For example, strings have a `count` method that counts
 occurrences of a substring; `"banana".count("a")` yields `3`.
-
-As with built-in functions, built-in methods accept only positional
-arguments except where noted.
-The parameter names serve merely as documentation.
 
 
 <a id='dict·get'></a>
