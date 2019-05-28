@@ -2378,13 +2378,15 @@ min("two", "three", "four", key=len)            # "two", the shortest
 ### print
 
 `print(*args, **kwargs)` prints its arguments, followed by a newline.
-Arguments are formatted as if by `str(x)` and separated with a space.
-Keyword arguments are preceded by their name.
+Arguments are formatted as if by `str(x)` and separated with a space,
+unless an alternative separator is specified by a `sep` named argument.
 
 Example:
 
 ```python
-print(1, "hi", x=3)	# "1 hi x=3\n"
+print(1, "hi", x=3)                             # "1 hi x=3\n"
+print("hello", "world")                         # "hello world\n"
+print("hello", "world", sep=", ")               # "hello, world\n"
 ```
 
 Typically the formatted string is printed to the standard error file,
