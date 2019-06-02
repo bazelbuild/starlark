@@ -1,0 +1,15 @@
+# _inconsistency_: rust elems() returns list of ints
+
+# string.elems
+# assert_eq(list("abcd".elems()), ["a", "b", "c", "d"])
+
+# assert_eq(len("aaa".elems()), 3)
+
+def test_iter():
+  i = 0
+  for c in "abcd".elems():
+    assert_eq(c, "abcd"[i])
+    i += 1
+  assert_eq(i, 4)
+
+# test_iter()
