@@ -1,0 +1,9 @@
+---
+platforms:
+  ubuntu1604:
+    shell_commands:
+      - sh setup_workspace.sh
+    build_targets:
+      - "//..."
+    test_targets:
+      - "//..."
