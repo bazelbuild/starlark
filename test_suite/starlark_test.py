@@ -68,8 +68,8 @@ def assert_(cond, msg="assertion failed"):
 """
 
   def testFile(self):
-    f = test_file
-    print("===", f, "===")
+    print("===", test_file, "===")
+    f = os.path.join(testenv.STARLARK_TESTDATA_PATH, test_file)
     for chunk, expected in self.chunks(f):
       with tempfile.NamedTemporaryFile(
           mode="wb", suffix=".star", delete=False) as tmp:
