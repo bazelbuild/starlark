@@ -4,6 +4,7 @@ import tempfile
 import subprocess
 import os
 import re
+import glob
 
 import testenv
 
@@ -86,5 +87,5 @@ def assert_(cond, msg="assertion failed"):
 if __name__ == "__main__":
   # Test filename is the last argument on the command-line.
   test_file = sys.argv[-1]
-  binary_path = testenv.STARLARK_BINARY_PATH[sys.argv[-2]]
+  binary_path = glob.glob(testenv.STARLARK_BINARY_PATH[sys.argv[-2]])[0]
   unittest.main(argv=sys.argv[2:])
