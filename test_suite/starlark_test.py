@@ -24,10 +24,12 @@ class StarlarkTest(unittest.TestCase):
           expected_errors = []
           code = []
         else:
-          code.append(line)
           i = line.find(self.ERR_SEP)
           if i >= 0:
             expected_errors.append(line[i + len(self.ERR_SEP):].strip())
+            code.append(line[:i])
+          else:
+            code.append(line)
     yield code, expected_errors
 
   def evaluate(self, f):
@@ -52,7 +54,7 @@ class StarlarkTest(unittest.TestCase):
       # Try both substring and regex matching.
       if exp not in output_ and not re.search(exp, output_):
         self.seen_error = True
-        print("Error `{}` not found, got: `{}`".format(exp, output))
+        print("Error `{}` not found, got: `{}`".format(exp.encode('utf-8'), output.encode('utf-8')))
 
   PRELUDE = """
 def assert_eq(x, y):

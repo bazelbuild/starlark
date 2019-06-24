@@ -57,28 +57,28 @@ assert_eq([0, 1, 2][-1], 2)
 assert_eq([0, 1, 2][0], 0)
 
 ---
-'123'['a'::] ### (slice start must be an integer, not 'a'|invalid start index)
+'123'['a'::] ### (slice start must be an integer, not 'a'|invalid start index|parameters mismatch)
 ---
-'123'[:'b':] ### (slice end must be an integer, not 'b'|invalid end index)
+'123'[:'b':] ### (slice end must be an integer, not 'b'|invalid end index|parameters mismatch)
 ---
-(1, 2, 3)[1::0] ### (slice step cannot be zero|zero is not a valid slice step)
+(1, 2, 3)[1::0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---
-[1, 2, 3][::0] ### (slice step cannot be zero|zero is not a valid slice step)
+[1, 2, 3][::0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---
-[1, 2, 3][1::0] ### (slice step cannot be zero|zero is not a valid slice step)
+[1, 2, 3][1::0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---
-[1, 2, 3][:3:0] ### (slice step cannot be zero|zero is not a valid slice step)
+[1, 2, 3][:3:0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---
-[1, 2, 3][1:3:0] ### (slice step cannot be zero|zero is not a valid slice step)
+[1, 2, 3][1:3:0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---
-[[1], [2]]['a'] ### (indices must be integers, not string|got string, want int)
+[[1], [2]]['a'] ### (indices must be integers, not string|got string, want int|parameters mismatch)
 ---
-[0, 1, 2][3] ### index( 3)? out of range
+[0, 1, 2][3] ### (out of range|out of bound)
 ---
-[0, 1, 2][-4] ### index( -4)? out of range
+[0, 1, 2][-4] ### (out of range|out of bound)
 ---
-[0][-2] ### index( -2)? out of range
+[0][-2] ### (out of range|out of bound)
 ---
-[0][1] ### index( 1)? out of range
+[0][1] ### (out of range|out of bound)
 ---
-[][1] ### index( 1)? out of range
+[][1] ### (out of range|out of bound)

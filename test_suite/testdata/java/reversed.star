@@ -9,9 +9,9 @@ assert_eq(reversed([]), [])
 # assert_eq(reversed('bbb'.elems()), ['b', 'b', 'b'])
 
 ---
-reversed(None) ### (parameter 'sequence' cannot be None|got NoneType, want iterable)
+reversed(None) ### (parameter 'sequence' cannot be None|got NoneType, want iterable|not iterable)
 ---
-reversed(1) ### (type 'int' is not iterable|got int, want iterable)
+reversed(1) ### (type 'int' is not iterable|got int, want iterable|not iterable)
 ---
 # _inconsistency_: go, rust reversed() accepts dict as argument
 # reversed({1: 3}) ## Argument to reversed() must be a sequence, not a dictionary

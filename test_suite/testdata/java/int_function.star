@@ -13,7 +13,7 @@ assert_eq(int(False), 0)
 int(None) ### None
 ---
 # This case is allowed in Python but not Skylark
-int() ### x
+int() ### (no default value|not enough parameters|missing argument)
 ---
 
 # string, no base
@@ -34,18 +34,18 @@ assert_eq(int('+42'), 42)
 ---
 # int(-2147483649) ## invalid base-10 integer constant: 2147483649
 ---
-int('') ### (cannot be empty|invalid literal)
+int('') ### (cannot be empty|invalid literal|not a base 10)
 ---
 # Surrounding whitespace is not allowed
-int('  42  ') ### invalid literal
+int('  42  ') ### (invalid literal|not a base 10)
 ---
-int('-') ### invalid literal
+int('-') ### (invalid literal|not a base 10)
 ---
-int('0x') ### invalid literal
+int('0x') ### (invalid literal|not a base 16)
 ---
-int('1.5') ### invalid literal
+int('1.5') ### (invalid literal|not a base 10)
 ---
-int('ab') ### invalid literal
+int('ab') ### (invalid literal|not a base 10)
 ---
 
 assert_eq(int('11', 2), 3)
@@ -64,9 +64,9 @@ assert_eq(int('016', 16), 22)
 # invalid base
 # int('016', 0) ## base.*016
 ---
-int('123', 3) ### invalid literal
+int('123', 3) ### (invalid literal|not a base 3)
 ---
-int('FF', 15) ### invalid literal
+int('FF', 15) ### (invalid literal|not a base 15)
 ---
 int('123', -1) ### >= 2 (and|&&) <= 36
 ---
@@ -74,7 +74,7 @@ int('123', 1) ### >= 2 (and|&&) <= 36
 ---
 int('123', 37) ### >= 2 (and|&&) <= 36
 ---
-int('123', 'x') ### base must be an integer
+int('123', 'x') ### (base must be an integer|not supported)
 ---
 
 # base with prefix
@@ -88,10 +88,10 @@ assert_eq(int('0XFF', 0), 255)
 assert_eq(int('0xFF', 16), 255)
 
 ---
-int('0xFF', 8) ### invalid literal
+int('0xFF', 8) ### (invalid literal|not a base 8)
 ---
-int(True, 2) ### can't convert non-string with explicit base
+int(True, 2) ### (can't convert non-string with explicit base|non-string)
 ---
-int(1, 2) ### can't convert non-string with explicit base
+int(1, 2) ### (can't convert non-string with explicit base|non-string)
 ---
-int(True, 10) ### can't convert non-string with explicit base
+int(True, 10) ### (can't convert non-string with explicit base|non-string)

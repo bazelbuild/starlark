@@ -8,9 +8,9 @@ assert_eq('somestring'[-2], "n")
 assert_eq('somestring'[-10], "s")
 
 ---
-'abcdef'[10] ### out of range
+'abcdef'[10] ### (out of range|out of bound)
 ---
-'abcdef'[-11] ### out of range
+'abcdef'[-11] ### (out of range|out of bound)
 ---
 
 # slicing
@@ -46,15 +46,15 @@ assert_eq('123'[3:1:1], "")
 assert_eq('123'[1:3:-1], "")
 
 ---
-'123'[::0] ### (slice step cannot be zero|not a valid slice step)
+'123'[::0] ### (slice step cannot be zero|not a valid slice step|out of bound)
 ---
-'123'[1::0] ### (slice step cannot be zero|not a valid slice step)
+'123'[1::0] ### (slice step cannot be zero|not a valid slice step|out of bound)
 ---
-'123'[:3:0] ### (slice step cannot be zero|not a valid slice step)
+'123'[:3:0] ### (slice step cannot be zero|not a valid slice step|out of bound)
 ---
-'123'[1:3:0] ### (slice step cannot be zero|not a valid slice step)
+'123'[1:3:0] ### (slice step cannot be zero|not a valid slice step|out of bound)
 ---
-'123'['a'::] ### (slice start must be an integer, not 'a'|want int)
+'123'['a'::] ### (slice start must be an integer, not 'a'|want int|parameters mismatch)
 ---
-'123'[:'b':] ### (slice end must be an integer, not 'b'|want int)
+'123'[:'b':] ### (slice end must be an integer, not 'b'|want int|parameters mismatch)
 ---

@@ -54,15 +54,15 @@ assert_eq('{test} and {}'.format(2, test = 1), "1 and 2")
 assert_eq('{test} and {0}'.format(2, test = 1), "1 and 2")
 
 ---
-'{{}'.format(1) ### (Found '}' without matching '{'|single '}')
+'{{}'.format(1) ### (Found '}' without matching '{'|single '}'|standalone '}')
 ---
-'{}}'.format(1) ### (Found '}' without matching '{'|single '}')
+'{}}'.format(1) ### (Found '}' without matching '{'|single '}'|standalone '}')
 ---
-'{0}'.format() ### (No replacement found for index 0|index out of range)
+'{0}'.format() ### (No replacement found for index 0|index out of range|out of bound)
 ---
-'{0} and {1}'.format('this') ### (No replacement found for index 1|index out of range)
+'{0} and {1}'.format('this') ### (No replacement found for index 1|index out of range|out of bound)
 ---
-'{0} and {2}'.format('this', 'that') ### (No replacement found for index 2|index out of range)
+'{0} and {2}'.format('this', 'that') ### (No replacement found for index 2|index out of range|out of bound)
 ---
 # _inconsistency_: -0 not allowed in go,rust, different error
 # '{-0} and {-1}'.format('this', 'that') ##
@@ -71,9 +71,9 @@ assert_eq('{test} and {0}'.format(2, test = 1), "1 and 2")
 ---
 '{0.1} and {1}'.format('this', 'that') ### (Invalid character '.' inside replacement field|not supported)
 ---
-'{}'.format() ### (No replacement found for index 0|index out of range)
+'{}'.format() ### (No replacement found for index 0|index out of range|not enough parameters)
 ---
-'{} and {}'.format('this') ### (No replacement found for index 1|index out of range)
+'{} and {}'.format('this') ### (No replacement found for index 1|index out of range|not enough parameters)
 ---
 '{test} and {}'.format(test = 1, 2) ### positional argument
 ---
@@ -89,6 +89,6 @@ assert_eq('{test} and {0}'.format(2, test = 1), "1 and 2")
 ---
 '{test,}'.format(test = 1) ### (Invalid character ',' inside replacement field|not found)
 ---
-'{ {} }'.format(42) ### Nested replacement fields
+'{ {} }'.format(42) ### (Nested replacement fields|unmatched '{')
 ---
-'{a}{b}'.format(a = 5) ### (Missing argument 'b'|keyword b not found)
+'{a}{b}'.format(a = 5) ### (Missing argument 'b'|not found)
