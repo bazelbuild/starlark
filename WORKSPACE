@@ -3,21 +3,6 @@ workspace(name = "starlark_test_suite")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "2244b0308846bb22b4ff0bcc675e99290ff9f1115553ae9671eba1030af31bc0",
-    strip_prefix = "protobuf-3.6.1.2",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.6.1.2.tar.gz"],
-)
-
-http_archive(
-    name = "bazel_skylib",
-    # Commit 3721d32c14d3639ff94320c780a60a6e658fb033 of 2019-03-20
-    sha256 = "2ef429f5d7ce7111263289644d233707dba35e39696377ebab8b0bc701f7818e",
-    strip_prefix = "bazel-skylib-3721d32c14d3639ff94320c780a60a6e658fb033",
-    urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/0.8.0/bazel-skylib.0.8.0.tar.gz"],
-)
-
 git_repository(
     name = "io_bazel",
     remote = "https://github.com/bazelbuild/bazel.git",
