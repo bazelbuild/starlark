@@ -2,7 +2,7 @@
 assert_eq('-'.join(['a', 'b', 'c']), "a-b-c")
 
 ---
-join(' ', ['a', 'b', 'c']) ### (name 'join' is not defined|undefined)
+join(' ', ['a', 'b', 'c']) ### (name 'join' is not defined|undefined|not found)
 ---
 
 assert_eq(''.join([(x + '*') for x in ['a', 'b', 'c']]), "a*b*c*")
@@ -80,11 +80,11 @@ assert_eq('Apricot'.endswith('co'), False)
 # assert_eq('a'.endswith(()), False)
 # assert_eq(''.endswith(()), False)
 ---
-'a'.endswith(['a']) ### (expected value of type 'string or tuple of strings'|got list)
+'a'.endswith(['a']) ### (expected value of type 'string or tuple of strings'|got list|parameters mismatch)
 ---
-'1'.endswith((1,)) ### (got type 'int'|got int)
+'1'.endswith((1,)) ### (got type 'int'|got int|parameters mismatch)
 ---
-'a'.endswith(('1', 1)) ### (got type 'int'|got int)
+'a'.endswith(('1', 1)) ### (got type 'int'|got int|parameters mismatch)
 ---
 
 # startswith
@@ -110,11 +110,11 @@ assert_eq(''.startswith('a'), False)
 # assert_eq('a'.startswith(()), False)
 # assert_eq(''.startswith(()), False)
 ---
-'a'.startswith(['a']) ### (expected value of type 'string or tuple of strings'|got list)
+'a'.startswith(['a']) ### (expected value of type 'string or tuple of strings'|got list|expected string)
 ---
-'1'.startswith((1,)) ### (got type 'int'|got int)
+'1'.startswith((1,)) ### (got type 'int'|got int|expected string)
 ---
-'a'.startswith(('1', 1)) ### (got type 'int'|got int)
+'a'.startswith(('1', 1)) ### (got type 'int'|got int|expected string)
 ---
 
 # substring
