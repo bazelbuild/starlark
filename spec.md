@@ -2791,10 +2791,20 @@ They are interpreted according to Starlark's [indexing conventions](#indexing).
 <a id='string·endswith'></a>
 ### string·endswith
 
-`S.endswith(suffix)` reports whether the string S has the specified suffix.
+`S.endswith(suffix[, start[, end]])` reports whether the string 
+`S[start:end]` has the specified suffix.
 
 ```python
 "filename.sky".endswith(".sky")         # True
+"filename.sky".endswith(".sky", 9, 12)  # False
+"filename.sky".endswith("name", 0, 8)   # True
+```
+
+The `suffix` argument may be a tuple of strings, in which case the
+function reports whether any one of them is a suffix.
+
+```python
+'foo.cc'.endswith(('.cc', '.h'))         # True
 ```
 
 <a id='string·find'></a>
@@ -3105,10 +3115,22 @@ the final element does not necessarily end with a line terminator.
 <a id='string·startswith'></a>
 ### string·startswith
 
-`S.startswith(suffix)` reports whether the string S has the specified prefix.
+`S.startswith(prefix[, start[, end]])` reports whether the string 
+`S[start:end]` has the specified prefix.
 
 ```python
 "filename.sky".startswith("filename")         # True
+"filename.star".startswith("name", 4)         # True
+"filename.star".startswith("name", 4, 7)      # False
+```
+
+The `prefix` argument may be a tuple of strings, in which case the
+function reports whether any one of them is a prefix.
+
+```python
+'abc'.startswith(('a', 'A'))                  # True
+'ABC'.startswith(('a', 'A'))                  # True
+'def'.startswith(('a', 'A'))                  # False
 ```
 
 <a id='string·strip'></a>
