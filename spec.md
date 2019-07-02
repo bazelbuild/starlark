@@ -2965,10 +2965,14 @@ are strings.
 <a id='string·lstrip'></a>
 ### string·lstrip
 
-`S.lstrip()` returns a copy of the string S with leading whitespace removed.
+`S.lstrip([cutset])` returns a copy of the string S with leading whitespace removed.
+
+Like `strip`, it accepts an optional string parameter that specifies an
+alternative set of Unicode code points to remove.
 
 ```python
 "  hello  ".lstrip()                    # "  hello"
+"  hello  ".lstrip("h o")               # "ell  "
 ```
 
 <a id='string·partition'></a>
@@ -3049,10 +3053,14 @@ rightmost splits.
 <a id='string·rstrip'></a>
 ### string·rstrip
 
-`S.rstrip()` returns a copy of the string S with trailing whitespace removed.
+`S.rstrip([cutset])` returns a copy of the string S with trailing whitespace removed.
+
+Like `strip`, it accepts an optional string parameter that specifies an
+alternative set of Unicode code points to remove.
 
 ```python
 "  hello  ".rstrip()                    # "hello  "
+"  hello  ".rstrip("h o")               # "  hell"
 ```
 
 <a id='string·split'></a>
@@ -3114,10 +3122,15 @@ the final element does not necessarily end with a line terminator.
 <a id='string·strip'></a>
 ### string·strip
 
-`S.strip()` returns a copy of the string S with leading and trailing whitespace removed.
+`S.strip([cutset])` returns a copy of the string S with leading and trailing whitespace removed.
+
+It accepts an optional string argument,
+`cutset`, which instead removes all leading
+and trailing Unicode code points contained in `cutset`.
 
 ```python
 "  hello  ".strip()                     # "hello"
+"  hello  ".strip("h o")                # "ell"
 ```
 
 <a id='string·title'></a>
