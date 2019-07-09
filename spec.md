@@ -2971,8 +2971,8 @@ Like `strip`, it accepts an optional string parameter that specifies an
 alternative set of Unicode code points to remove.
 
 ```python
-"  hello  ".lstrip()                    # "  hello"
-"  hello  ".lstrip("h o")               # "ell  "
+"  hello  ".lstrip()                    # "hello  "
+"  hello  ".lstrip("h o")               # "ello  "
 ```
 
 <a id='string·partition'></a>
@@ -3059,7 +3059,7 @@ Like `strip`, it accepts an optional string parameter that specifies an
 alternative set of Unicode code points to remove.
 
 ```python
-"  hello  ".rstrip()                    # "hello  "
+"  hello  ".rstrip()                    # "  hello"
 "  hello  ".rstrip("h o")               # "  hell"
 ```
 
