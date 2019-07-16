@@ -1298,7 +1298,6 @@ Starlark has the following binary operators, arranged in order of increasing pre
 ```text
 or
 and
-not
 ==   !=   <   >   <=   >=   in   not in
 -   +
 *   /   //   %
@@ -1313,7 +1312,6 @@ BinaryExpr = Test {Binop Test} .
 
 Binop = 'or'
       | 'and'
-      | 'not'
       | '==' | '!=' | '<' | '>' | '<=' | '>=' | 'in' | 'not' 'in'
       | '-' | '+'
       | '*' | '%' | '/' | '//'
