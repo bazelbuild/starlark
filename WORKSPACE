@@ -3,13 +3,37 @@ workspace(name = "starlark_test_suite")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
+http_archive(
+    name = "rules_cc",
+    sha256 = "36fa66d4d49debd71d05fba55c1353b522e8caef4a20f8080a3d17cdda001d89",
+    strip_prefix = "rules_cc-0d5f3f2768c6ca2faca0079a997a97ce22997a0c",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_cc/archive/0d5f3f2768c6ca2faca0079a997a97ce22997a0c.zip",
+        "https://github.com/bazelbuild/rules_cc/archive/0d5f3f2768c6ca2faca0079a997a97ce22997a0c.zip",
+    ],
+)
+
+http_archive(
+    name = "com_google_protobuf",
+    strip_prefix = "protobuf-master",
+    urls = ["https://github.com/google/protobuf/archive/master.zip"],
+)
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+protobuf_deps()
+
+http_archive(
+    name = "bazel_skylib",
+    strip_prefix = "bazel-skylib-master",
+    urls = ["https://github.com/bazelbuild/bazel-skylib/archive/master.zip"],
+)
+
 git_repository(
     name = "io_bazel",
     remote = "https://github.com/bazelbuild/bazel.git",
     branch = "master",
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "io_bazel_rules_go",
     urls = ["https://github.com/bazelbuild/rules_go/releases/download/0.18.5/rules_go-0.18.5.tar.gz"],
