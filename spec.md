@@ -299,6 +299,7 @@ Strings have several built-in methods:
 
 * [`capitalize`](#string·capitalize)
 * [`count`](#string·count)
+* [`elems`](#string·elems)
 * [`endswith`](#string·endswith)
 * [`find`](#string·find)
 * [`format`](#string·format)
@@ -2784,6 +2785,16 @@ They are interpreted according to Starlark's [indexing conventions](#indexing).
 ```python
 "hello, world!".count("o")              # 2
 "hello, world!".count("o", 7, 12)       # 1  (in "world")
+```
+
+<a id='string·elems'></a>
+### string·elems
+
+`S.elems()` returns an iterable value containing successive
+1-byte substrings of S.
+
+```python
+'Hello, 123'.elems()  # ["H", "e", "l", "l", "o", ",", " ", "1", "2", "3"]
 ```
 
 <a id='string·endswith'></a>
