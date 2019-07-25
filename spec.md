@@ -89,10 +89,12 @@ characters are tokens:
 
 ```text
 +    -    *    //   %    **
+~    &    |    ^    <<   >>
 .    ,    =    ;    :
 (    )    [    ]    {    }
 <    >    >=   <=   ==   !=
 +=   -=   *=   //=  %=
+&=   |=   ^=   <<=  >>=
 ```
 
 *Keywords*: The following tokens are keywords and may not be used as
@@ -249,6 +251,12 @@ remainder of floored division, respectively.
 If the signs of the operands differ, the sign of the remainder `x % y`
 matches that of the dividend, `x`.
 For all finite x and y (y ≠ 0), `(x // y) * y + (x % y) == x`.
+
+Integers, including negative values, may be interpreted as bit vectors.
+The `|`, `&`, and `^` operators implement bitwise OR, AND, and XOR,
+respectively. The unary `~` operator yields the bitwise inversion of its
+integer argument. The `<<` and `>>` operators shift the first argument
+to the left or right by the number of bits given by the second argument.
 
 Any bool, number, or string may be interpreted as an integer by using
 the `int` built-in function.
@@ -1130,7 +1138,6 @@ Operand = identifier
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expression] [,] ')'
-        | '-' PrimaryExpr
         .
 
 DotSuffix   = '.' identifier .
@@ -1259,21 +1266,27 @@ There are two unary operators, both appearing before their operand:
 `-`, and `not`.
 
 ```text
-UnaryExpr = '-' Test
+UnaryExpr = '+' Test
+          | '-' Test
+          | '~' Test
           | 'not' Test
           .
 ```
 
 ```text
++ number        unary positive          (number)
 - number        unary negation          (number)
+~ number        unary bitwise inversion (number)
 not x           logical negation        (any type)
 ```
 
-The `-` operators returns the opposite of any number.
+The `-` operator returns the opposite of any number.
+The `+` operator is never necessary in a correct program, but may
+serve as an assertion that its operand is a number, or as documentation.
 
 ```python
 if x > 0:
-	return 1
+	return +1
 elif x < 0:
 	return -1
 else:
@@ -1291,6 +1304,15 @@ not ""                          # True
 not 0                           # True
 ```
 
+The `~` operator yields the bitwise inversion of its integer argument.
+The bitwise inversion of x is defined as -(x+1).
+
+```python
+~1                              # -2
+~-1                             # 0
+~0                              # -1
+```
+
 
 ### Binary operators
 
@@ -1300,6 +1322,10 @@ Starlark has the following binary operators, arranged in order of increasing pre
 or
 and
 ==   !=   <   >   <=   >=   in   not in
+|
+^
+&
+<< >>
 -   +
 *   /   //   %
 ```
@@ -1314,6 +1340,10 @@ BinaryExpr = Test {Binop Test} .
 Binop = 'or'
       | 'and'
       | '==' | '!=' | '<' | '>' | '<=' | '>=' | 'in' | 'not' 'in'
+      | '|'
+      | '^'
+      | '&'
+      | '<< | '>>'
       | '-' | '+'
       | '*' | '%' | '/' | '//'
       .
@@ -1403,6 +1433,11 @@ Arithmetic
    number * number              # multiplication
    number // number             # floored division
    number % number              # remainder of floored division
+   number ^ number              # bitwise XOR
+   number & number              # bitwise AND
+   number | number              # bitwise OR
+   number << number             # bitwise left shift
+   number >> number             # bitwise right shift
 
 Concatenation
    string + string
@@ -1418,8 +1453,22 @@ String interpolation
    string % any                 # see String Interpolation
 ```
 
-The operands of the arithmetic operators `+`, `-`, `*`, `//`, and
-`%` must both be `int`. The type of the result has type `int`.
+The operands of the arithmetic operators `+`, `-`, `*`, `//`,`%`, `&`,
+`|` and `^` must both be `int`. The type of the result has type `int`.
+
+The `<<` and `>>` operators require operands of `int` type both. They
+shift the first operand to the left or right by the number of bits given
+by the second operand. It is a dynamic error if the second operand is
+negative. Implementations may impose a limit on the second operand of a
+left shift.
+
+```python
+0x12345678 & 0xFF               # 0x00000078
+0x12345678 | 0xFF               # 0x123456FF
+0b01011101 ^ 0b110101101        # 0b111110000
+0b01011101 >> 2                 # 0b010111
+0b01011101 << 2                 # 0b0101110100
+```
 
 The `+` operator may be applied to non-numeric operands of the same
 type, such as two lists, two tuples, or two strings, in which case it
@@ -1682,11 +1731,6 @@ f("a")                                          # 3
 f("n")                                          # 2
 ```
 
-<b>Implementation note:</b>
-The Java implementation does not currently allow a method to be
-selected but not immediately called.
-See Google Issue b/21392896.
-
 ### Index expressions
 
 An index expression `a[i]` yields the `i`th element of an _indexable_
@@ -1867,11 +1911,11 @@ in `for` loops and in comprehensions.
 
 An augmented assignment, which has the form `lhs op= rhs` updates the
 variable `lhs` by applying a binary arithmetic operator `op` (one of
-`+`, `-`, `*`, `/`, `//`, `%`) to the previous value of `lhs` and the value
-of `rhs`.
+`+`, `-`, `*`, `/`, `//`, `%`, `&`, `|`, `^`, `<<`, `>>`) to the
+previous value of `lhs` and the value of `rhs`.
 
 ```text
-AssignStmt = Expression ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=') Expression .
+AssignStmt = Expression ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expression .
 ```
 
 The left-hand side must be a simple target:
@@ -3193,7 +3237,6 @@ File = {Statement | newline} eof .
 Statement = DefStmt | IfStmt | ForStmt | SimpleStmt .
 
 DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
-# NOTE: trailing comma is not permitted if the last argument is `'*' identifier` or `'**' identifier`.
 
 Parameters = Parameter {',' Parameter}.
 
@@ -3219,7 +3262,7 @@ ReturnStmt   = 'return' [Expression] .
 BreakStmt    = 'break' .
 ContinueStmt = 'continue' .
 PassStmt     = 'pass' .
-AssignStmt   = Expression ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=') Expression .
+AssignStmt   = Expression ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expression .
 ExprStmt     = Expression .
 
 LoadStmt = 'load' '(' string {',' [identifier '='] string} [','] ')' .
@@ -3248,7 +3291,6 @@ Operand = identifier
 DotSuffix   = '.' identifier .
 SliceSuffix = '[' [Expression] [':' Test [':' Test]] ']' .
 CallSuffix  = '(' [Arguments [',']] ')' .
-# NOTE: trailing comma is not permitted if the last argument is `'*' Test` or `'**' Test`.
 
 Arguments = Argument {',' Argument} .
 Argument  = Test | identifier '=' Test | '*' Test | '**' Test .
@@ -3263,7 +3305,9 @@ Entry    = Test ':' Test .
 
 CompClause = 'for' LoopVariables 'in' Test | 'if' Test .
 
-UnaryExpr = '-' Test
+UnaryExpr = '+' Test
+          | '-' Test
+          | '~' Test
           | 'not' Test
           .
 
@@ -3273,7 +3317,9 @@ Binop = 'or'
       | 'and'
       | '==' | '!=' | '<' | '>' | '<=' | '>=' | 'in' | 'not' 'in'
       | '|'
+      | '^'
       | '&'
+      | '<< | '>>'
       | '-' | '+'
       | '*' | '%' | '/' | '//'
       .
