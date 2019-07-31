@@ -14,19 +14,25 @@ http_archive(
 )
 
 http_archive(
-    name = "com_google_protobuf",
-    strip_prefix = "protobuf-master",
-    urls = ["https://github.com/google/protobuf/archive/master.zip"],
+    name = "rules_proto",
+    sha256 = "88b0a90433866b44bb4450d4c30bc5738b8c4f9c9ba14e9661deb123f56a833d",
+    strip_prefix = "rules_proto-b0cc14be5da05168b01db282fe93bdf17aa2b9f4",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/b0cc14be5da05168b01db282fe93bdf17aa2b9f4.tar.gz",
+        "https://github.com/bazelbuild/rules_proto/archive/b0cc14be5da05168b01db282fe93bdf17aa2b9f4.tar.gz",
+    ],
 )
-
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-protobuf_deps()
 
 http_archive(
-    name = "bazel_skylib",
-    strip_prefix = "bazel-skylib-master",
-    urls = ["https://github.com/bazelbuild/bazel-skylib/archive/master.zip"],
+    name = "rules_pkg",
+    sha256 = "5bdc04987af79bd27bc5b00fe30f59a858f77ffa0bd2d8143d5b31ad8b1bd71c",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/rules_pkg-0.2.0.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.2.0/rules_pkg-0.2.0.tar.gz",
+    ],
 )
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+rules_pkg_dependencies()
 
 git_repository(
     name = "io_bazel",
