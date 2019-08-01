@@ -3160,7 +3160,7 @@ If `maxsplit` is given and non-negative, it specifies a maximum number of splits
 
 `S.splitlines([keepends])` returns a list whose elements are the
 successive lines of S, that is, the strings formed by splitting S at
-line terminators (currently assumed to be a single newline, `\n`,
+line terminators (currently assumed to be `\n`, `\r` and `\r\n`,
 regardless of platform).
 
 The optional argument, `keepends`, is interpreted as a Boolean.
@@ -3168,6 +3168,7 @@ If true, line terminators are preserved in the result, though
 the final element does not necessarily end with a line terminator.
 
 ```python
+"A\nB\rC\r\nD".splitlines()     # ["A", "B", "C", "D"]
 "one\n\ntwo".splitlines()       # ["one", "", "two"]
 "one\n\ntwo".splitlines(True)   # ["one\n", "\n", "two"]
 ```
