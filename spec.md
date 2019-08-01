@@ -2338,13 +2338,14 @@ enumerate(["one", "two"], 1)                    # [(1, "one"), (2, "two")]
 
 ### getattr
 
-`getattr(x, name)` returns the value of the attribute (field or method) of x named `name`.
-It is a dynamic error if x has no such attribute.
+`getattr(x, name[, default])` returns the value of the attribute (field or method) of x named `name`
+if it exists. If not, it either returns `default` (if specified) or raises an error.
 
 `getattr(x, "f")` is equivalent to `x.f`.
 
 ```python
-getattr("banana", "split")("a")	       # ["b", "n", "n", ""], equivalent to "banana".split("a")
+getattr("banana", "split")("a")	       		# ["b", "n", "n", ""], equivalent to "banana".split("a")
+getattr("banana", "myattr", "mydefault")	# "mydefault"
 ```
 
 ### hasattr
