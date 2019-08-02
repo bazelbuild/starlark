@@ -13,6 +13,15 @@ http_archive(
     ],
 )
 
+git_repository(
+    name = "rules_python",
+    remote = "https://github.com/bazelbuild/rules_python.git",
+    commit = "4b84ad270387a7c439ebdccfd530e2339601ef27",  # 2019-08-02
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+py_repositories()
+
 http_archive(
     name = "rules_proto",
     sha256 = "88b0a90433866b44bb4450d4c30bc5738b8c4f9c9ba14e9661deb123f56a833d",
