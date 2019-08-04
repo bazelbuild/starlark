@@ -43,7 +43,7 @@ Otherwise, consider using a Python mode.
    tool for Go. [Delve uses Starlark](https://github.com/go-delve/delve/blob/master/Documentation/cli/starlark.md)
    as a a scripting language.
 *  [qri](http://qri.io/) is versioned, scriptable, exportable,
-   collaborative datasets. It uses Starlark to [describe transformations](http://qri.io/docs/reference/skylark_syntax/).
+   collaborative datasets. It uses Starlark to [describe transformations](https://qri.io/docs/reference/starlark_syntax/).
 *  [Skycfg](https://github.com/stripe/skycfg) is a library for Starlark to
    generate Protocol Buffer messages.
 *  [starlark-go-nethttp](https://github.com/pcj/starlark-go-nethttp) is a wrapper
