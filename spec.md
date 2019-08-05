@@ -2513,10 +2513,19 @@ reversed({"one": 1, "two": 2}.keys())           # ["two", "one"]
 `sorted(x)` returns a new list containing the elements of the iterable sequence x,
 in sorted order.  The sort algorithm is stable.
 
-```python
-sorted([3, 1, 4, 1, 5, 9])              # [1, 1, 3, 4, 5, 9]
+The optional named parameter `reverse`, if true, causes `sorted` to
+return results in reverse sorted order.
 
-sorted(["two", "three", "four"])        # ["three", "two", "four"]
+The optional named parameter `key` specifies a function of one
+argument to apply to obtain the value's sort key.
+The default behavior is the identity function.
+
+```python
+sorted([3, 1, 4, 1, 5, 9])                                 # [1, 1, 3, 4, 5, 9]
+sorted([3, 1, 4, 1, 5, 9], reverse=True)                   # [9, 5, 4, 3, 1, 1]
+
+sorted(["two", "three", "four"], key=len)                  # ["two", "four", "three"], shortest to longest
+sorted(["two", "three", "four"], key=len, reverse=True)    # ["three", "four", "two"], longest to shortest
 ```
 
 ### str
