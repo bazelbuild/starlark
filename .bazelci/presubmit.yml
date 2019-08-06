@@ -5,5 +5,7 @@ platforms:
       - sh setup_workspace.sh
     build_targets:
       - "//..."
+    test_flags:
+      - "--test_output=all"
     test_targets:
       - "//..."
