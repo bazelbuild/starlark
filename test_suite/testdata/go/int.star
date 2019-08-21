@@ -68,7 +68,7 @@ def compound():
   assert_eq(x, 5)
   x %= 3
   assert_eq(x, 2)
-  # _inconsistency: java does not support bitwise operations yet
+  # _inconsistency: rust does not support bitwise operations yet
   # x = 2
   # x &= 1
   # assert_eq(x, 0)
@@ -122,10 +122,9 @@ assert_eq(int("00"), 0)
 assert_eq(int("0", base=10), 0)
 assert_eq(int("00", base=10), 0)
 
-# _inconsistency_: a bug in the rust implementation, results in error
-# assert_eq(int("0", base=8), 0)
-# assert_eq(int("-0", base=8), 0)
-# assert_eq(int("+0", base=8), 0)
+assert_eq(int("0", base=8), 0)
+assert_eq(int("-0", base=8), 0)
+assert_eq(int("+0", base=8), 0)
 
 assert_eq(int("00", base=8), 0)
 assert_eq(int("-0"), 0)
@@ -208,7 +207,7 @@ int("0Oxa", 8) ### (invalid literal|not a base 8)
 # int("0x-4", 16) ## invalid literal with base 16: 0x-4
 ---
 
-# _inconsistency_: java does not support bitwise operations
+# _inconsistency_: rust does not support bitwise operations
 # bitwise union (int|int), intersection (int&int), XOR (int^int), unary not (~int),
 # left shift (int<<int), and right shift (int>>int).
 # use resolve.AllowBitwise to enable the ops.

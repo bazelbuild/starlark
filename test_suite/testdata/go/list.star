@@ -80,9 +80,8 @@ assert_eq([x for x in range(12) if x % 2 == 0 if x % 3 == 0], [0, 6])
 assert_eq([x for x in [1, 2] if not None], [1, 2])
 assert_eq([x for x in [1, 2] if 3], [1, 2])
 
-# _inconsistency_: java list() has no default argument
 # list function
-# assert_eq(list(), [])
+assert_eq(list(), [])
 
 # _inconsistency_: list comprehension doesn't define a separate block in java
 # A list comprehension defines a separate lexical block,
@@ -151,7 +150,7 @@ def list_extend():
 
 list_extend()
 ---
-# _inconsistency_: java and rust += do not assume LHS is local
+# _inconsistency_: rust += do not assume LHS is local
 
 # Unlike list.extend(iterable), list += iterable makes its LHS name local.
 # a_list = []
@@ -216,34 +215,31 @@ assert_eq(bananas.index("a"), 1)  # bAnanas
 bananas.index("d") ### (value not in list|not found)
 ---
 
-# _inconsistency_: java list.index doesn't support start, end optional args
-# bananas = ["b", "a", "n", "a", "n", "a", "s"]
+bananas = ["b", "a", "n", "a", "n", "a", "s"]
 # start
-# assert_eq(bananas.index("a", -1000), 1)  # bAnanas
-# assert_eq(bananas.index("a", 0), 1)  # bAnanas
-# assert_eq(bananas.index("a", 1), 1)  # bAnanas
-# assert_eq(bananas.index("a", 2), 3)  # banAnas
-# assert_eq(bananas.index("a", 3), 3)  # banAnas
-# assert_eq(bananas.index("b", 0), 0)  # Bananas
-# assert_eq(bananas.index("n", -3), 4)  # banaNas
-# assert_eq(bananas.index("s", -2), 6)  # bananaS
+assert_eq(bananas.index("a", -1000), 1)  # bAnanas
+assert_eq(bananas.index("a", 0), 1)  # bAnanas
+assert_eq(bananas.index("a", 1), 1)  # bAnanas
+assert_eq(bananas.index("a", 2), 3)  # banAnas
+assert_eq(bananas.index("a", 3), 3)  # banAnas
+assert_eq(bananas.index("b", 0), 0)  # Bananas
+assert_eq(bananas.index("n", -3), 4)  # banaNas
+assert_eq(bananas.index("s", -2), 6)  # bananaS
 
-# bananas.index("n", -2) ## value not in list
+bananas.index("n", -2) ### (value not in list|not found)
 ---
-# bananas = ["b", "a", "n", "a", "n", "a", "s"]
-# bananas.index("b", 1) ## value not in list
+bananas = ["b", "a", "n", "a", "n", "a", "s"]
+bananas.index("b", 1) ### (value not in list|not found)
 ---
-# bananas = ["b", "a", "n", "a", "n", "a", "s"]
+bananas = ["b", "a", "n", "a", "n", "a", "s"]
 
 # start, end
-# assert_eq(bananas.index("s", -1000, 7), 6)  # bananaS
-# bananas.index("s", -1000, 6) ## value not in list
+assert_eq(bananas.index("s", -1000, 7), 6)  # bananaS
+bananas.index("s", -1000, 6) ### (value not in list|not found)
 ---
-# bananas = ["b", "a", "n", "a", "n", "a", "s"]
-# bananas.index("d", -1000, 1000) ## value not in list
+bananas = ["b", "a", "n", "a", "n", "a", "s"]
+bananas.index("d", -1000, 1000) ### (value not in list|not found)
 ---
-
-
 
 bananas = ["b", "a", "n", "a", "n", "a", "s"]
 

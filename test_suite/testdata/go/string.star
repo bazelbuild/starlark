@@ -438,19 +438,19 @@ def test_predicates():
       "abc": "alnum alpha lower",
       "ABC": "alnum alpha upper",
       "123": "alnum digit",
-      "ǄǇ": "alnum alpha upper",
       # _inconsistency_: rust title() works differently
       # "ǅǈ": "alnum alpha",
-      "ǅ ǈ": "title",
-      "ǆǉ": "alnum alpha lower",
+      # _inconsistency_: java produces empty list with unicode
+      # "ǅ ǈ": "title",
+      # "ǆǉ": "alnum alpha lower",
+      # "ǄǇ": "alnum alpha upper",
   }
   for str, want in table.items():
     got = ' '.join([name for name in predicates if getattr(str, "is"+name)()])
     if got != want:
       fail("%r matched [%s], want [%s]" % (str, got, want))
 
-# _inconsistency_: java does not support calling methods with getattr
-# test_predicates()
+test_predicates()
 
 # Strings are not iterable.
 # ok

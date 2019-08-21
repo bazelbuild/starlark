@@ -143,7 +143,7 @@ assert_eq([x for x in x14], [1, 3])
 
 x15 = {"one": 1}
 
-# _inconsistency_: rust returns list of keys, java throws an error
+# _inconsistency_: rust returns list of keys
 # varargs
 # def varargs(*args): return args
 # assert_eq(varargs(*x15), ("one",))
