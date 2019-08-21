@@ -33,7 +33,7 @@ assert_(4 not in (1, 2, 3))
 assert_(123 in {123: ""})
 assert_(456 not in {123:""})
 
-# _inconsistency_: valid syntax in go, java. Invalid in python, rust (list unhashable)
+# _inconsistency_: valid syntax in go. Invalid in python, rust, java (list unhashable)
 # assert_([] not in {123: ""})
 ---
 3 in "foo" ### (in.*requires string as left operand|parameters mismatch)
@@ -42,22 +42,23 @@ assert_(456 not in {123:""})
 # sorted
 assert_eq(sorted([42, 123, 3]), [3, 42, 123])
 assert_eq(sorted(["wiz", "foo", "bar"]), ["bar", "foo", "wiz"])
+assert_eq(sorted([42, 123, 3], reverse=True), [123, 42, 3])
+assert_eq(sorted(["wiz", "foo", "bar"], reverse=True), ["wiz", "foo", "bar"])
 
-# _inconsistency_: java sorted() doesn't support reverse, key args
-# assert_eq(sorted([42, 123, 3], reverse=True), [123, 42, 3])
-# assert_eq(sorted(["wiz", "foo", "bar"], reverse=True), ["wiz", "foo", "bar"])
 # sort is stable
-# pairs = [(4, 0), (3, 1), (4, 2), (2, 3), (3, 4), (1, 5), (2, 6), (3, 7)]
-# assert_eq(sorted(pairs, key=lambda x: x[0]),
-#          [(1, 5),
-#           (2, 3), (2, 6),
-#           (3, 1), (3, 4), (3, 7),
-#           (4, 0), (4, 2)])
+pairs = [(4, 0), (3, 1), (4, 2), (2, 3), (3, 4), (1, 5), (2, 6), (3, 7)]
+def f(x): return x[0]
+assert_eq(sorted(pairs, key=f),
+        [(1, 5),
+         (2, 3), (2, 6),
+         (3, 1), (3, 4), (3, 7),
+         (4, 0), (4, 2)])
+
 # custom key function
-# assert_eq(sorted(["two", "three", "four"], key=len),
-#          ["two", "four", "three"])
-# assert_eq(sorted(["two", "three", "four"], key=len, reverse=True),
-#          ["three", "four", "two"])
+assert_eq(sorted(["two", "three", "four"], key=len),
+        ["two", "four", "three"])
+assert_eq(sorted(["two", "three", "four"], key=len, reverse=True),
+        ["three", "four", "two"])
 
 ---
 sorted(1) ### (for parameter iterable: got int, want iterable|not a collection|not iterable)
@@ -66,8 +67,8 @@ sorted([1, 2, None, 3]) ### (not implemented|cannot compare)
 ---
 sorted([1, "one"]) ### (string < int not implemented|cannot compare)
 ---
-# _inconsistency_: java sorted() doesn't support key arg
-# sorted([1, 2, 3], key=None) ## got NoneType, want callable
+# _inconsistency_: java accepts key to be None
+# sorted([1, 2, 3], key=None) ## (want callable|not supported)
 ---
 
 # reversed
@@ -186,8 +187,7 @@ min([]) ### (empty|expected at least one item)
 #              "hijk".elems()),
 #          [("a", "d", "h"), ("b", "e", "i"), ("c", "f", "j")])
 
-# _inconsistency_: java doesn't support 2nd optional argument 'start'
-# assert_eq(enumerate([False, True, None], 42), [(42, False), (43, True), (44, None)])
+assert_eq(enumerate([False, True, None], 42), [(42, False), (43, True), (44, None)])
 
 # zip
 assert_eq(zip(), [])

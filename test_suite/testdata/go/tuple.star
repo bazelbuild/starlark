@@ -31,8 +31,7 @@ assert_eq("abcd"[4:0:-1], "dcb")
 # assert_eq(banana[4::-2], tuple("nnb".elems()))
 
 # tuple
-# _inconsistency_: java tuple cannot be called without args
-# assert_eq(tuple(), ())
+assert_eq(tuple(), ())
 assert_eq(tuple(["a", "b", "c"]), ("a", "b", "c"))
 assert_eq(tuple(["a", "b", "c"]), ("a", "b", "c"))
 assert_eq(tuple([1]), (1,))
