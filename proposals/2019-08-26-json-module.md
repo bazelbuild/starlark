@@ -7,7 +7,7 @@ authors:
   - [jmillikin](https://john-millikin.com)
 reviewers:
   - Starlark core reviewers
-discussion thread: [#](https://github.com/bazelbuild/starlark/issues/)
+discussion thread: [#83](https://github.com/bazelbuild/starlark/pull/83)
 ---
 
 # JSON Module
