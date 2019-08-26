@@ -67,7 +67,7 @@ def json.decode(data):
 
 Type conversions are:
 * JSON arrays are decoded to Starlark `list` values.
-* JSON objects are decoded to Starlark `dict` values. Key are in the same order as the input data.
+* JSON objects are decoded to Starlark `dict` values. Keys are in the same order as the input data.
 * JSON `true`, `false`, and `null` literals are decoded to Starlark `True`, `False`, and `None` respectively.
 * JSON strings are decoded to Starlark `string` values.
 * JSON numbers with no fractional component are decoded to Starlark `int` values. Starlark implementations without
