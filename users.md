@@ -42,6 +42,14 @@ Otherwise, consider using a Python mode.
    programming language, aiming to provide a simple, full featured debugging
    tool for Go. [Delve uses Starlark](https://github.com/go-delve/delve/blob/master/Documentation/cli/starlark.md)
    as a a scripting language.
+*  [Drone](https://drone.io) is a self-service Continuous Delivery platform. It
+   supports [Starlark scripting](https://docs.drone.io/starlark/overview/) as an
+   alternate to yaml configurations.
+*  [Isopod](https://github.com/cruise-automation/isopod) created by Cruise
+   Automation is a DSL framework for Kubernetes configuration. It renders
+   Kubernetes objects as Protocol Buffers.
+*  [lucicfg](https://chromium.googlesource.com/infra/luci/luci-go/+/refs/heads/master/lucicfg/doc/README.md)
+   from Chromium CI is a tool for generating low-level configuration files from Starlark.
 *  [qri](http://qri.io/) is versioned, scriptable, exportable,
    collaborative datasets. It uses Starlark to [describe transformations](https://qri.io/docs/reference/starlark_syntax/).
 *  [Skycfg](https://github.com/stripe/skycfg) is a library for Starlark to
@@ -55,4 +63,6 @@ Otherwise, consider using a Python mode.
    are written in Starlark.
 *  [ytt](https://get-ytt.io/) is a templating tool, built on top of Starlark,
    that understands YAML structure allowing you to focus on your data instead of
-   how to properly escape it.
+   how to properly escape it. Read also [IBM's blog post](
+   https://developer.ibm.com/blogs/yaml-templating-tool-to-simplify-complex-configuration-management/)
+   about it.
