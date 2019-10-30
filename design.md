@@ -103,7 +103,7 @@ def square(x): return x
 ```
 
 You instantly know what magic and square are, no matter what happens in the rest
-of the file. This restriction helps users read and maintain code. It is also
+of the file. This restriction helps users read and maintain code. It also
 provides valuable information to tools, such as IDEs and refactoring tools.
 
 # No for/if statements at top-level
