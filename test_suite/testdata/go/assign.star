@@ -102,6 +102,13 @@ f()
 
 ---
 
+# Top level reassignments aren't allowed
+
+z = 0
+z += 3 ### (cannot reassign|augmented assignment|read only)
+
+---
+
 # effects of evaluating LHS occur only once
 
 count = [0] # count[0] is the number of calls to f
@@ -188,7 +195,7 @@ use_before_def() ### referenced before assignment
 
 ---
 
-z += 3 ### (global variable z referenced before assignment|not defined|not found)
+z.toUpperCase() ### (global variable z referenced before assignment|not defined|not found|undefined)
 
 ---
 
