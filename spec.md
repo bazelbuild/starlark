@@ -721,7 +721,8 @@ f(-1)           # returns 1 without printing
 ```
 
 
-It is a dynamic error for a function to call itself or another
+Dialect may optionally disable recursion. When recursion is
+disabled, it is a dynamic error for a function to call itself or another
 function value with the same declaration.
 
 ```python
@@ -3238,6 +3239,17 @@ Letters are converted to uppercase at the start of words, lowercase elsewhere.
 ```python
 "Hello, World!".upper()                 # "HELLO, WORLD!"
 ```
+
+
+## Optional features
+
+Since Starlark is not a general-purpose language, certain features
+can be optionally implemented or optionally turned on or off by the
+implementations.
+
+Optioanal features:
+* [recursion](#functions)
+
 
 
 ## Grammar reference
