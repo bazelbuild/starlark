@@ -18,7 +18,9 @@ load("@rules_python//python:defs.bzl", "py_test")
             ],
             main = "starlark_test.py",
         )
-        for test_file in glob(["testdata/java/*", "testdata/go/*", "testdata/rust/*"])
+        for test_file in glob([
+            "testdata/java/*", "testdata/go/*", "testdata/rust/*"
+        ], exclude = ["**/.*"])
     ]
     for impl, binary_rule in [("java", "@io_bazel//src/main/java/com/google/devtools/starlark:Starlark"),
                               ("go", "@net_starlark_go//cmd/starlark:starlark"),
