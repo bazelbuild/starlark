@@ -46,7 +46,7 @@ rules_pkg_dependencies()
 git_repository(
     name = "io_bazel",
     remote = "https://github.com/bazelbuild/bazel.git",
-    commit = "f5587f2496f2ab7a53ea55aaca2486ff6e454db8", # 31-7-2019
+    commit = "72013afdeae42dc55a566e532574d310f34af729", # 2020-07-23
 )
 
 http_archive(

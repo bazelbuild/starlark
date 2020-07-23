@@ -25,7 +25,7 @@ def fib(x):
   if x < 2:
     return x
   return fib(x-2) + fib(x-1)
-fib(10) ### (function fib called recursively|recursive call|Recursion was detected)
+fib(10) ### (recursive|Recursion was detected)
 ---
 
 # _inconsistency_: java does not support lambda
@@ -52,7 +52,7 @@ def double(x): return x+x
 assert_eq(map(double, [1, 2, 3]), [2, 4, 6])
 assert_eq(map(double, ["a", "b", "c"]), ["aa", "bb", "cc"])
 def mapdouble(x): return map(double, x)
-map(mapdouble, ([1, 2, 3], ["a", "b", "c"])) ### (function map called recursively|recursive call|Recursion was detected)
+map(mapdouble, ([1, 2, 3], ["a", "b", "c"])) ### (recursive|Recursion was detected)
 # With the -recursion option it would yield [[2, 4, 6], ["aa", "bb", "cc"]].
 ---
 
@@ -159,7 +159,7 @@ f(
     33, 34, 35, 36, 37, 38, 39, 40,
     41, 42, 43, 44, 45, 46, 47, 48,
     49, 50, 51, 52, 53, 54, 55, 56,
-    57, 58, 59, 60, 61, 62, 63, 64) ### (missing 1 argument|insufficient arguments|not enough parameters)
+    57, 58, 59, 60, 61, 62, 63, 64) ### (missing 1 .*argument|not enough parameters)
 ---
 def f(a, b, c, d, e, f, g, h,
       i, j, k, l, m, n, o, p,

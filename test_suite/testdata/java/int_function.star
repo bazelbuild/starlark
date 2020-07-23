@@ -13,7 +13,7 @@ assert_eq(int(False), 0)
 int(None) ### None
 ---
 # This case is allowed in Python but not Skylark
-int() ### (no default value|not enough parameters|missing argument)
+int() ### (required positional argument|not enough parameters|missing argument)
 ---
 
 # string, no base

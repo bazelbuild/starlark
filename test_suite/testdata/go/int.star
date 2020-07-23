@@ -88,7 +88,7 @@ compound()
 # We follow Python 3 here, but I can't see the method in its madness.
 # int from bool/int/float
 ---
-int() ### (missing argument|no default value|not enough parameters)
+int() ### (missing .*argument|not enough parameters)
 ---
 assert_eq(int(False), 0)
 assert_eq(int(True), 1)

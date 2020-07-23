@@ -54,6 +54,6 @@ assert_eq(1 and "a" and [1] and 0 and 1 // 0, 0)
 # See github.com/bazelbuild/starlark/issues/30
 assert_eq(''.splitlines(True), [])
 ---
-''.splitlines(1) ### (got int, want bool|expected value of type 'bool'|expected bool)
+''.splitlines(1) ### (got.*want|expected bool)
 ---
-''.splitlines("hello") ### (got string, want bool|expected value of type 'bool'|expected bool)
+''.splitlines("hello") ### (got.*want|expected bool)

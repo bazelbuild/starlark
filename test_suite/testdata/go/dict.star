@@ -161,14 +161,14 @@ def iterator1():
   dict = {1:1, 2:1}
   for k in dict:
     dict[2*k] = dict[k]
-iterator1() ### (insert.*during iteration|cannot mutate|locked object)
+iterator1() ### (insert.*during iteration|cannot mutate|temporarily immutable)
 ---
 
 def iterator2():
   dict = {1:1, 2:1}
   for k in dict:
     dict.pop(k)
-iterator2() ### (delete.*during iteration|cannot mutate|locked object)
+iterator2() ### (delete.*during iteration|cannot mutate|temporarily immutable)
 ---
 
 def f(d):
@@ -176,7 +176,7 @@ def f(d):
 def iterator3():
   dict = {1:1, 2:1}
   _ = [f(dict) for x in dict]
-iterator3() ### (insert.*during iteration|cannot mutate|locked object)
+iterator3() ### (insert.*during iteration|cannot mutate|temporarily immutable)
 ---
 
 # This assignment is not a modification-during-iteration:
