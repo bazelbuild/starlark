@@ -76,8 +76,8 @@ assert_eq([] + [1] + [2, 3], [1, 2, 3])
 assert_eq([] + [1] + l + [2, 3], [1, 4, 2, 3])
 
 ---
-"a" + "b" + 1 + "c" ### (unknown binary op: string \+ int|unsupported operand|parameters mismatch)
+"a" + "b" + 1 + "c" ### ((unknown|unsupported) binary op|parameters mismatch)
 ---
-() + () + 1 + () ### (unknown binary op: tuple \+ int|unsupported operand|parameters mismatch)
+() + () + 1 + () ### ((unknown|unsupported) binary op|parameters mismatch)
 ---
-[] + [] + 1 + [] ### (unknown binary op: list \+ int|unsupported operand|parameters mismatch)
+[] + [] + 1 + [] ### ((unknown|unsupported) binary op|parameters mismatch)

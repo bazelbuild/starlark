@@ -213,7 +213,7 @@ assert_(hasattr("", "find"))
 assert_(not hasattr("", "x"))
 assert_eq(getattr("", "x", 42), 42)
 ---
-getattr("", "x") ### (no .x field or method|no attribute 'x'|not supported)
+getattr("", "x") ### (no.* field or method|not supported)
 ---
 
 # dir returns a new, sorted, mutable list

@@ -57,9 +57,9 @@ assert_eq([0, 1, 2][-1], 2)
 assert_eq([0, 1, 2][0], 0)
 
 ---
-'123'['a'::] ### (slice start must be an integer, not 'a'|invalid start index|parameters mismatch)
+'123'['a'::] ### (got.*want|invalid start index|parameters mismatch)
 ---
-'123'[:'b':] ### (slice end must be an integer, not 'b'|invalid end index|parameters mismatch)
+'123'[:'b':] ### (got.*want|invalid end index|parameters mismatch)
 ---
 (1, 2, 3)[1::0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---
@@ -71,7 +71,7 @@ assert_eq([0, 1, 2][0], 0)
 ---
 [1, 2, 3][1:3:0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---
-[[1], [2]]['a'] ### (indices must be integers, not string|got string, want int|parameters mismatch)
+[[1], [2]]['a'] ### (got.*want|parameters mismatch)
 ---
 [0, 1, 2][3] ### (out of range|out of bound)
 ---

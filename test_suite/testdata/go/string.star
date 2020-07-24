@@ -146,9 +146,9 @@ assert_eq("banana"[4::-2], "nnb")
 assert_eq("banana"[::-1], "ananab")
 assert_eq("banana"[None:None:-2], "aaa")
 ---
-"banana"[:"":] ### (invalid end index: got string, want int|must be an integer|parameters mismatch)
+"banana"[:"":] ### (got.*want|parameters mismatch)
 ---
-"banana"[:"":True] ### (got bool for slice step, want int|must be an integer|parameters mismatch)
+"banana"[:"":True] ### (got.*want|parameters mismatch)
 ---
 
 # in, not in
@@ -159,7 +159,7 @@ assert_("" in "")
 ---
 1 in "" ### (requires string as left operand|parameters mismatch)
 ---
-"" in 1 ### (unknown binary op: string in int|not iterable|not supported)
+"" in 1 ### ((unknown|unsupported) binary op|not supported)
 ---
 
 # ==, !=
@@ -368,7 +368,7 @@ assert_(not "foo".endswith("x"))
 assert_("foo".startswith("fo"))
 assert_(not "foo".startswith("x"))
 ---
-"foo".startswith(1) ### (got int.*want string|expected value of type 'string or tuple of strings'|expected string)
+"foo".startswith(1) ### (got.*want|expected string)
 ---
 # _inconsistency_: rust startswith accepts only string, not tuple
 # assert_('abc'.startswith(('a', 'A')))
@@ -378,7 +378,7 @@ assert_(not "foo".startswith("x"))
 # _inconsistency_: rust startswith accepts only string not tuple
 # '123'.startswith((1, 2)) ## got int, for element 0
 ---
-'123'.startswith(['3']) ### (got list|expected string|expected value of type 'string or tuple of strings')
+'123'.startswith(['3']) ### (got.*want|expected string)
 ---
 # _inconsistency_: rust endswith accepts only string, not tuple
 # assert_('abc'.endswith(('c', 'C')))
@@ -388,7 +388,7 @@ assert_(not "foo".startswith("x"))
 # _inconsistency_: rust startswith accepts only string not tuple
 # '123'.endswith((1, 2)) ## got int, for element 0
 ---
-'123'.endswith(['3']) ### (got list|mismatch|expected value of type 'string or tuple of strings')
+'123'.endswith(['3']) ### (got.*want|mismatch)
 ---
 # _inconsistency_: rust startswith/endswith accept a single argument only
 # start/end
@@ -502,7 +502,7 @@ all("abc") ### (got string, want iterable|not iterable)
 any("abc") ### (got string, want iterable|not iterable)
 ---
 # reversed
-reversed("abc") ### (got string, want iterable|not iterable)
+reversed("abc") ### (got.*want|not iterable)
 ---
 # zip
 zip("ab" , "cd") ### (not iterable: string|not iterable)
@@ -516,7 +516,7 @@ assert_eq(','.join(["a", "b", "c"]), 'a,b,c')
 assert_eq(','.join(("a", "b", "c")), 'a,b,c')
 assert_eq(''.join(("a", "b", "c")), 'abc')
 ---
-''.join(None) ### (got NoneType, want iterable|not iterable|expected value of type 'sequence')
+''.join(None) ### (got NoneType, want iterable|not iterable|parameter 'elements' cannot be None)
 ---
 ''.join(["one", 2]) ### (join: in list, want string, got int|expected string|must be a string)
 ---
@@ -552,8 +552,8 @@ assert_eq("¿Por qué?".title(), "¿Por Qué?")
 
 ---
 # method spell check
-"".starts_with() ### (no .starts_with field.*did you mean .startswith|not supported|no method)
+"".starts_with() ### (no .starts_with field.*did you mean .startswith|not supported|no field or method)
 ---
-"".StartsWith() ### (no .StartsWith field.*did you mean .startswith|not supported|no method)
+"".StartsWith() ### (no .StartsWith field.*did you mean .startswith|not supported|no field or method)
 ---
-"".fin() ### (no .fin field.*.did you mean .find|not supported|no method)
+"".fin() ### (no .fin field.*.did you mean .find|not supported|no field or method)

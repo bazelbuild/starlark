@@ -18,7 +18,7 @@ foo.insert(10, 'g')
 assert_eq(foo, ['f', 'c', 'd', 'a', 'b', 'e', 'g'])
 
 ---
-(1, 2).insert(3) ### (no (method insert|\.insert field)|not supported)
+(1, 2).insert(3) ### (no (field or method 'insert|\.insert field)|not supported)
 ---
 
 # append
@@ -30,7 +30,7 @@ foo.append('d')
 assert_eq(foo, ['a', 'b', 'c', 'd'])
 
 ---
-(1, 2).append(3) ### (no (method append|\.append field)|not supported)
+(1, 2).append(3) ### (no (field or method 'append|\.append field)|not supported)
 ---
 
 # extend
@@ -41,7 +41,7 @@ foo.extend(('e', 'f'))
 assert_eq(foo, ['a', 'b', 'c', 'd', 'e', 'f'])
 
 ---
-(1, 2).extend([3, 4]) ### (no (method extend|\.extend field)|not supported)
+(1, 2).extend([3, 4]) ### (no (field or method 'extend|\.extend field)|not supported)
 ---
 [1, 2].extend(3) ### (expected value of type|got int, want iterable|not iterable)
 
@@ -62,7 +62,7 @@ foo.remove('b')
 assert_eq(foo, [])
 
 ---
-(1, 2).remove(3) ### (no (method remove|\.remove field)|not supported)
+(1, 2).remove(3) ### (no (field or method 'remove|\.remove field)|not supported)
 ---
 [1, 2].remove(3) ### not found
 ---
@@ -87,4 +87,4 @@ assert_eq(li3, [2, 4])
 ---
 [1, 2].pop(3) ### (out of range|out of bound)
 ---
-(1, 2).pop() ### (no (method pop|\.pop field)|not supported)
+(1, 2).pop() ### (no (field or method 'pop|\.pop field)|not supported)

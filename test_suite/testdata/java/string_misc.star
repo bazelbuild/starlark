@@ -80,11 +80,11 @@ assert_eq('Apricot'.endswith('co'), False)
 # assert_eq('a'.endswith(()), False)
 # assert_eq(''.endswith(()), False)
 ---
-'a'.endswith(['a']) ### (expected value of type 'string or tuple of strings'|got list|parameters mismatch)
+'a'.endswith(['a']) ### (got value of type 'list'|got list|parameters mismatch)
 ---
-'1'.endswith((1,)) ### (got type 'int'|got int|parameters mismatch)
+'1'.endswith((1,)) ### (want string|got int|parameters mismatch)
 ---
-'a'.endswith(('1', 1)) ### (got type 'int'|got int|parameters mismatch)
+'a'.endswith(('1', 1)) ### (want string|got int|parameters mismatch)
 ---
 
 # startswith
@@ -110,11 +110,11 @@ assert_eq(''.startswith('a'), False)
 # assert_eq('a'.startswith(()), False)
 # assert_eq(''.startswith(()), False)
 ---
-'a'.startswith(['a']) ### (expected value of type 'string or tuple of strings'|got list|expected string)
+'a'.startswith(['a']) ### (got.*want|got list|expected string)
 ---
-'1'.startswith((1,)) ### (got type 'int'|got int|expected string)
+'1'.startswith((1,)) ### (got.*want|got int|expected string)
 ---
-'a'.startswith(('1', 1)) ### (got type 'int'|got int|expected string)
+'a'.startswith(('1', 1)) ### (got.*want|got int|expected string)
 ---
 
 # substring
