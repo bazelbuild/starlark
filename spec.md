@@ -1045,7 +1045,7 @@ that embeds the Starlark interpreter to define additional data types
 representing sequences of unknown length that implement only the `Iterable` contract.
 
 Strings are not iterable, though they do support the `len(s)` and
-`s[i]` operations. Starlark deviates from Python here to avoid common
+`s[i]` operations. Starlark deviates from Python here to avoid a common
 pitfall in which a string is used by mistake where a list containing a
 single string was intended, resulting in its interpretation as a sequence
 of bytes.
