@@ -700,6 +700,13 @@ Once the parameters have been successfully bound to the arguments
 supplied by the call, the sequence of statements that comprise the
 function body is executed.
 
+Function arguments are evaluated in the order they appear in the call.
+<!-- see https://github.com/bazelbuild/starlark/issues/13 -->
+
+Unlike Python, Starlark does not allow more than one `*args` argument in a
+call, and if a `*args` argument is present it must appear after all
+positional and named arguments.
+
 A function call completes normally after the execution of either a
 `return` statement, or of the last statement in the function body.
 The result of the function call is the value of the return statement's
