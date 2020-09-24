@@ -362,16 +362,6 @@ It is error if the value is greater than decimal 255.
 '\119'			# "\t9"   = "\11" + "9"
 ```
 
-A *hex escape* encodes a single byte using its hexadecimal value.
-It consists of `\x` followed by exactly two hexadecimal digits [0-9A-Fa-f].
-
-```python
-"\x00"			# "\x00"  a string containing a single NUL byte
-"(\x20)"		# "( )"   ASCII 0x20 = 32 = space
-red, reset = "\x1b[31m", "\x1b[0m"	# ANSI terminal control codes for color
-"(" + red + "hello" + reset + ")"	# "(hello)" with red text, if on a terminal
-```
-
 An ordinary string literal may not contain an unescaped newline,
 but a *multiline string literal* may spread over multiple source lines.
 It is denoted using three quotation marks at start and end.
