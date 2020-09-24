@@ -463,8 +463,7 @@ values include `None`, Booleans, numbers, and strings, and tuples
 composed from hashable values.  Most mutable values, such as lists,
 and dictionaries, are not hashable, unless they are frozen.
 Attempting to use a non-hashable value as a key in a dictionary
-results in a dynamic error, as does passing one to the built-in
-`hash` function.
+results in a dynamic error.
 
 A [dictionary expression](#dictionary-expressions) specifies a
 dictionary as a set of key/value pairs enclosed in braces:
@@ -967,9 +966,8 @@ third without the possibility of a race condition.
 
 The `dict` data type is implemented using hash tables, so
 only _hashable_ values are suitable as keys of a `dict`.
-Attempting to use a non-hashable value as the key in a hash
-table, or as the operand of the `hash` built-in function, results in a
-dynamic error.
+Attempting to use a non-hashable value as the key in a dictionary
+results in a dynamic error.
 
 The hash of a value is an unspecified integer chosen so that two equal
 values have the same hash, in other words, `x == y => hash(x) == hash(y)`.
@@ -2354,8 +2352,22 @@ getattr("banana", "myattr", "mydefault")	# "mydefault"
 
 ### hash
 
+`hash(x)` returns an integer hash of a string x
+such that two equal strings have the same hash.
+In other words `x == y` implies `hash(x) == hash(y)`.
+`hash` fails if x, or any value upon which its hash depends, is unhashable.	In the interests of reproducibility of Starlark program behavior over time and
+across implementations, the specific hash function is the same as that implemented by
+[java.lang.String.hashCode](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#hashCode),
+a simple polynomial accumulator over the UTF-16 transcoding of the string:
+
+```python
+s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
+```
+
 `hash(x)` returns an integer hash value for a string x such that `x == y`
 implies `hash(x) == hash(y)`.
+
+
 
 ### int
 
