@@ -45,6 +45,142 @@ same interpreter leads to the same result. By default, user code cannot
 interact with the environment.
 
 
+## Contents
+
+<!-- WTF? No automatic TOC? -->
+
+  * [Overview](#overview)
+  * [Contents](#contents)
+  * [Lexical elements](#lexical-elements)
+  * [Data types](#data-types)
+    * [None](#none)
+    * [Booleans](#booleans)
+    * [Integers](#integers)
+    * [Strings](#strings)
+    * [Lists](#lists)
+    * [Tuples](#tuples)
+    * [Dictionaries](#dictionaries)
+    * [Sets](#sets)
+    * [Functions](#functions)
+    * [Built-in functions](#built-in-functions)
+  * [Name binding and variables](#name-binding-and-variables)
+  * [Value concepts](#value-concepts)
+    * [Identity and mutation](#identity-and-mutation)
+    * [Freezing a value](#freezing-a-value)
+    * [Hashing](#hashing)
+    * [Sequence types](#sequence-types)
+    * [Indexing](#indexing)
+  * [Expressions](#expressions)
+    * [Identifiers](#identifiers)
+    * [Literals](#literals)
+    * [Parenthesized expressions](#parenthesized-expressions)
+    * [Dictionary expressions](#dictionary-expressions)
+    * [List expressions](#list-expressions)
+    * [Unary operators](#unary-operators)
+    * [Binary operators](#binary-operators)
+    * [Conditional expressions](#conditional-expressions)
+    * [Comprehensions](#comprehensions)
+    * [Function and method calls](#function-and-method-calls)
+    * [Dot expressions](#dot-expressions)
+    * [Index expressions](#index-expressions)
+    * [Slice expressions](#slice-expressions)
+    * [Lambda expressions](#lambda-expressions)
+  * [Statements](#statements)
+    * [Pass statements](#pass-statements)
+    * [Assignments](#assignments)
+    * [Augmented assignments](#augmented-assignments)
+    * [Function definitions](#function-definitions)
+    * [Return statements](#return-statements)
+    * [Expression statements](#expression-statements)
+    * [If statements](#if-statements)
+    * [For loops](#for-loops)
+    * [Break and Continue](#break-and-continue)
+    * [Load statements](#load-statements)
+    * [Module execution](#module-execution)
+  * [Built-in constants and functions](#built-in-constants-and-functions)
+    * [None](#none)
+    * [True and False](#true-and-false)
+    * [any](#any)
+    * [all](#all)
+    * [bool](#bool)
+    * [chr](#chr)
+    * [dict](#dict)
+    * [dir](#dir)
+    * [enumerate](#enumerate)
+    * [fail](#fail)
+    * [float](#float)
+    * [getattr](#getattr)
+    * [hasattr](#hasattr)
+    * [hash](#hash)
+    * [int](#int)
+    * [len](#len)
+    * [list](#list)
+    * [max](#max)
+    * [min](#min)
+    * [ord](#ord)
+    * [print](#print)
+    * [range](#range)
+    * [repr](#repr)
+    * [reversed](#reversed)
+    * [set](#set)
+    * [sorted](#sorted)
+    * [str](#str)
+    * [tuple](#tuple)
+    * [type](#type)
+    * [zip](#zip)
+  * [Built-in methods](#built-in-methods)
+    * [dict·clear](#dict·clear)
+    * [dict·get](#dict·get)
+    * [dict·items](#dict·items)
+    * [dict·keys](#dict·keys)
+    * [dict·pop](#dict·pop)
+    * [dict·popitem](#dict·popitem)
+    * [dict·setdefault](#dict·setdefault)
+    * [dict·update](#dict·update)
+    * [dict·values](#dict·values)
+    * [list·append](#list·append)
+    * [list·clear](#list·clear)
+    * [list·extend](#list·extend)
+    * [list·index](#list·index)
+    * [list·insert](#list·insert)
+    * [list·pop](#list·pop)
+    * [list·remove](#list·remove)
+    * [set·union](#set·union)
+    * [string·capitalize](#string·capitalize)
+    * [string·codepoint_ords](#string·codepoint_ords)
+    * [string·codepoints](#string·codepoints)
+    * [string·count](#string·count)
+    * [string·elem_ords](#string·elem_ords)
+    * [string·elems](#string·elems)
+    * [string·endswith](#string·endswith)
+    * [string·find](#string·find)
+    * [string·format](#string·format)
+    * [string·index](#string·index)
+    * [string·isalnum](#string·isalnum)
+    * [string·isalpha](#string·isalpha)
+    * [string·isdigit](#string·isdigit)
+    * [string·islower](#string·islower)
+    * [string·isspace](#string·isspace)
+    * [string·istitle](#string·istitle)
+    * [string·isupper](#string·isupper)
+    * [string·join](#string·join)
+    * [string·lower](#string·lower)
+    * [string·lstrip](#string·lstrip)
+    * [string·partition](#string·partition)
+    * [string·replace](#string·replace)
+    * [string·rfind](#string·rfind)
+    * [string·rindex](#string·rindex)
+    * [string·rpartition](#string·rpartition)
+    * [string·rsplit](#string·rsplit)
+    * [string·rstrip](#string·rstrip)
+    * [string·split](#string·split)
+    * [string·splitlines](#string·splitlines)
+    * [string·startswith](#string·startswith)
+    * [string·strip](#string·strip)
+    * [string·title](#string·title)
+    * [string·upper](#string·upper)
+  * [Grammar reference](#grammar-reference)
+
 ## Lexical elements
 
 A Starlark program consists of one or more modules. Each module is defined by a
@@ -463,8 +599,7 @@ values include `None`, Booleans, numbers, and strings, and tuples
 composed from hashable values.  Most mutable values, such as lists,
 and dictionaries, are not hashable, unless they are frozen.
 Attempting to use a non-hashable value as a key in a dictionary
-results in a dynamic error, as does passing one to the built-in
-`hash` function.
+results in a dynamic error.
 
 A [dictionary expression](#dictionary-expressions) specifies a
 dictionary as a set of key/value pairs enclosed in braces:
@@ -701,6 +836,13 @@ Once the parameters have been successfully bound to the arguments
 supplied by the call, the sequence of statements that comprise the
 function body is executed.
 
+Function arguments are evaluated in the order they appear in the call.
+<!-- see https://github.com/bazelbuild/starlark/issues/13 -->
+
+Unlike Python, Starlark does not allow more than one `*args` argument in a
+call, and if a `*args` argument is present it must appear after all
+positional and named arguments.
+
 A function call completes normally after the execution of either a
 `return` statement, or of the last statement in the function body.
 The result of the function call is the value of the return statement's
@@ -752,9 +894,12 @@ or the application into which the interpreter is embedded.
 
 A built-in function value used in a Boolean context is always considered true.
 
-Many built-in functions are defined in the "universe" block of the environment
-(see [Name Resolution](#name-resolution)), and are thus available to
-all Starlark programs.
+Many built-in functions are predeclared in the environment
+(see [Name Resolution](#name-resolution)), and are thus available to	(see [Name Resolution](#name-resolution)).
+all Skylark programs.	Some built-in functions such as `len` are _universal_, that is,
+available to all Skylark programs.
+The host application may predeclare additional built-in functions
+in the environment of a specific module.
 
 Except where noted, built-in functions accept only positional arguments.
 
@@ -783,7 +928,7 @@ Variables may be assigned or re-assigned explicitly (`e`, `h`), or implicitly, a
 in a `for`-loop (`f`) or comprehension (`g`, `i`).
 
 ```python
-load("lib.sky", "a", b="B")
+load("lib.star", "a", b="B")
 
 def c(d):
   e = 0
@@ -797,25 +942,43 @@ h = [2*i for i in a]
 The environment of a Starlark program is structured as a tree of
 _lexical blocks_, each of which may contain name bindings.
 The tree of blocks is parallel to the syntax tree.
-Blocks are of four kinds.
+Blocks are of five kinds.
 
 <!-- Avoid the term "built-in block" since that's also a type. -->
-At the root of the tree is the _universe_ block, which binds constant
-values such as `None`, `True`, and `False`, and built-in functions
-such as `len`, `list`, and so on.
-Starlark programs cannot change the set of universe bindings.
-Because the universe block is shared by all files (modules),
-all values bound in it must be immutable and stateless
-from the perspective of the Starlark program.
+At the root of the tree is the _predeclared_ block,
+which binds several names implicitly.
+The set of predeclared names includes the universal
+constant values `None`, `True`, and `False`, and
+various built-in functions such as `len` and `list`;
+these functions are immutable and stateless.
+An application may pre-declare additional names
+to provide domain-specific functions to that file, for example.
+These additional functions may have side effects on the application.
+Starlark programs cannot change the set of predeclared bindings
+or assign new values to them.
 
-Nested beneath the universe block is the _module_ block, which
-contains the bindings of the current file.
+Nested beneath the predeclared block is the _module_ block,
+which contains the bindings of the current module.
 Bindings in the module block (such as `a`, `b`, `c`, and `h` in the
-example) are called _global_.
-The module block is typically empty at the start of the file
+example) are called _global_ and may be visible to other modules.
+The module block is empty at the start of the file
 and is populated by top-level binding statements,
 but an application may pre-bind one or more global names,
 to provide domain-specific functions to that file, for example.
+
+Nested beneath the module block is the _file_ block,
+which contains bindings local to the current file.
+Names in this block (such as `a` and `b` in the example)
+are bound only by `load` statements.
+The sets of names bound in the file block and in the module block do not overlap:
+it is an error for a load statement to bind the name of a global,
+or for a top-level statement to assign to a name bound by a load statement.
+
+A file block contains a _function_ block for each top-level
+function, and a _comprehension_ block for each top-level comprehension.
+Bindings in either of these kinds of block,
+and in the file block itself, are called _local_.
+(In the example, the bindings for `e`, `f`, `g`, and `i` are all local.)
 
 A module block contains a _function_ block for each top-level
 function, and a _comprehension_ block for each top-level
@@ -825,8 +988,9 @@ Additional functions and comprehensions, and their blocks, may be
 nested in any order, to any depth.
 
 If name is bound anywhere within a block, all uses of the name within
-the block are treated as references to that binding, even uses that
-appear before the binding.
+the block are treated as references to that binding,
+even if the use appears before the binding.
+This is true even at the top level, unlike Python.
 The binding of `y` on the last line of the example below makes `y`
 local to the function `hello`, so the use of `y` in the print
 statement also refers to the local `y`, even though it appears
@@ -967,9 +1131,8 @@ third without the possibility of a race condition.
 
 The `dict` data type is implemented using hash tables, so
 only _hashable_ values are suitable as keys of a `dict`.
-Attempting to use a non-hashable value as the key in a hash
-table, or as the operand of the `hash` built-in function, results in a
-dynamic error.
+Attempting to use a non-hashable value as the key in a dictionary
+results in a dynamic error.
 
 The hash of a value is an unspecified integer chosen so that two equal
 values have the same hash, in other words, `x == y => hash(x) == hash(y)`.
@@ -1018,7 +1181,7 @@ that embeds the Starlark interpreter to define additional data types
 representing sequences of unknown length that implement only the `Iterable` contract.
 
 Strings are not iterable, though they do support the `len(s)` and
-`s[i]` operations. Starlark deviates from Python here to avoid common
+`s[i]` operations. Starlark deviates from Python here to avoid a common
 pitfall in which a string is used by mistake where a list containing a
 single string was intended, resulting in its interpretation as a sequence
 of bytes.
@@ -2241,16 +2404,17 @@ the language.
 
 ## Built-in constants and functions
 
-The outermost block of the Starlark environment is known as the "universe" block.
+The outermost block of the Starlark environment is known as the "predeclared" block.
 It defines a number of fundamental values and functions needed by all Starlark programs,
-such as `None`, `True`, `False`, and `len`.
+such as `None`, `True`, `False`, and `len`, and possibly additional
+application-specific names.
 
 These names are not reserved words so Starlark programs are free to
 redefine them in a smaller block such as a function body or even at
 the top level of a module.  However, doing so may be confusing to the
 reader.  Nonetheless, this rule permits names to be added to the
-universe block in later versions of the language without breaking
-existing programs.
+predeclared block in later versions of the language (or
+application-specific dialect) without breaking existing programs.
 
 As with built-in functions, built-in methods accept only positional
 arguments except where noted.
@@ -2353,6 +2517,18 @@ getattr("banana", "myattr", "mydefault")	# "mydefault"
 `hasattr(x, name)` reports whether x has an attribute (field or method) named `name`.
 
 ### hash
+
+`hash(x)` returns an integer hash of a string x
+such that two equal strings have the same hash.
+In other words `x == y` implies `hash(x) == hash(y)`.
+`hash` fails if x, or any value upon which its hash depends, is unhashable.	In the interests of reproducibility of Starlark program behavior over time and
+across implementations, the specific hash function is the same as that implemented by
+[java.lang.String.hashCode](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#hashCode),
+a simple polynomial accumulator over the UTF-16 transcoding of the string:
+
+```python
+s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
+```
 
 `hash(x)` returns an integer hash value for a string x such that `x == y`
 implies `hash(x) == hash(y)`.
