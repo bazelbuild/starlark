@@ -751,9 +751,12 @@ or the application into which the interpreter is embedded.
 
 A built-in function value used in a Boolean context is always considered true.
 
-Many built-in functions are defined in the "universe" block of the environment
-(see [Name Resolution](#name-resolution)), and are thus available to
-all Starlark programs.
+Many built-in functions are predeclared in the environment
+(see [Name Resolution](#name-resolution)), and are thus available to	(see [Name Resolution](#name-resolution)).
+all Skylark programs.	Some built-in functions such as `len` are _universal_, that is,
+available to all Skylark programs.
+The host application may predeclare additional built-in functions
+in the environment of a specific module.
 
 Except where noted, built-in functions accept only positional arguments.
 
@@ -799,19 +802,23 @@ The tree of blocks is parallel to the syntax tree.
 Blocks are of four kinds.
 
 <!-- Avoid the term "built-in block" since that's also a type. -->
-At the root of the tree is the _universe_ block, which binds constant
-values such as `None`, `True`, and `False`, and built-in functions
-such as `len`, `list`, and so on.
-Starlark programs cannot change the set of universe bindings.
-Because the universe block is shared by all files (modules),
-all values bound in it must be immutable and stateless
-from the perspective of the Starlark program.
+At the root of the tree is the _predeclared_ block,
+which binds several names implicitly.
+The set of predeclared names includes the universal
+constant values `None`, `True`, and `False`, and
+various built-in functions such as `len` and `list`;
+these functions are immutable and stateless.
+An application may pre-declare additional names
+to provide domain-specific functions to that file, for example.
+These additional functions may have side effects on the application.
+Starlark programs cannot change the set of predeclared bindings
+or assign new values to them.
 
-Nested beneath the universe block is the _module_ block, which
+Nested beneath the predeclared block is the _module_ block, which
 contains the bindings of the current file.
 Bindings in the module block (such as `a`, `b`, `c`, and `h` in the
 example) are called _global_.
-The module block is typically empty at the start of the file
+The module block is empty at the start of the file
 and is populated by top-level binding statements,
 but an application may pre-bind one or more global names,
 to provide domain-specific functions to that file, for example.
@@ -2239,16 +2246,17 @@ the language.
 
 ## Built-in constants and functions
 
-The outermost block of the Starlark environment is known as the "universe" block.
+The outermost block of the Starlark environment is known as the "predeclared" block.
 It defines a number of fundamental values and functions needed by all Starlark programs,
-such as `None`, `True`, `False`, and `len`.
+such as `None`, `True`, `False`, and `len`, and possibly additional
+application-specific names.
 
 These names are not reserved words so Starlark programs are free to
 redefine them in a smaller block such as a function body or even at
 the top level of a module.  However, doing so may be confusing to the
 reader.  Nonetheless, this rule permits names to be added to the
-universe block in later versions of the language without breaking
-existing programs.
+predeclared block in later versions of the language (or
+application-specific dialect) without breaking existing programs.
 
 As with built-in functions, built-in methods accept only positional
 arguments except where noted.
