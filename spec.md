@@ -785,7 +785,7 @@ Variables may be assigned or re-assigned explicitly (`e`, `h`), or implicitly, a
 in a `for`-loop (`f`) or comprehension (`g`, `i`).
 
 ```python
-load("lib.sky", "a", b="B")
+load("lib.star", "a", b="B")
 
 def c(d):
   e = 0
@@ -799,7 +799,7 @@ h = [2*i for i in a]
 The environment of a Starlark program is structured as a tree of
 _lexical blocks_, each of which may contain name bindings.
 The tree of blocks is parallel to the syntax tree.
-Blocks are of four kinds.
+Blocks are of five kinds.
 
 <!-- Avoid the term "built-in block" since that's also a type. -->
 At the root of the tree is the _predeclared_ block,
@@ -814,14 +814,28 @@ These additional functions may have side effects on the application.
 Starlark programs cannot change the set of predeclared bindings
 or assign new values to them.
 
-Nested beneath the predeclared block is the _module_ block, which
-contains the bindings of the current file.
+Nested beneath the predeclared block is the _module_ block,
+which contains the bindings of the current module.
 Bindings in the module block (such as `a`, `b`, `c`, and `h` in the
-example) are called _global_.
+example) are called _global_ and may be visible to other modules.
 The module block is empty at the start of the file
 and is populated by top-level binding statements,
 but an application may pre-bind one or more global names,
 to provide domain-specific functions to that file, for example.
+
+Nested beneath the module block is the _file_ block,
+which contains bindings local to the current file.
+Names in this block (such as `a` and `b` in the example)
+are bound only by `load` statements.
+The sets of names bound in the file block and in the module block do not overlap:
+it is an error for a load statement to bind the name of a global,
+or for a top-level statement to assign to a name bound by a load statement.
+
+A file block contains a _function_ block for each top-level
+function, and a _comprehension_ block for each top-level comprehension.
+Bindings in either of these kinds of block,
+and in the file block itself, are called _local_.
+(In the example, the bindings for `e`, `f`, `g`, and `i` are all local.)
 
 A module block contains a _function_ block for each top-level
 function, and a _comprehension_ block for each top-level
@@ -831,8 +845,9 @@ Additional functions and comprehensions, and their blocks, may be
 nested in any order, to any depth.
 
 If name is bound anywhere within a block, all uses of the name within
-the block are treated as references to that binding, even uses that
-appear before the binding.
+the block are treated as references to that binding,
+even if the use appears before the binding.
+This is true even at the top level, unlike Python.
 The binding of `y` on the last line of the example below makes `y`
 local to the function `hello`, so the use of `y` in the print
 statement also refers to the local `y`, even though it appears
