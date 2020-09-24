@@ -299,7 +299,123 @@ octal_digit   = '0' … '7' .
 hex_digit     = '0' … '9' | 'A' … 'F' | 'a' … 'f' .
 ```
 
-TODO: define string_lit, indent, outdent, semicolon, newline, eof
+### String literals
+
+A Starlark string literal denotes a string value.
+In its simplest form, it consists of the desired text
+surrounded by matching single- or double-quotation marks:
+
+```python
+"abc"
+'abc'
+```
+
+Literal occurrences of the chosen quotation mark character must be
+escaped by a preceding backslash. So, if a string contains several
+of one kind of quotation mark, it may be convenient to quote the string
+using the other kind, as in these examples:
+
+```python
+'Have you read "To Kill a Mockingbird?"'
+"Yes, it's a classic."
+"Have you read \"To Kill a Mockingbird?\""
+'Yes, it\'s a classic.'
+```
+
+#### String escapes
+
+Within a string literal, the backslash character `\` indicates the
+start of an _escape sequence_, a notation for expressing things that
+are impossible or awkward to write directly.
+
+The following *traditional escape sequences* represent the ASCII control
+codes 7-13:
+
+```
+\a   \x07 alert or bell
+\b   \x08 backspace
+\f   \x0C form feed
+\n   \x0A line feed
+\r   \x0D carriage return
+\t   \x09 horizontal tab
+\v   \x0B vertical tab
+```
+
+A *literal backslash* is written using the escape `\\`.
+
+An *escaped newline*---that is, a backslash at the end of a line---is ignored,
+allowing a long string to be split across multiple lines of the source file.
+
+```python
+"abc\
+def"			# "abcdef"
+```
+
+An *octal escape* encodes a single byte using its octal value.
+It consists of a backslash followed by one, two, or three octal digits [0-7].
+It is error if the value is greater than decimal 255.
+
+```python
+'\0'			# "\x00"  a string containing a single NUL byte
+'\12'			# "\n"    octal 12 = decimal 10
+'\101-\132'		# "A-Z"
+'\119'			# "\t9"   = "\11" + "9"
+```
+
+A *hex escape* encodes a single byte using its hexadecimal value.
+It consists of `\x` followed by exactly two hexadecimal digits [0-9A-Fa-f].
+
+```python
+"\x00"			# "\x00"  a string containing a single NUL byte
+"(\x20)"		# "( )"   ASCII 0x20 = 32 = space
+red, reset = "\x1b[31m", "\x1b[0m"	# ANSI terminal control codes for color
+"(" + red + "hello" + reset + ")"	# "(hello)" with red text, if on a terminal
+```
+
+An ordinary string literal may not contain an unescaped newline,
+but a *multiline string literal* may spread over multiple source lines.
+It is denoted using three quotation marks at start and end.
+Within it, unescaped newlines and quotation marks (or even pairs of
+quotation marks) have their literal meaning, but three quotation marks
+end the literal. This makes it easy to quote large blocks of text with
+few escapes.
+
+```
+haiku = '''
+Yesterday it worked.
+Today it is not working.
+That's computers. Sigh.
+'''
+```
+
+Regardless of the platform's convention for text line endings---for
+example, a linefeed (\n) on UNIX, or a carriage return followed by a
+linefeed (\r\n) on Microsoft Windows---an unescaped line ending in a
+multiline string literal always denotes a line feed (\n).
+
+Starlark also supports *raw string literals*, which look like an
+ordinary single- or double-quotation preceded by `r`. Within a raw
+string literal, there is no special processing of backslash escapes,
+other than an escaped quotation mark (which denotes a literal
+quotation mark), or an escaped newline (which denotes a backslash
+followed by a newline). This form of quotation is typically used when
+writing strings that contain many quotation marks or backslashes (such
+as regular expressions or shell commands) to reduce the burden of
+escaping:
+
+```python
+"a\nb"		# "a\nb"  = 'a' + '\n' + 'b'
+r"a\nb"		# "a\\nb" = 'a' + '\\' + '\n' + 'b'
+"a\
+b"		# "ab"
+r"a\
+b"		# "a\\\nb"
+```
+
+It is an error for a backslash to appear within a string literal other
+than as part of one of the escapes described above.
+
+TODO: define indent, outdent, semicolon, newline, eof
 
 ## Data types
 
