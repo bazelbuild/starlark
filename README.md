@@ -64,8 +64,8 @@ names = ", ".join(people.keys())  # Alice, Bob, Charlie, Dave
 
 # Define a function
 def greet(name):
-  """Return a greeting."""
-  return "Hello {}!".format(name)
+    """Return a greeting."""
+    return "Hello {}!".format(name)
 
 greeting = greet(names)
 
