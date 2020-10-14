@@ -395,7 +395,7 @@ escaping:
 
 ```python
 "a\nb"		# "a\nb"  = 'a' + '\n' + 'b'
-r"a\nb"		# "a\\nb" = 'a' + '\\' + '\n' + 'b'
+r"a\nb"		# "a\\nb" = 'a' + '\\' + 'n' + 'b'
 "a\
 b"		# "ab"
 r"a\
