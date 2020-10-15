@@ -56,6 +56,7 @@ interact with the environment.
     * [None](#none)
     * [Booleans](#booleans)
     * [Integers](#integers)
+    * [Floating-point numbers](#floating-point-numbers)
     * [Strings](#strings)
     * [Lists](#lists)
     * [Tuples](#tuples)
@@ -273,7 +274,7 @@ x       index   starts_with     arg0
 ```
 
 *Literals*: literals are tokens that denote specific values.  Starlark
-has string and integer literals.
+has integer, floating-point, and string literals.
 
 ```text
 0                               # int
@@ -281,12 +282,16 @@ has string and integer literals.
 0x7f                            # hexadecimal int
 0o755                           # octal int
 
+0.0     0.       .0             # float
+1e10    1e+10    1e-10
+1.1e10  1.1e+10  1.1e-10
+
 "hello"      'hello'            # string
 '''hello'''  """hello"""        # triple-quoted string
 r'hello'     r"hello"           # raw string literal
 ```
 
-Integer literal tokens are defined by the following grammar:
+Integer and floating-point literal tokens are defined by the following grammar:
 
 ```text
 int         = decimal_lit | octal_lit | hex_lit | 0 .
@@ -294,10 +299,20 @@ decimal_lit = ('1' … '9') {decimal_digit} .
 octal_lit   = '0' ('o' | 'O') octal_digit {octal_digit} .
 hex_lit     = '0' ('x' | 'X') hex_digit {hex_digit} .
 
+float     = decimals '.' [decimals] [exponent]
+          | decimals exponent
+          | '.' decimals [exponent]
+          .
+decimals  = decimal_digit {decimal_digit} .
+exponent  = ('e'|'E') ['+'|'-'] decimals .
+
 decimal_digit = '0' … '9' .
 octal_digit   = '0' … '7' .
 hex_digit     = '0' … '9' | 'A' … 'F' | 'a' … 'f' .
 ```
+
+It is a static error if a floating-point literal denotes a value whose
+magnitude is too large to be represented as a finite `float` value.
 
 ### String literals
 
@@ -415,6 +430,7 @@ These are the main data types built in to the interpreter:
 NoneType                     # the type of None
 bool                         # True or False
 int                          # a signed integer
+float                        # an IEEE 754 double-precision floating-point number
 string                       # a byte string
 list                         # a fixed-length sequence of values
 tuple                        # a fixed-length sequence of values, unmodifiable
@@ -476,6 +492,9 @@ else:
         print("False")
 ```
 
+True and False may be converted to the values 1 and 0 using the `int` function,
+but Booleans are not numbers.
+
 ### Integers
 
 The Starlark integer type represents integers.  Its [type](#type) is `"int"`.
@@ -493,6 +512,8 @@ remainder of floored division, respectively.
 If the signs of the operands differ, the sign of the remainder `x % y`
 matches that of the dividend, `x`.
 For all finite x and y (y ≠ 0), `(x // y) * y + (x % y) == x`.
+The `/` operator implements floating-point division, and
+yields a `float` result even when its operands are both of type `int`.
 
 Integers, including negative values, may be interpreted as bit vectors.
 The `|`, `&`, and `^` operators implement bitwise OR, AND, and XOR,
@@ -511,6 +532,108 @@ non-zero.
 3 // 2                          # 1
 111111111 * 111111111           # 12345678987654321
 int("0xffff", 16)               # 65535
+```
+
+
+### Floating-point numbers
+
+The Starlark floating-point data type represents an IEEE 754
+double-precision floating-point number.
+Its [type](#type) is `"float"`.
+
+Arithmetic on floats using the `+`, `-`, `*`, `/`, `//`, and `%`
+operators follows the IEEE 754 standard.
+However, computing the division or remainder of division by zero is a dynamic error.
+
+An arithmetic operation applied to a mixture of `float` and `int`
+operands works as if the `int` operand were first converted to a
+`float`.  For example, `3.141 + 1` is equivalent to `3.141 +
+float(1)`. The implicit conversion fails if the `int` value is too
+large to be represented as a `float`.
+
+There are two floating-point division operators:
+`x / y ` yields the floating-point quotient of `x` and `y`,
+whereas `x // y` yields `floor(x / y)`, that is, the largest
+representable integer value not greater than `x / y`.
+Although the resulting number is integral, it is represented as a
+`float` if either operand is a `float`.
+
+The `%` operation computes the remainder of floored division.
+As with the corresponding operation on integers,
+if the signs of the operands differ, the sign of the remainder `x % y`
+matches that of the dividend, `x`.
+
+All float values are ordered, so they may be compared
+using operators such as `==` and `<`, and sorted using `sorted`.
+
+IEEE 754 defines two zero values, +0.0 and -0.0.
+They compare equal to each other.
+
+IEEE 754 defines two infinite float values `+Inf` and `-Inf`,
+which represent numbers greater/less than all finite float values.
+
+IEEE 754 defines many "not a number" (NaN) values.
+They are non-finite, and represent the results of dubious operations
+such as `Inf / Inf`. All NaN values compare equal to each other,
+but greater than any non-NaN `float` value.
+(Starlark does not follow the IEEE 754 standard for NaN comparisons,
+which requires that all comparisons with NaN are false, except NaN != NaN.)
+<!--
+This choice greatly simplifies the logic for float arithmetic by
+ensuring many standard identities and invariants such as:
+- float < float (also < <= == => >) are transitive relations
+- float < float is a strict weak order: the relation eq is transitive, 
+  where eq(x, y) = not (x < y) and not (y < x).
+- not (float < float) <=> (float >= float)
+- sorting a list of values that includes NaN is stable.
+
+Furthermore, implementations may assume that identical objects
+are equal, a useful optimization. Python in many cases exploits
+this optimization without the necessary invariant, leading to
+inconsistencies such as this:
+
+>>> nan = float('nan')
+>>> nan == nan
+False
+>>> nan is nan
+True
+>>> float('nan') == float('nan')
+False
+>>> float('nan') is float('nan')
+False
+>>> (nan,) == (nan,)
+True
+>>> (float('nan'),) == (float('nan'),)
+False
+
+-->
+
+A comparison operation may be applied to a mixture of int and float values.
+The result of such comparisons is mathematically exact, even if neither operand
+can be exactly represented by the type of the other.
+
+```python
+(type(1.0), type(1))            # ("float", "int")
+1.0 == 1			# True
+
+big = (1<<53)+1			# first int not exactly representable as float
+(big + 0.0) == big		# False (addition caused rounding down)
+(big + 0.0) - big		# 0.0   (both operands subject to rounding down)
+```
+
+Any bool, number, or string may be interpreted as a floating-point
+number by using the `float` built-in function.
+
+A float used in a Boolean context is considered true if it is
+non-zero (not equal to 0.0 or -0.0). A NaN value is thus considered true.
+
+```python
+1.23e45 * 1.23e45                               # 1.5129e+90
+1.111111111111111 * 1.111111111111111           # 1.23457
+3.0 / 2                                         # 1.5
+3 / 2.0                                         # 1.5
+float(3) / 2                                    # 1.5
+3.0 // 2.0                                      # 1.0
 ```
 
 
@@ -1148,11 +1271,12 @@ The [dot expression](#dot-expressions) `.split` is a dynamic operation
 on the value returned by `get_filename()`.
 
 
-## Value concepts {#value-concepts}
+## Value concepts
 
-Starlark has eleven core [data types](#data-types).  An application
-that embeds the Starlark intepreter may define additional types that
-behave like Starlark values.  All values, whether core or
+Starlark has over a dozen core [data types](#data-types).
+An application that embeds the Starlark intepreter may
+define additional types that behave like Starlark values.
+All values, whether core or
 application-defined, implement a few basic behaviors:
 
 ```text
@@ -1170,8 +1294,8 @@ For example, an assignment statement updates the value held by a
 variable, and calls to some built-in functions such as `print` change
 the state of the application that embeds the interpreter.
 
-Values of some data types, such as `NoneType`, `bool`, `int`, and
-`string`, are _immutable_; they can never change.
+Values of some data types, such as `NoneType`, `bool`, `int`, `float`,
+and `string`, are _immutable_; they can never change.
 Immutable values have no notion of _identity_: it is impossible for a
 Starlark program to tell whether two integers, for instance, are
 represented by the same object; it can tell only whether they are
@@ -1244,7 +1368,7 @@ The hash of a value is an unspecified integer chosen so that two equal
 values have the same hash, in other words, `x == y => hash(x) == hash(y)`.
 A hashable value has the same hash throughout its lifetime.
 
-Values of the types `NoneType`, `bool`, `int`, and `string`,
+Values of the types `NoneType`, `bool`, `int`, `float`, and `string`,
 which are all immutable, are hashable.
 
 Values of mutable types such as `list` and `dict` are not
@@ -1403,7 +1527,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | string
+        | int | float | string
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expression] [,] ')'
@@ -1417,7 +1541,7 @@ SliceSuffix = '[' [Expression] [':' Test [':' Test]] ']' .
 ### Identifiers
 
 ```text
-Primary = identifier
+Operand = identifier
 ```
 
 An identifier is a name that identifies a value.
@@ -1429,17 +1553,17 @@ Lookup of locals and globals may fail if not yet defined.
 Starlark supports string literals of three different kinds:
 
 ```text
-Primary = int | string
+Operand = int | float | string
 ```
 
-Evaluation of a literal yields a value of the given type (string, int) with the
-given value.
+Evaluation of a literal yields a value of the given type
+(int, float, or string) with the given value.
 See [Literals](#lexical elements) for details.
 
 ### Parenthesized expressions
 
 ```text
-Primary = '(' [Expression] ')'
+Operand = '(' [Expression] ')'
 ```
 
 A single expression enclosed in parentheses yields the result of that expression.
@@ -1531,8 +1655,8 @@ Examples:
 
 ### Unary operators
 
-There are two unary operators, both appearing before their operand:
-`-`, and `not`.
+There are four unary operators, all appearing before their operand:
+`+`, `-`, `~`, and `not`.
 
 ```text
 UnaryExpr = '+' Test
@@ -1543,14 +1667,15 @@ UnaryExpr = '+' Test
 ```
 
 ```text
-+ number        unary positive          (number)
-- number        unary negation          (number)
-~ number        unary bitwise inversion (number)
++ number        unary positive          (int, float)
+- number        unary negation          (int, float)
+~ number        unary bitwise inversion (int)
 not x           logical negation        (any type)
 ```
 
-The `-` operator returns the opposite of any number.
-The `+` operator is never necessary in a correct program, but may
+The `+` and `-` operators may be applied to any number:
+`+` yields the operand unchanged, and `-` yields its negation.
+The `+` operator is never necessary in a correct program but may
 serve as an assertion that its operand is a number, or as documentation.
 
 ```python
@@ -1666,20 +1791,33 @@ operator is its negation.
 
 The operators `<`, `>`, `<=`, and `>=` perform an ordered comparison
 of their operands.  It is an error to apply these operators to
-operands of unequal type.  Of the built-in types, only the following
+operands of unequal type, unless one of the operands is an `int` and
+the other is a `float`.  Of the built-in types, only the following
 support ordered comparison, using the ordering relation shown:
 
 ```text
-NoneType        # None <= None
 bool            # False < True
 int             # mathematical
+float           # as defined by IEEE 754, except NaN > +Inf
 string          # lexicographical
 tuple           # lexicographical
 list            # lexicographical
 ```
 
-Applications may define additional types that support ordered
-comparison.
+Comparison of floating-point values follows the IEEE 754 standard
+for finite values (including -0.0) and for positive and negative
+infinity, but not for `NaN` values, for which the standard behavior
+would break several mathematical identities. Thus:
+```
+-Inf < -1e50 < -1.0 < -1e-50 < 0.0 < 1e-50 < 1.0 < 1e50 < +Inf < NaN
++0.0 == -0.0
+NaN == NaN
+```
+
+Applications may define additional types that support ordered comparison. 
+The application-defined comparison relation must be a
+[strict weak ordering](https://en.wikipedia.org/wiki/Weak_ordering#Strict_weak_orderings).
+<!-- This is a prequisite of the 'sorted' function. -->
 
 The remaining built-in types support only equality comparisons.
 Values of type `dict` compare equal if their elements compare
@@ -1696,23 +1834,25 @@ The following table summarizes the binary arithmetic operations
 available for built-in types:
 
 ```text
-Arithmetic
+Arithmetic (int or float; result has type float unless both operands have type int)
    number + number              # addition
    number - number              # subtraction
    number * number              # multiplication
+   number / number              # floating-point division (result is always a float)
    number // number             # floored division
    number % number              # remainder of floored division
-   number ^ number              # bitwise XOR
-   number & number              # bitwise AND
-   number | number              # bitwise OR
-   number << number             # bitwise left shift
-   number >> number             # bitwise right shift
+
+Bitwise operations:
+   int ^ int                    # bitwise XOR
+   int & int                    # bitwise AND
+   int | int                    # bitwise OR
+   int << int                   # bitwise left shift
+   int >> int                   # bitwise right shift
 
 Concatenation
    string + string
      list + list
     tuple + tuple
-     dict + dict                # (deprecated)
 
 Repetition (string/list/tuple)
       int * sequence
@@ -1722,8 +1862,15 @@ String interpolation
    string % any                 # see String Interpolation
 ```
 
-The operands of the arithmetic operators `+`, `-`, `*`, `//`,`%`, `&`,
-`|` and `^` must both be `int`. The type of the result has type `int`.
+The operands of the arithmetic operators `+`, `-`, `*`, `//`, and `%`,
+must both be numbers (`int` or `float`) but need not have the same type.
+The type of the result has type `int` only if both operands have that type.
+The result of floating-point division `/` always has type `float`.
+
+The `&` operator requires two operands of type `int`,
+and yields the bitwise intersection (AND) of its operands.
+The `|` operator likewise computes bitwise union,
+and the `^` operator bitwise XOR (exclusive OR).
 
 The `<<` and `>>` operators require operands of `int` type both. They
 shift the first operand to the left or right by the number of bits given
@@ -1827,10 +1974,26 @@ operand types are valid and how to convert the operand `x` to a string:
 s       any             as if by str(x)
 r       any             as if by repr(x)
 d       number          signed integer decimal
+o       number          signed octal
+e       number          float exponential format, lowercase (1.230000e+12)
+E       number          float exponential format, uppercase (1.230000E+12)
+f       number          float decimal format                (1230000000000.000000)
+F       number          same as %f
+g       number          compact format, lowercase           (0.0, 1.1, 1200, 1e+45, 1.2e+12) 
+G       number          compact format, uppercase           (0.0, 1.1, 1200, 1e+45, 1.2E+12)
 ```
 
+The compact form `%g` is also used by `str(float)`.
+Its result uses the least precision required to accurately
+represent the value, omits unnecessary trailing zeros in the
+significand (along with the decimal point itself if the significand
+has no fraction), and always contains a decimal point or an exponent
+and thus unambiguously denotes a `float`, not an `int`.
+
 It is an error if the argument does not have the type required by the
-conversion specifier.  A Boolean argument is not considered a number.
+conversion specifier, except that ints may converted to floats
+and floats may truncated to ints.
+A Boolean argument is not considered a number.
 
 Examples:
 
@@ -2606,6 +2769,27 @@ enumerate(["zero", "one", "two"])               # [(0, "zero"), (1, "one"), (2, 
 enumerate(["one", "two"], 1)                    # [(1, "one"), (2, "two")]
 ```
 
+### float
+
+`float(x)` interprets its argument as a floating-point number.
+
+If x is a `float`, the result is x.
+
+If x is an `int`, the result is the floating-point value nearest x.
+The call fails if x is too large to represent as a finite `float`.
+
+If x is a `bool`, the result is `1.0` for `True` and `0.0` for `False`.
+
+If x is a string, the string is interpreted as a floating-point literal.
+The function also recognizes the names `Inf` (or `Infinity`) and `NaN`,
+optionally preceded by a `+` or `-` sign.
+These construct the IEEE 754 non-finite values.
+Letter case is not significant.
+The call fails if the literal denotes a value too large to represent as
+a finite `float`.
+
+With no argument, `float()` returns `0.0`.
+
 ### getattr
 
 `getattr(x, name[, default])` returns the value of the attribute (field or method) of x named `name`
@@ -2618,6 +2802,9 @@ getattr("banana", "split")("a")	       		# ["b", "n", "n", ""], equivalent to "b
 getattr("banana", "myattr", "mydefault")	# "mydefault"
 ```
 
+The three-argument form `getattr(x, name, default)` returns the
+provided `default` value instead of failing.
+
 ### hasattr
 
 `hasattr(x, name)` reports whether x has an attribute (field or method) named `name`.
@@ -2627,7 +2814,7 @@ getattr("banana", "myattr", "mydefault")	# "mydefault"
 `hash(x)` returns an integer hash of a string x
 such that two equal strings have the same hash.
 In other words `x == y` implies `hash(x) == hash(y)`.
-`hash` fails if x, or any value upon which its hash depends, is unhashable.	In the interests of reproducibility of Starlark program behavior over time and
+In the interests of reproducibility of Starlark program behavior over time and
 across implementations, the specific hash function is the same as that implemented by
 [java.lang.String.hashCode](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#hashCode),
 a simple polynomial accumulator over the UTF-16 transcoding of the string:
@@ -2644,7 +2831,12 @@ implies `hash(x) == hash(y)`.
 `int(x[, base])` interprets its argument as an integer.
 
 If `x` is an `int`, the result is `x`.
-If `x` is a `bool`, the result is 0 for `False` or 1 for `True`.
+
+If x is a `float`, the result is the integer value nearest to x,
+truncating towards zero. It is an error if x is not finite (`NaN`
+or infinity).
+
+If x is a `bool`, the result is 0 for `False` or 1 for `True`.
 
 If `x` is a string, it is interpreted as a sequence of digits in the specified
 base, decimal by default. If `base` is zero, `x` is interpreted like an integer
@@ -2821,6 +3013,7 @@ All other strings, such as elements of a list of strings, are double-quoted.
 str(1)                          # '1'
 str("x")                        # 'x'
 str([1, "x"])                   # '[1, "x"]'
+str(0.0)                        # '0.0'        (formatted as if by "%g")
 ```
 
 ### tuple
@@ -2836,6 +3029,7 @@ type(x) returns a string describing the type of its operand.
 ```python
 type(None)              # "NoneType"
 type(0)                 # "int"
+type(0.0)               # "float"
 ```
 
 ### zip
@@ -3575,7 +3769,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | string
+        | int | float | string
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expression [',']] ')'
@@ -3627,7 +3821,7 @@ Tokens:
 
 - spaces: newline, eof, indent, outdent.
 - identifier.
-- literals: string, int.
+- literals: string, int, float.
 - plus all quoted tokens such as '+=', 'return'.
 
 Notes:
