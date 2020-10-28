@@ -2962,9 +2962,10 @@ If it is another `dict`, then its key/value pairs are inserted into D.
 If it is an iterable, it must provide a sequence of pairs (or other iterables of length 2),
 each of which is treated as a key/value pair to be inserted into D.
 
-For each `name=value` argument present, the name is converted to a
-string and used as the key for an insertion into D, with its corresponding
-value being `value`.
+Then, for each `name=value` argument present, an entry with key `name`
+and value `value` is inserted into D.
+
+All insertions overwrite any previous entries having the same key.
 
 `update` fails if the dictionary is frozen or has active iterators.
 
