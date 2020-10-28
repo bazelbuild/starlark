@@ -2962,7 +2962,7 @@ If it is another `dict`, then its key/value pairs are inserted into D.
 If it is an iterable, it must provide a sequence of pairs (or other iterables of length 2),
 each of which is treated as a key/value pair to be inserted into D.
 
-Afterwards, for each `name=value` argument present, an entry with key `name`
+Then, for each `name=value` argument present, an entry with key `name`
 and value `value` is inserted into D.
 
 All insertions overwrite any previous entries having the same key.
