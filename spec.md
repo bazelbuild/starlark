@@ -2161,12 +2161,12 @@ An assignment to a compound target checks that the right-hand value is a
 sequence with the same number of elements as the target.
 Each element of the sequence is then assigned to the corresponding
 element of the target, recursively applying the same logic.
-It is a static error if the sequence is empty.
 
 ```python
 a, b = 2, 3
 (x, y) = f()
 [zero, one, two] = range(3)
+[] = ()
 
 [(a, b), (c, d)] = ("ab", "cd")
 ```
