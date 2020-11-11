@@ -2707,7 +2707,7 @@ min("two", "three", "four", key=len)            # "two", the shortest
 
 ### print
 
-`print(*args, **kwargs)` prints its arguments, followed by a newline.
+`print(*args, sep=" ")` prints its arguments, followed by a newline.
 Arguments are formatted as if by `str(x)` and separated with a space,
 unless an alternative separator is specified by a `sep` named argument.
 
