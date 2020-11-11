@@ -2801,6 +2801,7 @@ return results in reverse sorted order.
 The optional named parameter `key` specifies a function of one
 argument to apply to obtain the value's sort key.
 The default behavior is the identity function.
+The `key` function is called exactly once per element of the sequence, in order.
 
 ```python
 sorted([3, 1, 4, 1, 5, 9])                                 # [1, 1, 3, 4, 5, 9]
