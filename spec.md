@@ -2575,7 +2575,7 @@ With no arguments, `dict()` returns a new empty dictionary.
 
 ### dir
 
-`dir(x)` returns a list of the names of the attributes (fields and methods) of its operand.
+`dir(x)` returns a new sorted list of the names of the attributes (fields and methods) of its operand.
 The attributes of a value `x` are the names `f` such that `x.f` is a valid expression.
 
 For example,
