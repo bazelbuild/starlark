@@ -3043,6 +3043,7 @@ nearest value within that range is used; see [Indexing](#indexing).
 
 `index` fails if `x` is not found in L, or if `start` or `end`
 is not a valid index (`int` or `None`).
+To avoid this error, test `x in list` before calling `list.index(x)`.
 
 ```python
 x = ["b", "a", "n", "a", "n", "a"]
