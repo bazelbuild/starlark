@@ -414,7 +414,8 @@ These are the main data types built in to the interpreter:
 ```text
 NoneType                     # the type of None
 bool                         # True or False
-int                          # a signed integer
+int                          # a signed integer of arbitrary magnitude
+float                        # an IEEE 754 double-precision floating-point number
 string                       # a byte string
 list                         # a fixed-length sequence of values
 tuple                        # a fixed-length sequence of values, unmodifiable
@@ -480,8 +481,8 @@ else:
 
 The Starlark integer type represents integers.  Its [type](#type) is `"int"`.
 
-Integers may be positive or negative. The precision is implementation-dependent.
-It is a dynamic error if a result is outside the supported range.
+Integers may be positive or negative, and arbitrarily large.
+Integer arithmetic is exact.
 Integers are totally ordered; comparisons follow mathematical
 tradition.
 
@@ -495,6 +496,7 @@ matches that of the dividend, `x`.
 For all finite x and y (y ≠ 0), `(x // y) * y + (x % y) == x`.
 
 Integers, including negative values, may be interpreted as bit vectors.
+Negative values use two's complement representation.
 The `|`, `&`, and `^` operators implement bitwise OR, AND, and XOR,
 respectively. The unary `~` operator yields the bitwise inversion of its
 integer argument. The `<<` and `>>` operators shift the first argument
@@ -1706,7 +1708,7 @@ Arithmetic
    number & number              # bitwise AND
    number | number              # bitwise OR
    number << number             # bitwise left shift
-   number >> number             # bitwise right shift
+   number >> number             # bitwise right shift (arithmetic)
 
 Concatenation
    string + string
@@ -1725,11 +1727,12 @@ String interpolation
 The operands of the arithmetic operators `+`, `-`, `*`, `//`,`%`, `&`,
 `|` and `^` must both be `int`. The type of the result has type `int`.
 
-The `<<` and `>>` operators require operands of `int` type both. They
-shift the first operand to the left or right by the number of bits given
-by the second operand. It is a dynamic error if the second operand is
-negative. Implementations may impose a limit on the second operand of a
-left shift.
+The `<<` and `>>` operators require two operands of type `int`. 
+They shift the first operand to the left or right 
+by the number of bits given by the second operand.
+Right shifts are arithmetic, not logical:
+they fill the vacated bits with copies of the sign bit.
+It is a dynamic error if the second operand is negative.
 
 ```python
 0x12345678 & 0xFF               # 0x00000078
@@ -1737,6 +1740,7 @@ left shift.
 0b01011101 ^ 0b110101101        # 0b111110000
 0b01011101 >> 2                 # 0b010111
 0b01011101 << 2                 # 0b0101110100
+-1 >> 100                       # -1
 ```
 
 The `+` operator may be applied to non-numeric operands of the same
