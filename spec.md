@@ -1670,7 +1670,6 @@ operands of unequal type.  Of the built-in types, only the following
 support ordered comparison, using the ordering relation shown:
 
 ```text
-NoneType        # None <= None
 bool            # False < True
 int             # mathematical
 string          # lexicographical
