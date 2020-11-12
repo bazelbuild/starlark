@@ -8,7 +8,7 @@ aim to remove the differences and provide a
 
 *   in Go: https://github.com/google/starlark-go/
 *   in Java:
-    https://github.com/bazelbuild/bazel/tree/master/src/main/java/com/google/devtools/starlark
+    https://github.com/bazelbuild/bazel/tree/master/src/main/java/net/starlark/java
 *   in Rust: https://github.com/google/starlark-rust/
 
 ## Tools
