@@ -990,12 +990,19 @@ fib(5)
 
 This rule, combined with the invariant that all loops are iterations
 over finite sequences, implies that Starlark programs are not Turing-complete.
+However, an implementation may allow clients to disable this check,
+allowing unbounded recursion.
 
 <!-- This rule is supposed to deter people from abusing Starlark for
      inappropriate uses, especially in the build system.
      It may work for that purpose, but it doesn't stop Starlark programs
      from consuming too much time or space.  Perhaps it should be a
      dialect option.
+
+     Implementations (e.g. Java, Go) may permit clients to bound computation
+     directly, by limiting the number of computational steps taken by a thread,
+     thus allowing short-lived yet recursive computations, but disallowing
+     long-running ones, even without recursion.
 -->
 
 
