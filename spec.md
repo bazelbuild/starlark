@@ -429,7 +429,7 @@ These are the main data types built in to the interpreter:
 ```text
 NoneType                     # the type of None
 bool                         # True or False
-int                          # a signed integer
+int                          # a signed integer of arbitrary magnitude
 float                        # an IEEE 754 double-precision floating-point number
 string                       # a byte string
 list                         # a fixed-length sequence of values
@@ -499,8 +499,8 @@ but Booleans are not numbers.
 
 The Starlark integer type represents integers.  Its [type](#type) is `"int"`.
 
-Integers may be positive or negative. The precision is implementation-dependent.
-It is a dynamic error if a result is outside the supported range.
+Integers may be positive or negative, and arbitrarily large.
+Integer arithmetic is exact.
 Integers are totally ordered; comparisons follow mathematical
 tradition.
 
@@ -516,6 +516,7 @@ The `/` operator implements floating-point division, and
 yields a `float` result even when its operands are both of type `int`.
 
 Integers, including negative values, may be interpreted as bit vectors.
+Negative values use two's complement representation.
 The `|`, `&`, and `^` operators implement bitwise OR, AND, and XOR,
 respectively. The unary `~` operator yields the bitwise inversion of its
 integer argument. The `<<` and `>>` operators shift the first argument
@@ -1065,6 +1066,11 @@ Once the parameters have been successfully bound to the arguments
 supplied by the call, the sequence of statements that comprise the
 function body is executed.
 
+It is a static error if a function call has two named arguments of the
+same name, such as `f(x=1, x=2)`. A call that provides a `**kwargs`
+argument may yet have two values for the same name, such as
+`f(x=1, **dict(x=2))`. This results in a dynamic error.
+
 Function arguments are evaluated in the order they appear in the call.
 <!-- see https://github.com/bazelbuild/starlark/issues/13 -->
 
@@ -1106,12 +1112,19 @@ fib(5)
 
 This rule, combined with the invariant that all loops are iterations
 over finite sequences, implies that Starlark programs are not Turing-complete.
+However, an implementation may allow clients to disable this check,
+allowing unbounded recursion.
 
 <!-- This rule is supposed to deter people from abusing Starlark for
      inappropriate uses, especially in the build system.
      It may work for that purpose, but it doesn't stop Starlark programs
      from consuming too much time or space.  Perhaps it should be a
      dialect option.
+
+     Implementations (e.g. Java, Go) may permit clients to bound computation
+     directly, by limiting the number of computational steps taken by a thread,
+     thus allowing short-lived yet recursive computations, but disallowing
+     long-running ones, even without recursion.
 -->
 
 
@@ -1201,7 +1214,7 @@ Names in this block (such as `a` and `b` in the example)
 are bound only by `load` statements.
 The sets of names bound in the file block and in the module block do not overlap:
 it is an error for a load statement to bind the name of a global,
-or for a top-level statement to assign to a name bound by a load statement.
+or for a top-level statement to bind a name bound by a load statement.
 
 A file block contains a _function_ block for each top-level
 function, and a _comprehension_ block for each top-level comprehension.
@@ -1251,6 +1264,47 @@ The same is true for global variables:
 print(x)                # dynamic error: global variable x referenced before assignment
 x = "hello"
 ```
+
+The same is also true for nested loops in comprehensions.
+In the (unnatural) examples below, the scope of the variables `x`, `y`, 
+and `z` is the entire compehension block, except the operand of the first
+loop (`[]` or `[1]`), which is resolved in the enclosing environment.
+The second loop may thus refer to variables defined by the third (`z`),
+even though such references would fail if actually executed.
+
+```
+[1//0 for x in [] for y in z for z in ()]   # []   (no error)
+[1//0 for x in [1] for y in z for z in ()]  # dynamic error: local variable z referenced before assignment
+```
+
+
+<!-- This is similar to Python[23]. Presumed rational: it resembles
+     the desugaring to nested loop statements, in which the scope
+     of all three variables is the entire enclosing function,
+     including the portion before the bindings.
+      def f():
+        ...
+        for x in []:
+          for y in z:
+            for z in ():
+              1//0
+-->
+
+It is a static error to refer to a name that has no binding at all.
+```
+def f():
+  if False:
+    g()                   # static error: undefined: g
+```
+(This behavior differs from Python, which treats such references as global,
+and thus does not report an error until the expression is evaluated.)
+
+<!-- Consequently, the REPL, which consumes one compound statement at a time,
+     cannot resolve forward references such as
+             def f(): return K
+             K = 1
+     because the first chunk has an unresolved reference to K.
+-->
 
 It is a static error to bind a global variable already explicitly bound in the file:
 
@@ -1847,7 +1901,7 @@ Bitwise operations:
    int & int                    # bitwise AND
    int | int                    # bitwise OR
    int << int                   # bitwise left shift
-   int >> int                   # bitwise right shift
+   int >> int                   # bitwise right shift (arithmetic)
 
 Concatenation
    string + string
@@ -1872,11 +1926,12 @@ and yields the bitwise intersection (AND) of its operands.
 The `|` operator likewise computes bitwise union,
 and the `^` operator bitwise XOR (exclusive OR).
 
-The `<<` and `>>` operators require operands of `int` type both. They
-shift the first operand to the left or right by the number of bits given
-by the second operand. It is a dynamic error if the second operand is
-negative. Implementations may impose a limit on the second operand of a
-left shift.
+The `<<` and `>>` operators require two operands of type `int`. 
+They shift the first operand to the left or right 
+by the number of bits given by the second operand.
+Right shifts are arithmetic, not logical:
+they fill the vacated bits with copies of the sign bit.
+It is a dynamic error if the second operand is negative.
 
 ```python
 0x12345678 & 0xFF               # 0x00000078
@@ -1884,6 +1939,7 @@ left shift.
 0b01011101 ^ 0b110101101        # 0b111110000
 0b01011101 >> 2                 # 0b010111
 0b01011101 << 2                 # 0b0101110100
+-1 >> 100                       # -1
 ```
 
 The `+` operator may be applied to non-numeric operands of the same
@@ -2325,12 +2381,12 @@ An assignment to a compound target checks that the right-hand value is a
 sequence with the same number of elements as the target.
 Each element of the sequence is then assigned to the corresponding
 element of the target, recursively applying the same logic.
-It is a static error if the sequence is empty.
 
 ```python
 a, b = 2, 3
 (x, y) = f()
 [zero, one, two] = range(3)
+[] = ()
 
 [(a, b), (c, d)] = ("ab", "cd")
 ```
@@ -2738,7 +2794,7 @@ With no arguments, `dict()` returns a new empty dictionary.
 
 ### dir
 
-`dir(x)` returns a list of the names of the attributes (fields and methods) of its operand.
+`dir(x)` returns a new sorted list of the names of the attributes (fields and methods) of its operand.
 The attributes of a value `x` are the names `f` such that `x.f` is a valid expression.
 
 For example,
@@ -2899,7 +2955,7 @@ min("two", "three", "four", key=len)            # "two", the shortest
 
 ### print
 
-`print(*args, **kwargs)` prints its arguments, followed by a newline.
+`print(*args, sep=" ")` prints its arguments, followed by a newline.
 Arguments are formatted as if by `str(x)` and separated with a space,
 unless an alternative separator is specified by a `sep` named argument.
 
@@ -2993,6 +3049,8 @@ return results in reverse sorted order.
 The optional named parameter `key` specifies a function of one
 argument to apply to obtain the value's sort key.
 The default behavior is the identity function.
+The `key` function is called exactly once per element of the sequence, in order,
+even for a single-element list.
 
 ```python
 sorted([3, 1, 4, 1, 5, 9])                                 # [1, 1, 3, 4, 5, 9]
@@ -3156,9 +3214,10 @@ If it is another `dict`, then its key/value pairs are inserted into D.
 If it is an iterable, it must provide a sequence of pairs (or other iterables of length 2),
 each of which is treated as a key/value pair to be inserted into D.
 
-For each `name=value` argument present, the name is converted to a
-string and used as the key for an insertion into D, with its corresponding
-value being `value`.
+Then, for each `name=value` argument present, an entry with key `name`
+and value `value` is inserted into D.
+
+All insertions overwrite any previous entries having the same key.
 
 `update` fails if the dictionary is frozen or has active iterators.
 
@@ -3237,6 +3296,7 @@ nearest value within that range is used; see [Indexing](#indexing).
 
 `index` fails if `x` is not found in L, or if `start` or `end`
 is not a valid index (`int` or `None`).
+To avoid this error, test `x in list` before calling `list.index(x)`.
 
 ```python
 x = ["b", "a", "n", "a", "n", "a"]
