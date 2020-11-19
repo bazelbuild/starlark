@@ -3330,7 +3330,7 @@ x                                       # ["a", "b", "c", "d", "e"]
 `L.pop([index])` removes and returns the last element of the list L, or,
 if the optional index is provided, at that index.
 
-`insert` fails if the index is negative or not less than the length of
+`pop` fails if the index is negative or not less than the length of
 the list, of if the list is frozen or has active iterators.
 
 ```python
