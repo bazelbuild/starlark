@@ -10,7 +10,6 @@ import testenv
 
 class StarlarkTest(unittest.TestCase):
   CHUNK_SEP = "---"
-  ERR_SEP = "###"
   seen_error = False
 
   def chunks(self, path):
@@ -30,12 +29,14 @@ class StarlarkTest(unittest.TestCase):
           code = []
           test_line_no = line_no + 1
         else:
-          i = line.find(self.ERR_SEP)
-          if i >= 0:
-            expected_errors.append(line[i + len(self.ERR_SEP):].strip())
-            code.append(line[:i])
-          else:
-            code.append(line)
+          m = re.search("### *((go|java|rust):)? *(.*)", line)
+          if m:
+            error_impl = m.group(2)
+            assert error_impl is None or error_impl in ["go", "java", "rust"]
+            if (not error_impl) or error_impl == impl:
+              expected_errors.append(m.group(3))
+          code.append(line)
+    assert len(expected_errors) <= 1
     yield code, expected_errors, test_line_no
 
   def evaluate(self, f):
