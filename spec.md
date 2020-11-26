@@ -1961,7 +1961,7 @@ Negative values of _n_ behave like zero.
 
 ```python
 'mur' * 2               # 'murmur'
-3 * range(3)            # [0, 1, 2, 0, 1, 2, 0, 1, 2]
+3 * (True, "a")         # (True, "a", True, "a", True, "a")
 ```
 
 Applications may define additional types that support any subset of
