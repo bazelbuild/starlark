@@ -3196,10 +3196,12 @@ present; `setdefault` additionally inserts the new key/value entry into the dict
 ```python
 x = {"one": 1, "two": 2}
 x.setdefault("one")                     # 1
-x.setdefault("three", 0)                # 0
-x                                       # {"one": 1, "two": 2, "three": 0}
+x.setdefault("three", 3)                # 3
+x                                       # {"one": 1, "two": 2, "three": 3}
+x.setdefault("three", 33)               # 3
+x                                       # {"one": 1, "two": 2, "three": 3}
 x.setdefault("four")                    # None
-x                                       # {"one": 1, "two": 2, "three": None}
+x                                       # {"one": 1, "two": 2, "three": 3, "four": None}
 ```
 
 <a id='dict·update'></a>
