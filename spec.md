@@ -3561,7 +3561,7 @@ are strings.
 
 ```python
 ", ".join(["one", "two", "three"])      # "one, two, three"
-"a".join("ctmrn")                       # "catamaran"
+"a".join("ctmrn".elems())               # "catamaran"
 ```
 
 <a id='string·lower'></a>
