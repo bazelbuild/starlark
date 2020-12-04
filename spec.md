@@ -242,7 +242,7 @@ and            else           load
 break          for            not
 continue       if             or
 def            in             pass
-elif           return
+elif           lambda         return
 ```
 
 The tokens below also may not be used as identifiers although they do not
@@ -251,15 +251,14 @@ appear in the grammar; they are reserved as possible future keywords:
 <!-- and to remain a syntactic subset of Python -->
 
 ```text
-as             is
-assert         lambda
+as             import
+assert         is
 class          nonlocal
 del            raise
 except         try
 finally        while
 from           with
 global         yield
-import
 ```
 
 *Identifiers*: an identifier is a sequence of Unicode letters, decimal
@@ -933,7 +932,16 @@ A function value represents a function defined in Starlark.
 Its [type](#type) is `"function"`.
 A function value used in a Boolean context is always considered true.
 
-Function definitions may not be nested.
+Functions defined by a [`def` statement](#function-definitions) are named;
+functions defined by a [`lambda` expression](#lambda-expressions) are anonymous.
+
+Function definitions may be nested, and an inner function may refer 
+to a local variable of an outer function.
+Starlark has no equivalent of Python's `nonlocal` keyword,
+and thus no way for an inner function cannot assign to a local 
+variable of an outer function.
+However, the inner function may mutate the value of such variables
+until they become frozen.
 
 A function definition defines zero or more named parameters.
 Starlark has a rich mechanism for passing arguments to functions.
@@ -1133,6 +1141,7 @@ allowing unbounded recursion.
 
 A built-in function is a function or method implemented by the interpreter
 or the application into which the interpreter is embedded.
+Its [type](#type) is `"builtin_function_or_method"`.
 
 A built-in function value used in a Boolean context is always considered true.
 
@@ -1431,7 +1440,7 @@ hashable, unless they have become immutable due to _freezing_.
 A `tuple` value is hashable only if all its elements are hashable.
 Thus `("localhost", 80)` is hashable but `([127, 0, 0, 1], 80)` is not.
 
-Values of type `function` are also hashable.
+Values of the types `function` and `builtin_function_or_method` are also hashable.
 Although functions are not necessarily immutable, as they may be
 closures that refer to mutable variables, instances of these types
 are compared by reference identity (see [Comparisons](#comparisons)),
@@ -1572,7 +1581,7 @@ and `Test` where it accepts an expression of only a single component.
 ```text
 Expression = Test {',' Test} .
 
-Test = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr .
+Test = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
 
 PrimaryExpr = Operand
             | PrimaryExpr DotSuffix
@@ -1653,10 +1662,11 @@ for x in 1, 2:
 ```
 
 Starlark (like Python 3) does not accept an unparenthesized tuple
-expression as the operand of a list comprehension:
+or lambda expression as the operand of a `for`-clause in a comprehension:
 
 ```python
 [2*x for x in 1, 2, 3]	       	# parse error: unexpected ','
+[2*x for x in lambda: 0]       	# parse error: unexpected 'lambda'
 ```
 
 ### Dictionary expressions
@@ -2086,6 +2096,24 @@ Example:
 "yes" if enabled else "no"
 ```
 
+During parsing, the `if` operator, considered as a postfix operator on
+the "true" expression, has higher precedence than `else` (a prefix
+operator on the "false" expression), which in turn has higher
+precedence than the `lambda` prefix operator.
+
+```python
+a if b else (c if d else e)          # parens are redundant
+(a if b else c) if d else e          # parens are required
+
+lambda: (a if b else c)              # parens are redunant
+(lambda: a) if b else c              # parens are required
+
+a if b else lambda: (c if d else e)  # parens are redundant
+a if b else (lambda: c if d else e)  # parens are required
+(a if b else lambda: c) if d else e  # parens are required
+```
+
+
 ### Comprehensions
 
 A comprehension constructs new list or dictionary value by looping
@@ -2316,6 +2344,46 @@ operand (when the stride is 1). By contrast, slicing a list requires
 the creation of a new list and copying of the necessary elements.
 
 
+### Lambda expressions
+
+A `lambda` expression yields a new function value.
+
+```grammar {.good}
+LambdaExpr = 'lambda' [Parameters] ':' Test .
+```
+
+Syntactically, a lambda expression consists of the keyword `lambda`,
+followed by a parameter list like that of a `def` statement but
+unparenthesized, then a colon `:`, and a single expression, the
+_function body_.
+
+Example:
+
+```python
+def map(f, list):
+    return [f(x) for x in list]
+
+map(lambda x: 2*x, range(3))    # [2, 4, 6]
+```
+
+As with functions created by a `def` statement, a lambda function
+captures the syntax of its body, the default values of any optional
+parameters, a reference to each free variable appearing in its body, and
+the global dictionary of the current module.
+
+The name of a function created by a lambda expression is `"lambda"`.
+
+The two statements below are essentially equivalent, but the
+function created by the `def` statement is named `twice` and the
+function created by the lambda expression is named `lambda`.
+
+```python
+def twice(x):
+   return x * 2
+
+twice = lambda x: x * 2
+```
+
 ## Statements
 
 ```text
@@ -2486,9 +2554,21 @@ def f(**kwargs): pass
 
 Execution of a `def` statement creates a new function object.  The
 function object contains: the syntax of the function body; the default
-value for each optional parameter; the value of each free variable
-referenced within the function body; and the global dictionary of the
+value for each optional parameter; a reference to each free variable
+appearing within the function body; and the global dictionary of the
 current module.
+
+```python
+def f(x):
+  res = []
+  def get_x():
+    res.append(x)
+  get_x()
+  x = 2
+  get_x()
+
+f(1) # returns [1, 2]
+```
 
 <!-- this is too implementation-oriented; it's not a spec. -->
 
@@ -3816,11 +3896,7 @@ ExprStmt     = Expression .
 
 LoadStmt = 'load' '(' string {',' [identifier '='] string} [','] ')' .
 
-Test = IfExpr
-     | PrimaryExpr
-     | UnaryExpr
-     | BinaryExpr
-     .
+Test = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
 
 IfExpr = Test 'if' Test 'else' Test .
 
@@ -3872,6 +3948,8 @@ Binop = 'or'
       | '-' | '+'
       | '*' | '%' | '/' | '//'
       .
+
+LambdaExpr = 'lambda' [Parameters] ':' Test .
 
 Expression = Test {',' Test} .
 # NOTE: trailing comma permitted only when within [...] or (...).
