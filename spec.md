@@ -1011,7 +1011,7 @@ f(3)                    # error: cannot append to frozen list
 <b>Variadic functions:</b> Some functions allow callers to provide an
 arbitrary number of arguments.
 After all required and optional parameters, a function definition may
-specify a _variadic arguments_ or _varargs_ parameter, indicated by a
+specify a _variadic arguments list_ or _varargs_ parameter, indicated by a
 star preceding the parameter name: `*args`.
 Any surplus positional arguments provided by the caller are formed
 into a tuple and assigned to the `args` parameter.
@@ -1026,7 +1026,7 @@ f(1, 2, 3, 4)           # (1, 2, (3, 4))
 
 <b>Keyword-variadic functions:</b> Some functions allow callers to
 provide an arbitrary sequence of `name=value` keyword arguments.
-A function definition may include a final _keyworded arguments_ or
+A function definition may include a final _keyword arguments dictionary_ or
 _kwargs_ parameter, indicated by a double-star preceding the parameter
 name: `**kwargs`.
 Any surplus named arguments that do not correspond to named parameters
@@ -1044,8 +1044,8 @@ f(x=2, y=1, z=3)        # (2, 1, {"z": 3})
 It is a static error if any two parameters of a function have the same name.
 
 Just as a function definition may accept an arbitrary number of
-positional or keyworded arguments, a function call may provide an
-arbitrary number of positional or keyworded arguments supplied by a
+positional or keyword arguments, a function call may provide an
+arbitrary number of positional or keyword arguments supplied by a
 list or dictionary:
 
 ```python
