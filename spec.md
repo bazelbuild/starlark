@@ -2846,6 +2846,31 @@ a finite `float`.
 
 With no argument, `float()` returns `0.0`.
 
+### fail
+
+The `fail(*args)` function causes execution to fail
+with an error message that includes the string forms of the argument values.
+The precise formatting depends on the implementation.
+
+```python
+fail("oops")			# "fail: oops"
+fail("oops", 1, False)		# "fail: oops 1 False"
+```
+<!-- 
+Note: 
+
+Neither the template of the error message nor the formatting of the 
+values is prescribed here. Implementations may use a richer representation
+than str or repr, with additional debugging information.
+The error message is not observable by Starlark programs.
+
+The Java implementation also accepts two (deprecated) named parameters:
+- msg=value, an optional leading argument.
+- attr=value..., which adds an attribute prefix.
+and the Go implementation accepts a sep=... parameter, like print().
+See https://github.com/bazelbuild/starlark/issues/47.
+-->
+
 ### getattr
 
 `getattr(x, name[, default])` returns the value of the attribute (field or method) of x named `name`
