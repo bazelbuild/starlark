@@ -3326,6 +3326,9 @@ and value `value` is inserted into D.
 
 All insertions overwrite any previous entries having the same key.
 
+It is permissible to update the dict with itself given as pairs.
+The operation is no-op.
+
 `update` fails if the dictionary is frozen or has active iterators.
 
 ```python
@@ -3381,6 +3384,9 @@ x                                       # []
 `L.extend(x)` appends the elements of `x`, which must be iterable, to
 the list L, and returns `None`.
 
+It is permissible to extend the list with itself. The operation
+doubles the list.
+
 `extend` fails if `x` is not iterable, or if the list L is frozen or has active iterators.
 
 ```python
@@ -3388,6 +3394,10 @@ x = []
 x.extend([1, 2, 3])                     # None
 x.extend(["foo"])                       # None
 x                                       # [1, 2, 3, "foo"]
+
+y = [1, 2]
+y.extend(y)
+y                                       # [1, 2, 1, 2]
 ```
 
 <a id='list·index'></a>
