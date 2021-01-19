@@ -509,7 +509,7 @@ The `*` operator performs multiplication.
 The `//` and `%` operations on integers compute floored division and
 remainder of floored division, respectively.
 If the signs of the operands differ, the sign of the remainder `x % y`
-matches that of the dividend, `x`.
+matches that of the divisor, `y`.
 For all finite x and y (y ≠ 0), `(x // y) * y + (x % y) == x`.
 The `/` operator implements floating-point division, and
 yields a `float` result even when its operands are both of type `int`.
@@ -561,7 +561,7 @@ Although the resulting number is integral, it is represented as a
 The `%` operation computes the remainder of floored division.
 As with the corresponding operation on integers,
 if the signs of the operands differ, the sign of the remainder `x % y`
-matches that of the dividend, `x`.
+matches that of the divisor, `y`.
 
 All float values are ordered, so they may be compared
 using operators such as `==` and `<`, and sorted using `sorted`.
