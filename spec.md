@@ -1598,7 +1598,9 @@ Operand = identifier
 
 DotSuffix   = '.' identifier .
 CallSuffix  = '(' [Arguments [',']] ')' .
-SliceSuffix = '[' [Expression] [':' Test [':' Test]] ']' .
+SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
+            | '[' Expression ']'
+            .
 ```
 
 ### Identifiers
@@ -2255,7 +2257,9 @@ value in the range -`n` ≤ `i` < `n`, where `n` is `len(a)`; any other
 index results in an error.
 
 ```text
-SliceSuffix = '[' [Expression] [':' Test [':' Test]] ']' .
+SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
+            | '[' Expression ']'
+            .
 ```
 
 A valid negative index `i` behaves like the non-negative index `n+i`,
@@ -2295,7 +2299,9 @@ A slice expression `a[start:stop:stride]` yields a new value containing a
 subsequence of `a`, which must be a string, tuple, or list.
 
 ```text
-SliceSuffix = '[' [Expression] [':' Test [':' Test]] ']' .
+SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
+            | '[' Expression ']'
+            .
 ```
 
 Each of the `start`, `stop`, and `stride` operands is optional;
@@ -3939,7 +3945,9 @@ Operand = identifier
         .
 
 DotSuffix   = '.' identifier .
-SliceSuffix = '[' [Expression] [':' Test [':' Test]] ']' .
+SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
+            | '[' Expression ']'
+            .
 CallSuffix  = '(' [Arguments [',']] ')' .
 
 Arguments = Argument {',' Argument} .
