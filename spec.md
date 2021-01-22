@@ -2040,7 +2040,9 @@ operand types are valid and how to convert the operand `x` to a string:
 s       any             as if by str(x)
 r       any             as if by repr(x)
 d       number          signed integer decimal
-o       number          signed octal
+o       number          signed octal, no 0o prefix
+x       number          signed hexadecimal, lowercase, no 0x prefix
+X       number          signed hexadecimal, uppercase, no 0x prefix
 e       number          float exponential format, lowercase (1.230000e+12)
 E       number          float exponential format, uppercase (1.230000E+12)
 f       number          float decimal format                (1230000000000.000000)
