@@ -385,21 +385,14 @@ It is an error if the value of an octal or hexadecimal escape is greater than de
 "\x41-\x5A"             # "A-Z"
 ```
 
-The bit width of each string element is not defined by this spec,
-and for reasons of efficiency and interoperability with the host language,
-it varies across implementations.
-For example, in the Go and Rust implementations,
-each string element is an 8-bit value (a byte) and Unicode text is encoded as UTF-8,
-whereas in the Java implementation,
-string elements are 16-bit values (Java `char`s) and Unicode text is encoded as UTF-16.
-This spec generalizes both approaches by referring to the string encoding as "UTF-K",
-where the value of K is implementation-defined.
-
-A *Unicode escape* denotes the UTF-K encoding of a single Unicode code point.
+A *Unicode escape* denotes the UTF-K encoding of a single, valid Unicode code point,
+where K is the implementation-defined number of bits in each string element
+(see [strings](#strings)).
 The `\uXXXX` form, with exactly four hexadecimal digits,
 denotes a 16-bit code point, and the `\UXXXXXXXX`,
 with exactly eight digits, denotes a 32-bit code point.
-It is an error if the value lies in the surrogate range (U+D800 to U+DFFF).
+It is an error if the value lies in the surrogate range (U+D800 to U+DFFF)
+or is greater than U+10FFFF.
 
 ```python
 '\u0041'		# "A", an ASCII letter (U+0041)
@@ -409,7 +402,7 @@ It is an error if the value lies in the surrogate range (U+D800 to U+DFFF).
 ```
 
 The length of the encoding of a single Unicode code point may vary
-based on the implementation's string encoding ("K").
+based on the implementation's value of K:
 
 ```python
 len("A") 		# 1
@@ -418,19 +411,13 @@ len("界")               # 3 (UTF-8) or 1 (UTF-16)
 len("😀")               # 4 (UTF-8) or 2 (UTF-16)
 ```
 
-An *element escape* denotes a single element of a text string.
-It consists of `\X`, followed by two hexadecimal digits if K=8, or four if K=16.
-Element escapes are needed only to express strings that do not
-contain a valid encoding of text, such as the result of a substring
-operation that truncates an incomplete UTF-K encoding.
-Element escapes are inherently non-portable,
-and their use in source code is discouraged.
-
-```python
-"\X41"			# 'A', same as '\x41'
-"\XFF"			# '\XFF', not a valid text string
-"😀"[:1]		# "\Xf0" (UTF-8) or "\Xd83d" (UTF-16)
-```
+Although string values may be capable of representing any sequence elements,
+string  _literals_ can denote only sequences of UTF-K code
+units that are valid encodings of text.
+(Any literal syntax capable of representing arbitrary element sequences
+would inherently be non-portable across implementations.)
+Consequently, when the `repr` function is applied to a string
+containing an invalid encoding, its result is not a valid string literal.
 
 An ordinary string literal may not contain an unescaped newline,
 but a *multiline string literal* may spread over multiple source lines.
@@ -498,8 +485,6 @@ with the following differences:
 
 - Octal and hexadecimal escapes may specify any byte value from
   zero (`\000` or `\x00`) to 255 (`\377` or `\xFF`).
-
-- Element escapes `\X` are not permitted.
 
 - A Unicode escape `\uXXXX` or `\UXXXXXXXX` denotes the byte
   sequence of the UTF-8 encoding of the specified 16- or 32-bit code point.
@@ -734,18 +719,24 @@ float(3) / 2                                    # 1.5
 A string is an immutable sequence of elements that encode Unicode text.
 The [type](#type) of a string is `"string"`.
 
-Depending on the implementation, the elements may be 8- or 16-bit values,
-and may hold arbitrary values of the element type;
-we call the implementation's element width K.
-By convention, however, strings are typically used to hold valid encodings
-of Unicode code points, encoded using UTF-K.
+For reasons of efficiency and interoperability with the host language,
+the number of bits in each string element, which we call K,
+is specified to be either 8 or 16, depending on the implementation.
+For example, in the Go and Rust implementations,
+each string element is an 8-bit value (a byte) and Unicode text is encoded as UTF-8,
+whereas in the Java implementation,
+string elements are 16-bit values (Java `char`s) and Unicode text is encoded as UTF-16.
+
+An implementation may permit strings to hold arbitrary values of the element type,
+including sequences that do not denote encode valid Unicode text;
+or, it may disallow invalid sequences, and operations that would form them.
 
 The built-in `len` function returns the number of elements in a string.
 
 Strings may be concatenated with the `+` operator.
 
 The substring expression `s[i:j]` returns the substring of `s` from
-index `i` up to index `j`.
+element index `i` up to index `j`.
 <!-- TODO: The Rust implementation of s[i:j] may fail if it cuts a 
      UTF-8 sequence in half. Need to accommodate that here. -->
 The index expression `s[i]` returns the
@@ -755,7 +746,8 @@ Strings are hashable, and thus may be used as keys in a dictionary.
 
 Strings are totally ordered lexicographically, so strings may be
 compared using operators such as `==` and `<`.
-(Beware that the UTF-16 string encoding is not order-preserving.)
+(Beware that the UTF-16 string encoding is not order-preserving
+with respect to code point values.)
 
 Strings are _not_ iterable sequences, so they cannot be used as the operand of
 a `for`-loop, list comprehension, or any other operation than requires
@@ -807,16 +799,16 @@ Strings have several built-in methods:
 A _bytes_ is an immutable sequence of values in the range 0-255.
 The [type](#type) of a bytes is `"bytes"`.
 
-Unlike a string, a bytes may represent binary data,
+Unlike a string, which is intended for text, a bytes may represent binary data,
 such as the contents of an arbitrary file, without loss.
 
 The built-in `len` function returns the number of elements (bytes) in a `bytes`.
 
 Two bytes values may be concatenated with the `+` operator.
 
-The slice expression `b[i:j]` returns the subsequence of `b` from
-index `i` up to index `j`.  The index expression `b[i]` returns the
-int value of the ith element.
+The slice expression `b[i:j]` returns the subsequence of `b`
+from index `i` up to but not including index `j`.
+The index expression `b[i]` returns the int value of the ith element.
 
 Like strings, bytes are hashable, totally ordered, and not iterable,
 and are considered True if they are non-empty. 
@@ -831,7 +823,7 @@ TODO(https://github.com/bazelbuild/starlark/issues/112)
     replace
 - specify ord, chr?
 - hash(bytes)
-- support 'bytes in bytes'?
+- support 'bytes in bytes', 'int in bytes'?
 - bytes(...) function
 - encode, decode methods?
 - can we reduce string iterator methods without loss of generality/efficiency?
@@ -960,7 +952,7 @@ Dictionaries provide constant-time operations to insert an element, to
 look up the value for a key, or to remove an element.  Dictionaries
 are implemented using hash tables, so keys must be hashable.  Hashable
 values include `None`, Booleans, numbers, strings, and bytes, and tuples
-composed from hashable values.  Most mutable values, such as lists,
+composed from hashable values.  Most mutable values, such as lists
 and dictionaries, are not hashable, unless they are frozen.
 Attempting to use a non-hashable value as a key in a dictionary
 results in a dynamic error.
@@ -1492,7 +1484,7 @@ variable, and calls to some built-in functions such as `print` change
 the state of the application that embeds the interpreter.
 
 Values of some data types, such as `NoneType`, `bool`, `int`, `float`,
-`string` and `bytes`, are _immutable_; they can never change.
+`string`, and `bytes`, are _immutable_; they can never change.
 Immutable values have no notion of _identity_: it is impossible for a
 Starlark program to tell whether two integers, for instance, are
 represented by the same object; it can tell only whether they are
@@ -1747,14 +1739,13 @@ Lookup of locals and globals may fail if not yet defined.
 
 ### Literals
 
-Starlark supports string literals of four different kinds:
+Starlark supports literals of four different kinds:
 
 ```text
 Operand = int | float | string | bytes
 ```
 
-Evaluation of a literal yields a value of the given type
-(int, float, string, or bytes) with the given value.
+Evaluation of an int, float, string, or bytes literal yields the value of that literal.
 See [Literals](#lexical elements) for details.
 
 ### Parenthesized expressions
@@ -2054,7 +2045,7 @@ Concatenation
      list + list
     tuple + tuple
 
-Repetition (bytes/string/list/tuple)
+Repetition (string/bytes/list/tuple)
       int * sequence
  sequence * int
 
@@ -2473,8 +2464,8 @@ nearest value in the range -1 to `n`-1, inclusive.
 Unlike Python, Starlark does not allow a slice expression on the left
 side of an assignment.
 
-Slicing a tuple or string may be more efficient than slicing a list
-because tuples and strings are immutable, so the result of the
+Slicing a tuple, string, or bytes may be more efficient than slicing a list
+because tuple, string, and bytes values are immutable, so the result of the
 operation can share the underlying representation of the original
 operand (when the stride is 1). By contrast, slicing a list requires
 the creation of a new list and copying of the necessary elements.
@@ -3272,6 +3263,18 @@ repr("x")               # '"x"'
 repr([1, "x"])          # '[1, "x"]'
 ```
 
+When applied to a string containing valid text,
+`repr` returns a string literal that denotes that string.
+When applied to a string containing an invalid UTF-K sequence,
+`repr` uses `\x` and `\u` escapes with out-of-range values to indicate
+the invalid elements; the result is not a valid literal.
+
+```python
+repr("🙂"[:1])		# "\xf0" (UTF-8) or "\ud83d" (UTF-16)
+"\xf0"                  # error: non-ASCII hex escape
+"\ud83d"                # error: invalid Unicode code point U+D83D
+```
+
 ### reversed
 
 `reversed(x)` returns a new list containing the elements of the iterable sequence x in reverse order.
@@ -3326,7 +3329,7 @@ With no arguments, `tuple()` returns the empty tuple.
 
 ### type
 
-type(x) returns a string describing the type of its operand.
+`type(x)` returns a string describing the type of its operand.
 
 ```python
 type(None)              # "NoneType"
@@ -4074,7 +4077,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | float | string
+        | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expression [',']] ')'
