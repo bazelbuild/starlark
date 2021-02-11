@@ -47,8 +47,6 @@ interact with the environment.
 
 ## Contents
 
-<!-- WTF? No automatic TOC? -->
-
   * [Overview](#overview)
   * [Contents](#contents)
   * [Lexical elements](#lexical-elements)
@@ -58,6 +56,7 @@ interact with the environment.
     * [Integers](#integers)
     * [Floating-point numbers](#floating-point-numbers)
     * [Strings](#strings)
+    * [Bytes](#bytes)
     * [Lists](#lists)
     * [Tuples](#tuples)
     * [Dictionaries](#dictionaries)
@@ -104,7 +103,7 @@ interact with the environment.
     * [any](#any)
     * [all](#all)
     * [bool](#bool)
-    * [chr](#chr)
+<!--    * [chr](#chr) -->
     * [dict](#dict)
     * [dir](#dir)
     * [enumerate](#enumerate)
@@ -118,7 +117,7 @@ interact with the environment.
     * [list](#list)
     * [max](#max)
     * [min](#min)
-    * [ord](#ord)
+<!--    * [ord](#ord) -->
     * [print](#print)
     * [range](#range)
     * [repr](#repr)
@@ -216,7 +215,7 @@ returns (U+000D), and newlines (U+000A).  Within a line, white space
 has no effect other than to delimit the previous token, but newlines,
 and spaces at the start of a line, are significant tokens.
 
-*Comments*: A hash character (`#`) appearing outside of a string
+*Comments*: A hash character (`#`) appearing outside of a string or bytes
 literal marks the start of a comment; the comment extends to the end
 of the line, not including the newline character.
 Comments are treated like other white space.
@@ -273,7 +272,7 @@ x       index   starts_with     arg0
 ```
 
 *Literals*: literals are tokens that denote specific values.  Starlark
-has integer, floating-point, and string literals.
+has integer, floating-point, string, and bytes literals.
 
 ```text
 0                               # int
@@ -288,6 +287,10 @@ has integer, floating-point, and string literals.
 "hello"      'hello'            # string
 '''hello'''  """hello"""        # triple-quoted string
 r'hello'     r"hello"           # raw string literal
+
+b"hello"     b'hello'           # bytes
+b'''hello''' b"""hello"""       # triple-quoted bytes
+rb'hello'    br"hello"          # raw bytes literal
 ```
 
 Integer and floating-point literal tokens are defined by the following grammar:
@@ -365,16 +368,56 @@ allowing a long string to be split across multiple lines of the source file.
 def"			# "abcdef"
 ```
 
-An *octal escape* encodes a single byte using its octal value.
+An *octal escape* encodes a single string element using its octal value.
 It consists of a backslash followed by one, two, or three octal digits [0-7].
-It is error if the value is greater than decimal 255.
+Simiarly, a *hexadecimal escape* encodes a single string element using its hexadecimal value.
+It consists of `\x` followed by two hexadecimal digits [0-9a-fA-F].
+It is an error if the value of an octal or hexadecimal escape is greater than decimal 127.
 
 ```python
-'\0'			# "\x00"  a string containing a single NUL byte
+'\0'			# "\x00"  a string containing a single NUL element
 '\12'			# "\n"    octal 12 = decimal 10
 '\101-\132'		# "A-Z"
 '\119'			# "\t9"   = "\11" + "9"
+
+'\x00'			# "\x00"  a string containing a single NUL element
+'\0A'			# "\n"    hexadecimal A = decimal 10
+"\x41-\x5A"             # "A-Z"
 ```
+
+A *Unicode escape* denotes the UTF-K encoding of a single, valid Unicode code point,
+where K is the implementation-defined number of bits in each string element
+(see [strings](#strings)).
+The `\uXXXX` form, with exactly four hexadecimal digits,
+denotes a 16-bit code point, and the `\UXXXXXXXX`,
+with exactly eight digits, denotes a 32-bit code point.
+It is an error if the value lies in the surrogate range (U+D800 to U+DFFF)
+or is greater than U+10FFFF.
+
+```python
+'\u0041'		# "A", an ASCII letter (U+0041)
+'\u0414' 		# "Д", a Cyrillic capital letter (U+0414)
+'\u754c                 # "界", a Chinese character (U+754C)
+'\U0001F600'            # "😀", an Emoji (U+1F600)
+```
+
+The length of the encoding of a single Unicode code point may vary
+based on the implementation's value of K:
+
+```python
+len("A") 		# 1
+len("Д") 		# 2 (UTF-8) or 1 (UTF-16)
+len("界")               # 3 (UTF-8) or 1 (UTF-16)
+len("😀")               # 4 (UTF-8) or 2 (UTF-16)
+```
+
+Although string values may be capable of representing any sequence elements,
+string  _literals_ can denote only sequences of UTF-K code
+units that are valid encodings of text.
+(Any literal syntax capable of representing arbitrary element sequences
+would inherently be non-portable across implementations.)
+Consequently, when the `repr` function is applied to a string
+containing an invalid encoding, its result is not a valid string literal.
 
 An ordinary string literal may not contain an unescaped newline,
 but a *multiline string literal* may spread over multiple source lines.
@@ -419,6 +462,39 @@ b"		# "a\\\nb"
 It is an error for a backslash to appear within a string literal other
 than as part of one of the escapes described above.
 
+
+### Bytes literals
+
+A Starlark bytes literal denotes a bytes value,
+and looks like a string literal, in any of its various forms
+(single-quoted, double-quoted, triple-quoted, raw)
+preceded by the letter `b`.
+
+```python
+b"abc"       b'abc'
+b"""abc"""   b'''abc'''
+br"abc"      br'abc'
+rb"abc"      rb'abc'
+```
+
+A raw bytes literal may be indicated by either a `br` or `rb` prefix.
+
+Non-escaped text within a bytes literal denotes the UTF-8 encoding of that text.
+Bytes literals support the same escape sequences as text strings,
+with the following differences:
+
+- Octal and hexadecimal escapes may specify any byte value from
+  zero (`\000` or `\x00`) to 255 (`\377` or `\xFF`).
+
+- A Unicode escape `\uXXXX` or `\UXXXXXXXX` denotes the byte
+  sequence of the UTF-8 encoding of the specified 16- or 32-bit code point.
+  (As with text strings, the code point value must not lie in the surrogate range.)
+
+Any valid string literal that, with a `b` prefix, is also a
+valid bytes literal is equivalent in the sense that
+the bytes value is the UTF-8 encoding of the string value.
+
+
 TODO: define indent, outdent, semicolon, newline, eof
 
 ## Data types
@@ -430,7 +506,8 @@ NoneType                     # the type of None
 bool                         # True or False
 int                          # a signed integer of arbitrary magnitude
 float                        # an IEEE 754 double-precision floating-point number
-string                       # a byte string
+string                       # a text string, with Unicode encoded as UTF-8 or UTF-16
+bytes                        # a byte string
 list                         # a fixed-length sequence of values
 tuple                        # a fixed-length sequence of values, unmodifiable
 dict                         # a mapping from values to values
@@ -451,7 +528,7 @@ every value has a type string that can be obtained with the expression
 `type(x)`, and any value may be converted to a string using the
 expression `str(x)`, or to a Boolean truth value using the expression
 `bool(x)`.  Other operations apply only to certain types.  For
-example, the indexing operation `a[i]` works only with strings, lists,
+example, the indexing operation `a[i]` works only with strings, bytes values, lists,
 and tuples, and any application-defined types that are _indexable_.
 The [_value concepts_](#value-concepts) section explains the groupings of
 types by the operators they support.
@@ -639,28 +716,43 @@ float(3) / 2                                    # 1.5
 
 ### Strings
 
-A string represents an immutable sequence of bytes.
+A string is an immutable sequence of elements that encode Unicode text.
 The [type](#type) of a string is `"string"`.
 
-Strings can represent arbitrary binary data, including zero bytes, but
-most strings contain text, encoded by convention using UTF-8.
+For reasons of efficiency and interoperability with the host language,
+the number of bits in each string element, which we call K,
+is specified to be either 8 or 16, depending on the implementation.
+For example, in the Go and Rust implementations,
+each string element is an 8-bit value (a byte) and Unicode text is encoded as UTF-8,
+whereas in the Java implementation,
+string elements are 16-bit values (Java `char`s) and Unicode text is encoded as UTF-16.
 
-The built-in `len` function returns the number of bytes in a string.
+An implementation may permit strings to hold arbitrary values of the element type,
+including sequences that do not denote encode valid Unicode text;
+or, it may disallow invalid sequences, and operations that would form them.
+
+The built-in `len` function returns the number of elements in a string.
 
 Strings may be concatenated with the `+` operator.
 
 The substring expression `s[i:j]` returns the substring of `s` from
-index `i` up to index `j`.  The index expression `s[i]` returns the
-1-byte substring `s[i:i+1]`.
+element index `i` up to index `j`.
+<!-- TODO: The Rust implementation of s[i:j] may fail if it cuts a 
+     UTF-8 sequence in half. Need to accommodate that here. -->
+The index expression `s[i]` returns the
+1-element substring `s[i:i+1]`.
 
 Strings are hashable, and thus may be used as keys in a dictionary.
 
 Strings are totally ordered lexicographically, so strings may be
 compared using operators such as `==` and `<`.
+(Beware that the UTF-16 string encoding is not order-preserving
+with respect to code point values.)
 
 Strings are _not_ iterable sequences, so they cannot be used as the operand of
 a `for`-loop, list comprehension, or any other operation than requires
-an iterable sequence.
+an iterable sequence. One must expliitly call a method of a string value
+to obtain an iterable view.
 
 Any value may formatted as a string using the `str` or `repr` built-in
 functions, the `str % tuple` operator, or the `str.format` method.
@@ -701,6 +793,41 @@ Strings have several built-in methods:
 * [`title`](#string·title)
 * [`upper`](#string·upper)
 
+
+### Bytes
+
+A _bytes_ is an immutable sequence of values in the range 0-255.
+The [type](#type) of a bytes is `"bytes"`.
+
+Unlike a string, which is intended for text, a bytes may represent binary data,
+such as the contents of an arbitrary file, without loss.
+
+The built-in `len` function returns the number of elements (bytes) in a `bytes`.
+
+Two bytes values may be concatenated with the `+` operator.
+
+The slice expression `b[i:j]` returns the subsequence of `b`
+from index `i` up to but not including index `j`.
+The index expression `b[i]` returns the int value of the ith element.
+
+Like strings, bytes are hashable, totally ordered, and not iterable,
+and are considered True if they are non-empty. 
+
+```
+TODO(https://github.com/bazelbuild/starlark/issues/112)
+- methods. Likely the same as string (minus those concerned with text):
+    elems - iterator over ints
+    join
+    {start,end}with
+    {r,}{find,index,partition,split,strip}
+    replace
+- specify ord, chr?
+- hash(bytes)
+- support 'bytes in bytes', 'int in bytes'?
+- bytes(...) function
+- encode, decode methods?
+- can we reduce string iterator methods without loss of generality/efficiency?
+```
 
 ### Lists
 
@@ -824,8 +951,8 @@ The [type](#type) of a dictionary is `"dict"`.
 Dictionaries provide constant-time operations to insert an element, to
 look up the value for a key, or to remove an element.  Dictionaries
 are implemented using hash tables, so keys must be hashable.  Hashable
-values include `None`, Booleans, numbers, and strings, and tuples
-composed from hashable values.  Most mutable values, such as lists,
+values include `None`, Booleans, numbers, strings, and bytes, and tuples
+composed from hashable values.  Most mutable values, such as lists
 and dictionaries, are not hashable, unless they are frozen.
 Attempting to use a non-hashable value as a key in a dictionary
 results in a dynamic error.
@@ -867,8 +994,7 @@ len(coins)				# 5, existing item was updated
 A dictionary can also be constructed using a [dictionary
 comprehension](#comprehension), which evaluates a pair of expressions,
 the _key_ and the _value_, for every element of another iterable such
-as a list.  This example builds a mapping from each word to its length
-in bytes:
+as a list.  This example builds a mapping from each word to its length:
 
 ```python
 words = ["able", "baker", "charlie"]
@@ -1358,7 +1484,7 @@ variable, and calls to some built-in functions such as `print` change
 the state of the application that embeds the interpreter.
 
 Values of some data types, such as `NoneType`, `bool`, `int`, `float`,
-and `string`, are _immutable_; they can never change.
+`string`, and `bytes`, are _immutable_; they can never change.
 Immutable values have no notion of _identity_: it is impossible for a
 Starlark program to tell whether two integers, for instance, are
 represented by the same object; it can tell only whether they are
@@ -1431,7 +1557,7 @@ The hash of a value is an unspecified integer chosen so that two equal
 values have the same hash, in other words, `x == y => hash(x) == hash(y)`.
 A hashable value has the same hash throughout its lifetime.
 
-Values of the types `NoneType`, `bool`, `int`, `float`, and `string`,
+Values of the types `NoneType`, `bool`, `int`, `float`, `string`, and `bytes`,
 which are all immutable, are hashable.
 
 Values of mutable types such as `list` and `dict` are not
@@ -1457,13 +1583,13 @@ We can classify different kinds of sequence types based on the
 operations they support.
 
 * `Iterable`: an _iterable_ value lets us process each of its elements in a fixed order.
-  Examples: `dict`, `list`, `tuple`, but not `string`.
+  Examples: `dict`, `list`, `tuple`, but not `string` or `bytes`.
 * `Sequence`: a _sequence of known length_ lets us know how many elements it
   contains without processing them.
-  Examples: `dict`, `list`, `tuple`, but not `string`.
+  Examples: `dict`, `list`, `tuple`, but not `string` or `bytes`.
 * `Indexable`: an _indexed_ type has a fixed length and provides efficient
   random access to its elements, which are identified by integer indices.
-  Examples: `string`, `tuple`, and `list`.
+  Examples: `string`, `bytes`, `tuple`, and `list`.
 * `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
   element at a given integer index. Example: `list`.
 * `Mapping`: a mapping is an association of keys to values. Example: `dict`.
@@ -1473,11 +1599,11 @@ least the `Sequence` contract, it's possible for an an application
 that embeds the Starlark interpreter to define additional data types
 representing sequences of unknown length that implement only the `Iterable` contract.
 
-Strings are not iterable, though they do support the `len(s)` and
+Strings and bytes values are not iterable, though they do support the `len(s)` and
 `s[i]` operations. Starlark deviates from Python here to avoid a common
 pitfall in which a string is used by mistake where a list containing a
 single string was intended, resulting in its interpretation as a sequence
-of bytes.
+of letters.
 
 Most Starlark operators and built-in functions that need a sequence
 of values will accept any iterable.
@@ -1590,7 +1716,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | float | string
+        | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expression] [,] ')'
@@ -1615,14 +1741,13 @@ Lookup of locals and globals may fail if not yet defined.
 
 ### Literals
 
-Starlark supports string literals of three different kinds:
+Starlark supports literals of four different kinds:
 
 ```text
-Operand = int | float | string
+Operand = int | float | string | bytes
 ```
 
-Evaluation of a literal yields a value of the given type
-(int, float, or string) with the given value.
+Evaluation of an int, float, string, or bytes literal yields the value of that literal.
 See [Literals](#lexical elements) for details.
 
 ### Parenthesized expressions
@@ -1866,6 +1991,7 @@ bool            # False < True
 int             # mathematical
 float           # as defined by IEEE 754, except NaN > +Inf
 string          # lexicographical
+bytes           # lexicographical
 tuple           # lexicographical
 list            # lexicographical
 ```
@@ -1917,10 +2043,11 @@ Bitwise operations:
 
 Concatenation
    string + string
+    bytes + bytes
      list + list
     tuple + tuple
 
-Repetition (string/list/tuple)
+Repetition (string/bytes/list/tuple)
       int * sequence
  sequence * int
 
@@ -1955,7 +2082,7 @@ It is a dynamic error if the second operand is negative.
 ```
 
 The `+` operator may be applied to non-numeric operands of the same
-type, such as two lists, two tuples, or two strings, in which case it
+type, such as two lists, two tuples, two strings, or two bytes, in which case it
 computes the concatenation of the two operands and yields a new value of
 the same type.
 
@@ -1966,7 +2093,7 @@ the same type.
 ```
 
 The `*` operator may be applied to an integer _n_ and a value of type
-`string`, `list`, or `tuple`, in which case it yields a new value
+`string`, `bytes`, `list`, or `tuple`, in which case it yields a new value
 of the same sequence type consisting of _n_ repetitions of the original sequence.
 The order of the operands is immaterial.
 Negative values of _n_ behave like zero.
@@ -2254,7 +2381,7 @@ f("n")                                          # 2
 ### Index expressions
 
 An index expression `a[i]` yields the `i`th element of an _indexable_
-type such as a string, tuple, or list.  The index `i` must be an `int`
+type such as a string, bytes, tuple, or list.  The index `i` must be an `int`
 value in the range -`n` ≤ `i` < `n`, where `n` is `len(a)`; any other
 index results in an error.
 
@@ -2298,7 +2425,7 @@ type, such as a tuple or string, or a frozen value of a mutable type.
 ### Slice expressions
 
 A slice expression `a[start:stop:stride]` yields a new value containing a
-subsequence of `a`, which must be a string, tuple, or list.
+subsequence of `a`, which must be a string, bytes, tuple, or list.
 
 ```text
 SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
@@ -2345,8 +2472,8 @@ nearest value in the range -1 to `n`-1, inclusive.
 Unlike Python, Starlark does not allow a slice expression on the left
 side of an assignment.
 
-Slicing a tuple or string may be more efficient than slicing a list
-because tuples and strings are immutable, so the result of the
+Slicing a tuple, string, or bytes may be more efficient than slicing a list
+because tuple, string, and bytes values are immutable, so the result of the
 operation can share the underlying representation of the original
 operand (when the stride is 1). By contrast, slicing a list requires
 the creation of a new list and copying of the necessary elements.
@@ -2995,6 +3122,8 @@ s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
 `hash(x)` returns an integer hash value for a string x such that `x == y`
 implies `hash(x) == hash(y)`.
 
+<!-- TODO: hash(bytes) -->
+
 ### int
 
 `int(x[, base])` interprets its argument as an integer.
@@ -3142,6 +3271,18 @@ repr("x")               # '"x"'
 repr([1, "x"])          # '[1, "x"]'
 ```
 
+When applied to a string containing valid text,
+`repr` returns a string literal that denotes that string.
+When applied to a string containing an invalid UTF-K sequence,
+`repr` uses `\x` and `\u` escapes with out-of-range values to indicate
+the invalid elements; the result is not a valid literal.
+
+```python
+repr("🙂"[:1])		# "\xf0" (UTF-8) or "\ud83d" (UTF-16)
+"\xf0"                  # error: non-ASCII hex escape
+"\ud83d"                # error: invalid Unicode code point U+D83D
+```
+
 ### reversed
 
 `reversed(x)` returns a new list containing the elements of the iterable sequence x in reverse order.
@@ -3185,6 +3326,7 @@ str(1)                          # '1'
 str("x")                        # 'x'
 str([1, "x"])                   # '[1, "x"]'
 str(0.0)                        # '0.0'        (formatted as if by "%g")
+str(b"abc")                     # 'b"abc"'
 ```
 
 ### tuple
@@ -3195,7 +3337,7 @@ With no arguments, `tuple()` returns the empty tuple.
 
 ### type
 
-type(x) returns a string describing the type of its operand.
+`type(x)` returns a string describing the type of its operand.
 
 ```python
 type(None)              # "NoneType"
@@ -3496,11 +3638,14 @@ They are interpreted according to Starlark's [indexing conventions](#indexing).
 ### string·elems
 
 `S.elems()` returns an iterable value containing successive
-1-byte substrings of S.
+1-element substrings of S.
 
 ```python
 'Hello, 123'.elems()  # ["H", "e", "l", "l", "o", ",", " ", "1", "2", "3"]
 ```
+
+<!-- TODO: this isn't compatible with Rust strings, which must be valid UTF-8. -->
+
 
 <a id='string·endswith'></a>
 ### string·endswith
@@ -3940,7 +4085,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | float | string
+        | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expression [',']] ')'
@@ -3996,11 +4141,11 @@ Tokens:
 
 - spaces: newline, eof, indent, outdent.
 - identifier.
-- literals: string, int, float.
+- literals: string, bytes, int, float.
 - plus all quoted tokens such as '+=', 'return'.
 
 Notes:
 
 - Ambiguity is resolved using operator precedence.
 - The grammar does not enforce the legal order of params and args,
-  nor that the first compclause must be a 'for'.
+  nor that the first CompClause must be a 'for'.
