@@ -103,6 +103,7 @@ interact with the environment.
     * [any](#any)
     * [all](#all)
     * [bool](#bool)
+    * [bytes](#bytes)
 <!--    * [chr](#chr) -->
     * [dict](#dict)
     * [dir](#dir)
@@ -129,6 +130,7 @@ interact with the environment.
     * [type](#type)
     * [zip](#zip)
   * [Built-in methods](#built-in-methods)
+    * [bytes·elems](#bytes·elems)
     * [dict·clear](#dict·clear)
     * [dict·get](#dict·get)
     * [dict·items](#dict·items)
@@ -147,10 +149,10 @@ interact with the environment.
     * [list·remove](#list·remove)
     * [set·union](#set·union)
     * [string·capitalize](#string·capitalize)
-    * [string·codepoint_ords](#string·codepoint_ords)
-    * [string·codepoints](#string·codepoints)
+<!-- * [string·codepoint_ords](#string·codepoint_ords) -->
+<!-- * [string·codepoints](#string·codepoints) -->
     * [string·count](#string·count)
-    * [string·elem_ords](#string·elem_ords)
+<!-- * [string·elem_ords](#string·elem_ords) -->
     * [string·elems](#string·elems)
     * [string·endswith](#string·endswith)
     * [string·find](#string·find)
@@ -810,23 +812,24 @@ The slice expression `b[i:j]` returns the subsequence of `b`
 from index `i` up to but not including index `j`.
 The index expression `b[i]` returns the int value of the ith element.
 
-Like strings, bytes are hashable, totally ordered, and not iterable,
+The `in` operator may be used to test for the presence of one bytes
+as a subsequence of another, or for the presence of a single `int` byte value.
+
+Like strings, bytes values are hashable, totally ordered, and not iterable,
 and are considered True if they are non-empty. 
 
+A bytes value has these methods:
+
+* [`elems`](#bytes·elems)
 ```
 TODO(https://github.com/bazelbuild/starlark/issues/112)
-- methods. Likely the same as string (minus those concerned with text):
-    elems - iterator over ints
+- more methods: likely the same as string (minus those concerned with text):
     join
     {start,end}with
     {r,}{find,index,partition,split,strip}
     replace
-- specify ord, chr?
-- hash(bytes)
-- support 'bytes in bytes', 'int in bytes'?
-- bytes(...) function
-- encode, decode methods?
-- can we reduce string iterator methods without loss of generality/efficiency?
+TODO: encode, decode methods?
+TODO: ord, chr.
 ```
 
 ### Lists
@@ -1271,10 +1274,10 @@ Its [type](#type) is `"builtin_function_or_method"`.
 
 A built-in function value used in a Boolean context is always considered true.
 
-Many built-in functions are predeclared in the environment
-(see [Name Resolution](#name-resolution)), and are thus available to	(see [Name Resolution](#name-resolution)).
-all Skylark programs.	Some built-in functions such as `len` are _universal_, that is,
-available to all Skylark programs.
+Many built-in functions are predeclared in the environment;
+see [Name Resolution](#name-resolution).
+Some built-in functions such as `len` are _universal_, that is,
+available to all Starlark programs.
 The host application may predeclare additional built-in functions
 in the environment of a specific module.
 
@@ -2110,19 +2113,20 @@ these operators.
 #### Membership tests
 
 ```text
-      any in     sequence		(list, tuple, dict, string)
+      any in     sequence		(list, tuple, dict, string, bytes, range)
       any not in sequence
 ```
 
 The `in` operator reports whether its first operand is a member of its
-second operand, which must be a list, tuple, dict, or string.
+second operand, which must be a list, tuple, dict, string, or bytes.
 The `not in` operator is its negation.
 Both return a Boolean.
 
 The meaning of membership varies by the type of the second operand:
 the members of a list or tuple are its elements;
 the members of a dict are its keys;
-the members of a string are all its substrings.
+the members of a string or bytes are all its substrings.
+Additionally, the members of a bytes include the int values of its (byte) elements.
 
 ```python
 1 in [1, 2, 3]                  # True
@@ -2136,6 +2140,9 @@ d = {"one": 1, "two": 2}
 "nasty" in "dynasty"            # True
 "a" in "banana"                 # True
 "f" not in "way"                # True
+
+b"nasty" in b"dynasty"          # True
+97 in b"abc"                    # True (97 = 'a')
 ```
 
 #### String interpolation
@@ -2381,7 +2388,7 @@ f("n")                                          # 2
 ### Index expressions
 
 An index expression `a[i]` yields the `i`th element of an _indexable_
-type such as a string, bytes, tuple, or list.  The index `i` must be an `int`
+type such as a string, bytes, tuple, list, or range.  The index `i` must be an `int`
 value in the range -`n` ≤ `i` < `n`, where `n` is `len(a)`; any other
 index results in an error.
 
@@ -2425,7 +2432,8 @@ type, such as a tuple or string, or a frozen value of a mutable type.
 ### Slice expressions
 
 A slice expression `a[start:stop:stride]` yields a new value containing a
-subsequence of `a`, which must be a string, bytes, tuple, or list.
+subsequence of `a`, which must be an indexable sequence such as string,
+bytes, tuple, list, or range.
 
 ```text
 SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
@@ -2984,6 +2992,29 @@ If the iterable is empty, it returns `True`.
 `bool(x)` interprets `x` as a Boolean value---`True` or `False`.
 With no argument, `bool()` returns `False`.
 
+### bytes
+
+`bytes(x)` converts its argument to a `bytes`.
+
+If x is a `bytes`, the result is x.
+
+If x is a string, the result is a `bytes` whose elements are
+the UTF-8 encoding of the string. Each element of the string that is
+not part of a valid encoding of a code point is replaced by the
+UTF-8 encoding of the replacement character, U+FFFD.
+
+If x is an iterable sequence of int values,
+the result is a `bytes` whose elements are those integers.
+It is an error if any element is not in the range 0-255.
+
+```python
+bytes("hello 😃")		# b"hello 😃"
+bytes(b"hello 😃")		# b"hello 😃"
+bytes("hello 😃"[:-1])          # b"hello ���"
+bytes([65, 66, 67])		# b"ABC"
+bytes(65)			# error: got int, want string, bytes, or iterable of int
+```
+
 ### dict
 
 `dict` creates a dictionary.  It accepts up to one positional
@@ -3107,22 +3138,20 @@ provided `default` value instead of failing.
 
 ### hash
 
-`hash(x)` returns an integer hash of a string x
-such that two equal strings have the same hash.
+`hash(x)` returns an integer hash of a string or bytes x
+such that two equal values have the same hash.
 In other words `x == y` implies `hash(x) == hash(y)`.
+Any other type of argument in an error, even if it is suitable as the key of a dict.
+
 In the interests of reproducibility of Starlark program behavior over time and
-across implementations, the specific hash function is the same as that implemented by
+across implementations, the specific hash function for bytes is 32-bit FNV-1a,
+and the hash function for strings is the same as that implemented by
 [java.lang.String.hashCode](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#hashCode),
 a simple polynomial accumulator over the UTF-16 transcoding of the string:
 
 ```python
 s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
 ```
-
-`hash(x)` returns an integer hash value for a string x such that `x == y`
-implies `hash(x) == hash(y)`.
-
-<!-- TODO: hash(bytes) -->
 
 ### int
 
@@ -3326,8 +3355,12 @@ str(1)                          # '1'
 str("x")                        # 'x'
 str([1, "x"])                   # '[1, "x"]'
 str(0.0)                        # '0.0'        (formatted as if by "%g")
-str(b"abc")                     # 'b"abc"'
+str(b"abc")                     # 'abc'
 ```
+
+The string form of a bytes value is the UTF-K decoding of the bytes.
+Each byte that is not part of a valid encoding is replaced by the
+UTF-K encoding of the replacement character, U+FFFD.
 
 ### tuple
 
@@ -3367,6 +3400,18 @@ using [dot expressions](#dot-expressions).
 For example, strings have a `count` method that counts
 occurrences of a substring; `"banana".count("a")` yields `3`.
 
+<a id='bytes·elems'></a>
+### bytes·elems
+
+`b.elems()` returns an opaque iterable value containing successive int elements of b.
+Its type is `"bytes.elems"`, and its string representation is of the form `b"...".elems()`.
+
+```python
+type(b"ABC".elems())	# "bytes.elems"
+b"ABC".elems()	        # b"ABC".elems()
+list(b"ABC".elems())  	# [65, 66, 67]
+```
+<!-- TODO: signpost how to convert an single int or list of int to a bytes. -->
 
 <a id='dict·get'></a>
 ### dict·get
@@ -3637,14 +3682,27 @@ They are interpreted according to Starlark's [indexing conventions](#indexing).
 <a id='string·elems'></a>
 ### string·elems
 
-`S.elems()` returns an iterable value containing successive
+`S.elems()` returns an opaque iterable value containing successive
 1-element substrings of S.
+Its type is `"string.elems"`, and its string representation is of the form `"...".elems()`.
 
 ```python
-'Hello, 123'.elems()  # ["H", "e", "l", "l", "o", ",", " ", "1", "2", "3"]
+"Hello, 123".elems()	        # "Hello, 123".elems()
+type("Hello, 123".elems())	# "string.elems"
+list("Hello, 123".elems())	# ["H", "e", "l", "l", "o", ",", " ", "1", "2", "3"]
 ```
 
-<!-- TODO: this isn't compatible with Rust strings, which must be valid UTF-8. -->
+<!-- TODO:
+This is not very useful, because it splits codepoints into strings that are not valid text.
+Nor is it compatible with Rust strings, which must be valid UTF-8.
+Better would be for elems() to return int values of string elements,
+analogous to bytes.elems(), and just as elem_ords does (in the Go impl).
+However, that's a breaking change, and .elems() is in use in Bazel code, so cleanup is required.
+
+Users that want single-codepoint substrings can use .codepoints() and codepoint_ords(),
+both implemented in Go, but neither yet in the spec (and both hard to support in the
+Java implemntation as long as Bazel does the Latin1 hack).
+-->
 
 
 <a id='string·endswith'></a>
