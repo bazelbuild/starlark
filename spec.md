@@ -3165,18 +3165,32 @@ or infinity).
 
 If x is a `bool`, the result is 0 for `False` or 1 for `True`.
 
-If `x` is a string, it is interpreted as a sequence of digits in the specified
-base, decimal by default. If `base` is zero, `x` is interpreted like an integer
-literal, the base being inferred from an optional base marker such as `0b`,
-`0o`, or `0x` preceding the first digit. These markers may also be used if
-`base` is the corresponding base. Irrespective of base, the string may start
-with an optional `+` or `-` sign indicating the sign of the result.
+If x is a string, it is interpreted as a sequence of digits in the
+specified base, decimal by default.
+
+If `base` is zero, x is interpreted like an integer literal,
+the base being inferred from an optional base prefix such as
+`0b`, `0o`, or `0x` preceding the first digit.
+<!-- Note: the spec does not currently support 0b literals, but
+     int("0b...") works in both implementation;
+     see bazelbuild/starlark#117.
+-->
+
+When a nonzero `base` is provided explictly,
+its value must be between 2 and 36.
+The letters `a-z` represent the digits 11 through 35.
+A matching base prefix is also permitted, and has no effect.
+
+Irrespective of base, the string may start with an optional `+` or `-`,
+indicating the sign of the result.
 
 ```python
 int("21")          # 21
 int("1234", 16)    # 4660
 int("0x1234", 16)  # 4660
 int("0x1234", 0)   # 4660
+int("0b0", 16)     # 176
+int("0b111", 0)    # 7
 int("0x1234")      # error (invalid base 10 number)
 ```
 
