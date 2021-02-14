@@ -104,7 +104,6 @@ interact with the environment.
     * [all](#all)
     * [bool](#bool)
     * [bytes](#bytes)
-<!--    * [chr](#chr) -->
     * [dict](#dict)
     * [dir](#dir)
     * [enumerate](#enumerate)
@@ -118,7 +117,6 @@ interact with the environment.
     * [list](#list)
     * [max](#max)
     * [min](#min)
-<!--    * [ord](#ord) -->
     * [print](#print)
     * [range](#range)
     * [repr](#repr)
@@ -149,10 +147,7 @@ interact with the environment.
     * [list·remove](#list·remove)
     * [set·union](#set·union)
     * [string·capitalize](#string·capitalize)
-<!-- * [string·codepoint_ords](#string·codepoint_ords) -->
-<!-- * [string·codepoints](#string·codepoints) -->
     * [string·count](#string·count)
-<!-- * [string·elem_ords](#string·elem_ords) -->
     * [string·elems](#string·elems)
     * [string·endswith](#string·endswith)
     * [string·find](#string·find)
@@ -830,6 +825,7 @@ TODO(https://github.com/bazelbuild/starlark/issues/112)
     replace
 TODO: encode, decode methods?
 TODO: ord, chr.
+TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 ```
 
 ### Lists
