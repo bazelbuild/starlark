@@ -74,7 +74,7 @@ int('123', 1) ### >= 2 (and|&&) <= 36
 ---
 int('123', 37) ### >= 2 (and|&&) <= 36
 ---
-int('123', 'x') ### (base must be an integer|not supported)
+int('123', 'x') ### (base must be an integer|for base, got string, want int|not supported)
 ---
 
 # base with prefix
