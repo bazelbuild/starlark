@@ -1,5 +1,7 @@
 # Starlark
 
+[![Build status](https://badge.buildkite.com/8b4240b7092ded039cad0d825d7a6ebff115623ec8af217121.svg)](https://buildkite.com/bazel/starlark)
+
 ## Overview
 
 Starlark (formerly known as Skylark) is a language intended for use as a
