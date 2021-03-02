@@ -2903,6 +2903,40 @@ load("module.sky", "x", "y", "z")       # assigns x, y, and z
 load("module.sky", "x", y2="y", "z")    # assigns x, y2, and z
 ```
 
+Varaibles bound by `load` statement are local to the current module:
+they are not available to `load` statements from other modules even
+if variable names do not start with an underscore.  Loaded variables
+are similar to builtins: they are available to the current module
+but they cannot be loaded unless they are explicitly reassigned to
+globals.
+
+Loaded variables cannot be rebound, similar to global variables:
+* it is a static error to bind a variable more than once with load statements
+* it a static or runtime error to bind a global variable if a variable
+  with the same name name previously loaded
+* it is permitted to load a variable overriding a builtin
+
+For example, this code is incorrect:
+
+```python
+load("module.sky", "x")
+load("module2.sky", "x")     # error: variable x is already bound
+```
+
+This code is incorrect as well:
+
+```python
+load("module.sky", "x")
+def x(): pass                # error: variable x is already bound
+```
+
+This code is fine:
+
+```python
+load("module.sky", True = "BetterTrue")
+```
+
+
 A load statement within a function is a static error.
 
 
