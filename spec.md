@@ -3933,7 +3933,8 @@ If S does not contain `x`, `partition` returns `(S, "", "")`.
 <a id='string·removeprefix'></a>
 ### string·removeprefix
 
-`S.removeprefix(x)` removes the prefix `x` from the string S and returns the rest of the string.
+`S.removeprefix(x)` removes the prefix `x` from the string S at most once,
+and returns the rest of the string.
 If the prefix string is not found then it returns the original string.
 
 `removeprefix` fails if `x` is not a string.
@@ -3941,12 +3942,14 @@ If the prefix string is not found then it returns the original string.
 ```python
 "banana".removeprefix("ban")		# "ana"
 "banana".removeprefix("ana")		# "banana"
+"bbaa".removeprefix("b")		# "baa"
 ```
 
 <a id='string·removesuffix'></a>
 ### string·removesuffix
 
-`S.removesuffix(x)` removes the suffix `x` from the string S and returns the rest of the string.
+`S.removesuffix(x)` removes the suffix `x` from the string S at most once,
+and returns the rest of the string.
 If the suffix string is not found then it returns the original string.
 
 `removesuffix` fails if `x` is not a string.
@@ -3954,6 +3957,7 @@ If the suffix string is not found then it returns the original string.
 ```python
 "banana".removesuffix("ana")		# "ban"
 "banana".removesuffix("ban")		# "banana"
+"bbaa".removesuffix("a")		# "bba"
 ```
 
 <a id='string·replace'></a>
