@@ -60,7 +60,6 @@ interact with the environment.
     * [Lists](#lists)
     * [Tuples](#tuples)
     * [Dictionaries](#dictionaries)
-    * [Sets](#sets)
     * [Functions](#functions)
     * [Built-in functions](#built-in-functions)
   * [Name binding and variables](#name-binding-and-variables)
