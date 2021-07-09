@@ -90,7 +90,7 @@ genrule(
     name = "starlark",
     outs = ["target/debug/starlark-repl"],
     srcs = ["."],
-    cmd = "cd $(SRCS) && cargo build && cd - && cp $(SRCS)/target/debug/starlark-rust $@",
+    cmd = "cd $(SRCS) && cargo build && cd - && cp $(SRCS)/target/debug/starlark $@",
     executable = True,
     local = True,
     visibility = ["//visibility:public"],
