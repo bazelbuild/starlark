@@ -10,7 +10,6 @@ aim to remove the differences and provide a
 *   in Java:
     https://github.com/bazelbuild/bazel/tree/master/src/main/java/net/starlark/java
 *   in Rust: https://github.com/google/starlark-rust/
-*   in C and Lua: https://github.com/obazl/moonlark
 
 ## Tools
 
@@ -20,6 +19,8 @@ aim to remove the differences and provide a
 * [Starlark Playground](https://github.com/qri-io/starpg): Starlark Playground
   is a web-based starlark editor. It uses the golang implementation of starlark
   running on a server to present a monaco editor set to python syntax.
+* [Moonlark](https://github.com/obazl/moonlark): Starlark parser in C with Lua
+  bindings.
 
 ## IDEs
 
