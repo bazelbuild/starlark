@@ -83,7 +83,7 @@ go_repository(
 # Assumes you have cargo/rust installed
 new_git_repository(
   name = "starlark-rust",
-  remote = "https://github.com/google/starlark-rust.git",
+  remote = "https://github.com/facebookexperimental/starlark-rust.git",
   branch = "master",
   build_file_content = """
 genrule(
