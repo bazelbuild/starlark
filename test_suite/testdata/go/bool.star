@@ -40,20 +40,20 @@ assert_eq(1 if "" else 0, 0)
 assert_eq(0 or "" or [] or 0, 0)
 assert_eq(0 or "" or [] or 123 or 1 // 0, 123)
 ---
-0 or "" or [] or 0 or 1 // 0 ### division by zero
+0 or "" or [] or 0 or 1 // 0 ### (division by zero|divide by zero)
 ---
 
 # 'and' yields the first false operand, or the last if all are true.
 assert_eq(1 and "a" and [1] and 123, 123)
 assert_eq(1 and "a" and [1] and 0 and 1 // 0, 0)
 ---
-1 and "a" and [1] and 123 and 1 // 0 ### division by zero
+1 and "a" and [1] and 123 and 1 // 0 ### (division by zero|divide by zero)
 ---
 
 # Built-ins that want a bool want an actual bool, not a truth value.
 # See github.com/bazelbuild/starlark/issues/30
 assert_eq(''.splitlines(True), [])
 ---
-''.splitlines(1) ### (got.*want|expected bool)
+''.splitlines(1) ### (got.*want|expected bool|type of parameter.*doesn't match)
 ---
-''.splitlines("hello") ### (got.*want|expected bool)
+''.splitlines("hello") ### (got.*want|expected bool|type of parameter.*doesn't match)
