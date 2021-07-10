@@ -19,15 +19,15 @@ assert_eq(int('0XFF', 0), 255)
 assert_eq(int('0xFF', 16), 255)
 
 ---
-int('1.5') ### (invalid literal|not a base 10)
+int('1.5') ### (invalid literal|not a base 10|not a valid number in base 10)
 ---
-int('ab') ### (invalid literal|not a base 10)
+int('ab') ### (invalid literal|not a base 10|not a valid number in base 10)
 ---
 int(None) ### None
 ---
-int('123', 3) ### (invalid literal|not a base 3)
+int('123', 3) ### (invalid literal|not a base 3|not a valid number in base 3)
 ---
-int('FF', 15) ### (invalid literal|not a base 15)
+int('FF', 15) ### (invalid literal|not a base 15|not a valid number in base 15)
 ---
 int('123', -1) ### >= 2 (and|&&) <= 36
 ---
@@ -35,7 +35,7 @@ int('123', 1) ### >= 2 (and|&&) <= 36
 ---
 int('123', 37) ### >= 2 (and|&&) <= 36
 ---
-int('0xFF', 8) ### (invalid literal|not a base 8)
+int('0xFF', 8) ### (invalid literal|not a base 8|not a valid number in base 8)
 ---
 int(True, 2) ### (can't convert non-string with explicit base|non-string)
 ---

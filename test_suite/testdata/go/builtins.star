@@ -61,11 +61,11 @@ assert_eq(sorted(["two", "three", "four"], key=len, reverse=True),
         ["three", "four", "two"])
 
 ---
-sorted(1) ### (for parameter iterable: got int, want iterable|not a collection|not iterable)
+sorted(1) ### (for parameter iterable: got int, want iterable|not a collection|not iterable|operation.*not supported)
 ---
-sorted([1, 2, None, 3]) ### (not implemented|cannot compare)
+sorted([1, 2, None, 3]) ### (not implemented|cannot compare|operation.*not supported)
 ---
-sorted([1, "one"]) ### (string < int not implemented|cannot compare)
+sorted([1, "one"]) ### (string < int not implemented|cannot compare|operation.*not supported)
 ---
 # _inconsistency_: java accepts key to be None
 # sorted([1, 2, 3], key=None) ## (want callable|not supported)
@@ -174,7 +174,7 @@ assert_eq(max("one", "two", "three", "four"), "two")
 ---
 min() ### (at least one (positional argument|item)|empty)
 ---
-min(1) ### not iterable
+min(1) ### (not iterable|operation.*not supported)
 ---
 min([]) ### (empty|expected at least one item)
 ---
@@ -200,7 +200,7 @@ z1.append(2)
 assert_eq(zip(z1), [(1,), (2,)])
 z1.append(3)
 ---
-zip([1, 2, 3], 1) ### not iterable
+zip([1, 2, 3], 1) ### (not iterable|operation.*not supported)
 ---
 
 # dir for builtin_function_or_method

@@ -34,10 +34,10 @@ assert_eq(any({1 : None, '' : None}), True)
 assert_eq(any({None : 1, '' : 2}), False)
 
 ---
-all(None) ### iterable
+all(None) ### (iterable|operation.*not supported)
 ---
-any(None) ### iterable
+any(None) ### (iterable|operation.*not supported)
 ---
-any(1) ### iterable
+any(1) ### (iterable|operation.*not supported)
 ---
-all(1) ### iterable
+all(1) ### (iterable|operation.*not supported)

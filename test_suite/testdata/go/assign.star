@@ -12,7 +12,7 @@ assert_eq(c, 3)
 
 ---
 def f1(): (x,) = 1
-f1() ### (int in sequence assignment|not iterable|got 'int')
+f1() ### (int in sequence assignment|not iterable|got 'int'|operation.*not supported on type)
 ---
 def f2(): a, b, c = 1, 2
 f2() ### (too few values to unpack|unpacked 2 values but expected 3|length mismatch)
@@ -36,7 +36,7 @@ assert_eq(c, 3)
 
 ---
 def f1(): [a, b, c,] = 1
-f1() ### (got int in sequence assignment|not iterable|got 'int')
+f1() ### (got int in sequence assignment|not iterable|got 'int'|operation.*not supported on type)
 ---
 def f2(): [a, b, c] = 1, 2
 f2() ### (too few values to unpack|unpacked 2 values but expected 3|length mismatch)
@@ -102,10 +102,9 @@ f()
 
 ---
 
-# Top level reassignments aren't allowed
-
-z = 0
-z += 3 ### (cannot reassign|augmented assignment|read only)
+# _inconsistency_: go implementation doesn't allow top level reassignments
+# z = 0
+# z += 3
 
 ---
 

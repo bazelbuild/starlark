@@ -42,9 +42,9 @@ f2() ### (out of range|out of bound)
 # list + list
 assert_eq([1, 2, 3] + [3, 4, 5], [1, 2, 3, 3, 4, 5])
 
-[1, 2] + (3, 4) ### (unknown.*list \+ tuple|unsupported binary|parameters mismatch)
+[1, 2] + (3, 4) ### (unknown.*list \+ tuple|unsupported binary|parameters mismatch|operation.*not supported)
 ---
-(1, 2) + [3, 4] ### (unknown.*tuple \+ list|unsupported binary|parameters mismatch)
+(1, 2) + [3, 4] ### (unknown.*tuple \+ list|unsupported binary|parameters mismatch|operation.*not supported)
 ---
 abc = ["a", "b", "c"]
 
@@ -166,7 +166,7 @@ def f5():
     x = []
     x += 1
 
-f5() ### ((unknown|unsupported) binary op|parameters mismatch)
+f5() ### ((unknown|unsupported) binary op|parameters mismatch|operation.*not supported)
 ---
 
 # append
@@ -258,7 +258,7 @@ def iterator1():
         list[x] = 2 * x
     return list
 
-iterator1() ### (assign to element.* during iteration|temporarily immutable|Cannot mutate)
+iterator1() ### (assign to element.* during iteration|temporarily immutable|Cannot mutate|mutate an iterable)
 ---
 
 def iterator2():
@@ -266,7 +266,7 @@ def iterator2():
     for x in list:
         list.remove(x)
 
-iterator2() ### (remove.*during iteration|temporarily immutable|Cannot mutate)
+iterator2() ### (remove.*during iteration|temporarily immutable|Cannot mutate|mutate an iterable)
 ---
 
 def iterator3():
@@ -274,7 +274,7 @@ def iterator3():
     for x in list:
         list.append(3)
 
-iterator3() ### (append.*during iteration|temporarily immutable|Cannot mutate)
+iterator3() ### (append.*during iteration|temporarily immutable|Cannot mutate|mutate an iterable)
 ---
 
 def iterator4():
@@ -282,7 +282,7 @@ def iterator4():
     for x in list:
         list.extend([3, 4])
 
-iterator4() ### (extend.*during iteration|temporarily immutable|Cannot mutate)
+iterator4() ### (extend.*during iteration|temporarily immutable|Cannot mutate|mutate an iterable)
 ---
 
 def f(x):
@@ -292,4 +292,4 @@ def iterator5():
     list = [1, 2, 3]
     _ = [f(list) for x in list]
 
-iterator5() ### (append.*during iteration|temporarily immutable|Cannot mutate)
+iterator5() ### (append.*during iteration|temporarily immutable|Cannot mutate|mutate an iterable)

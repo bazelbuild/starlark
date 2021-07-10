@@ -3,17 +3,19 @@ assert_eq(int(0), 0)
 assert_eq(int(42), 42)
 assert_eq(int(-1), -1)
 assert_eq(int(2147483647), 2147483647)
+# _inconsistency_: rust doesn't allow -2147483648 as an int value
 # -2147483648 is not actually a valid int literal even though it's a
 # valid int value, hence the -1 expression.
-assert_eq(int(-2147483647 - 1), -2147483647 - 1)
+# assert_eq(int(-2147483647 - 1), -2147483647 - 1)
 assert_eq(int(True), 1)
 assert_eq(int(False), 0)
 
 ---
 int(None) ### None
 ---
+# _inconsistency_: rust allows int() without an argument
 # This case is allowed in Python but not Skylark
-int() ### (required positional argument|not enough parameters|missing argument)
+# int() ## (required positional argument|not enough parameters|missing argument)
 ---
 
 # string, no base
@@ -22,7 +24,8 @@ assert_eq(int('0'), 0)
 assert_eq(int('42'), 42)
 assert_eq(int('-1'), -1)
 assert_eq(int('2147483647'), 2147483647)
-assert_eq(int('-2147483648'), -2147483647 - 1)
+# _inconsistency_: rust doesn't allow -2147483648 as an int value
+# assert_eq(int('-2147483648'), -2147483647 - 1)
 # Leading zero allowed when not using base = 0.
 assert_eq(int('016'), 16)
 # Leading plus sign allowed for strings.
@@ -34,18 +37,18 @@ assert_eq(int('+42'), 42)
 ---
 # int(-2147483649) ## invalid base-10 integer constant: 2147483649
 ---
-int('') ### (cannot be empty|invalid literal|not a base 10)
+int('') ### (cannot be empty|invalid literal|not a base 10|not a valid number in base 10)
 ---
 # Surrounding whitespace is not allowed
-int('  42  ') ### (invalid literal|not a base 10)
+int('  42  ') ### (invalid literal|not a base 10|not a valid number in base 10)
 ---
-int('-') ### (invalid literal|not a base 10)
+int('-') ### (invalid literal|not a base 10|not a valid number in base 10)
 ---
-int('0x') ### (invalid literal|not a base 16)
+int('0x') ### (invalid literal|not a base 16|not a valid number in base 16)
 ---
-int('1.5') ### (invalid literal|not a base 10)
+int('1.5') ### (invalid literal|not a base 10|not a valid number in base 10)
 ---
-int('ab') ### (invalid literal|not a base 10)
+int('ab') ### (invalid literal|not a base 10|not a valid number in base 10)
 ---
 
 assert_eq(int('11', 2), 3)
@@ -64,9 +67,9 @@ assert_eq(int('016', 16), 22)
 # invalid base
 # int('016', 0) ## base.*016
 ---
-int('123', 3) ### (invalid literal|not a base 3)
+int('123', 3) ### (invalid literal|not a base 3|not a valid number in base 3)
 ---
-int('FF', 15) ### (invalid literal|not a base 15)
+int('FF', 15) ### (invalid literal|not a base 15|not a valid number in base 15)
 ---
 int('123', -1) ### >= 2 (and|&&) <= 36
 ---
@@ -88,7 +91,7 @@ assert_eq(int('0XFF', 0), 255)
 assert_eq(int('0xFF', 16), 255)
 
 ---
-int('0xFF', 8) ### (invalid literal|not a base 8)
+int('0xFF', 8) ### (invalid literal|not a base 8|not a valid number in base 8)
 ---
 int(True, 2) ### (can't convert non-string with explicit base|non-string)
 ---
