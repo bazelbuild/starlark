@@ -33,13 +33,13 @@ assert_eq(max(1, 1, 1, 1, 1, 1), 1)
 assert_eq(max([1, 1, 1, 1, 1, 1]), 1)
 
 ---
-min(1)  ### not iterable
+min(1)  ### (not iterable|operation.*not supported on type)
 ---
 min([])  ### (expected at least one item|empty)
 ---
 max([]) ### (expected at least one item|empty)
 ---
-max(1) ### not iterable
+max(1) ### (not iterable|operation.*not supported on type)
 ---
 
 # _inconsistency_: rust supports comparision between ints and strings

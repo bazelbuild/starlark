@@ -22,7 +22,7 @@ load("@rules_python//python:defs.bzl", "py_test")
             "testdata/java/*", "testdata/go/*", "testdata/rust/*"
         ], exclude = ["**/.*"])
     ]
-    for impl, binary_rule in [("java", "@io_bazel//src/main/java/net/starlark/java/cmd:Starlark"),
+    for impl, binary_rule in [("java", "@io_bazel//src/main/java/net/starlark/java/cmd:starlark"),
                               ("go", "@net_starlark_go//cmd/starlark:starlark"),
                               ("rust", "@starlark-rust//:starlark")]
 ]

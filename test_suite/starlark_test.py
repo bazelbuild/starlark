@@ -43,8 +43,11 @@ class StarlarkTest(unittest.TestCase):
     """Execute Starlark file, return stderr."""
     proc = subprocess.Popen(
         [binary_path, f], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    _, stderr = proc.communicate()
-    return stderr
+    stdout, stderr = proc.communicate()
+    if proc.returncode == 0:
+      return b""
+    else:
+      return stdout + stderr
 
   def check_output(self, output, expected, line_no):
     if expected and not output:
