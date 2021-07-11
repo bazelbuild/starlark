@@ -36,7 +36,7 @@ assert_eq(tuple(["a", "b", "c"]), ("a", "b", "c"))
 assert_eq(tuple(["a", "b", "c"]), ("a", "b", "c"))
 assert_eq(tuple([1]), (1,))
 ---
-tuple(1) ### (got int, want iterable|not iterable|not a collection)
+tuple(1) ### (got int, want iterable|not iterable|not a collection|operation.*not supported)
 ---
 
 # tuple * int,  int * tuple

@@ -43,7 +43,7 @@ assert_eq(foo, ['a', 'b', 'c', 'd', 'e', 'f'])
 ---
 (1, 2).extend([3, 4]) ### (no (field or method 'extend|\.extend field)|not supported)
 ---
-[1, 2].extend(3) ### (expected value of type|got int, want iterable|not iterable)
+[1, 2].extend(3) ### (expected value of type|got int, want iterable|not iterable|operation.*not supported on type)
 
 # remove
 

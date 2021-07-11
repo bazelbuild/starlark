@@ -24,7 +24,6 @@ assert_eq(0in[1,2,3], False)
 # https://github.com/google/starlark-rust/issues/64: alphabetize dir entries
 assert_eq(dir(""), sorted(dir("")))
 ---
-# https://github.com/google/starlark-rust/issues/66: / is only for floats (which we don't support)
-### rust: not supported
-### java: operator is not allowed
-1 / 1
+# _inconsistency_: starlark spec allows floats and '/' operator; currently, only Java
+# implementation supports it.
+# 1 / 1
