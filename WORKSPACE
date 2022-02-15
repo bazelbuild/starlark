@@ -90,7 +90,7 @@ go_repository(
 new_git_repository(
   name = "starlark-rust",
   remote = "https://github.com/facebookexperimental/starlark-rust.git",
-  branch = "master",
+  branch = "main",
   build_file_content = """
 genrule(
     name = "starlark",
