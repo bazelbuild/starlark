@@ -164,6 +164,8 @@ interact with the environment.
     * [string·lower](#string·lower)
     * [string·lstrip](#string·lstrip)
     * [string·partition](#string·partition)
+    * [string·removeprefix](#string·removeprefix)
+    * [string·removesuffix](#string·removesuffix)
     * [string·replace](#string·replace)
     * [string·rfind](#string·rfind)
     * [string·rindex](#string·rindex)
@@ -777,6 +779,8 @@ Strings have several built-in methods:
 * [`lower`](#string·lower)
 * [`lstrip`](#string·lstrip)
 * [`partition`](#string·partition)
+* [`removeprefix`](#string·removeprefix)
+* [`removesuffix`](#string·removesuffix)
 * [`replace`](#string·replace)
 * [`rfind`](#string·rfind)
 * [`rindex`](#string·rindex)
@@ -3924,6 +3928,36 @@ If S does not contain `x`, `partition` returns `(S, "", "")`.
 
 ```python
 "one/two/three".partition("/")		# ("one", "/", "two/three")
+```
+
+<a id='string·removeprefix'></a>
+### string·removeprefix
+
+`S.removeprefix(x)` removes the prefix `x` from the string S at most once,
+and returns the rest of the string.
+If the prefix string is not found then it returns the original string.
+
+`removeprefix` fails if `x` is not a string.
+
+```python
+"banana".removeprefix("ban")		# "ana"
+"banana".removeprefix("ana")		# "banana"
+"bbaa".removeprefix("b")		# "baa"
+```
+
+<a id='string·removesuffix'></a>
+### string·removesuffix
+
+`S.removesuffix(x)` removes the suffix `x` from the string S at most once,
+and returns the rest of the string.
+If the suffix string is not found then it returns the original string.
+
+`removesuffix` fails if `x` is not a string.
+
+```python
+"banana".removesuffix("ana")		# "ban"
+"banana".removesuffix("ban")		# "banana"
+"bbaa".removesuffix("a")		# "bba"
 ```
 
 <a id='string·replace'></a>
