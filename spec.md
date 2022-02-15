@@ -658,7 +658,7 @@ which requires that all comparisons with NaN are false, except NaN != NaN.)
 This choice greatly simplifies the logic for float arithmetic by
 ensuring many standard identities and invariants such as:
 - float < float (also < <= == => >) are transitive relations
-- float < float is a strict weak order: the relation eq is transitive, 
+- float < float is a strict weak order: the relation eq is transitive,
   where eq(x, y) = not (x < y) and not (y < x).
 - not (float < float) <=> (float >= float)
 - sorting a list of values that includes NaN is stable.
@@ -736,7 +736,7 @@ Strings may be concatenated with the `+` operator.
 
 The substring expression `s[i:j]` returns the substring of `s` from
 element index `i` up to index `j`.
-<!-- TODO: The Rust implementation of s[i:j] may fail if it cuts a 
+<!-- TODO: The Rust implementation of s[i:j] may fail if it cuts a
      UTF-8 sequence in half. Need to accommodate that here. -->
 The index expression `s[i]` returns the
 1-element substring `s[i:i+1]`.
@@ -815,7 +815,7 @@ The `in` operator may be used to test for the presence of one bytes
 as a subsequence of another, or for the presence of a single `int` byte value.
 
 Like strings, bytes values are hashable, totally ordered, and not iterable,
-and are considered True if they are non-empty. 
+and are considered True if they are non-empty.
 
 A bytes value has these methods:
 
@@ -1064,10 +1064,10 @@ A function value used in a Boolean context is always considered true.
 Functions defined by a [`def` statement](#function-definitions) are named;
 functions defined by a [`lambda` expression](#lambda-expressions) are anonymous.
 
-Function definitions may be nested, and an inner function may refer 
+Function definitions may be nested, and an inner function may refer
 to a local variable of an outer function.
 Starlark has no equivalent of Python's `nonlocal` keyword,
-and thus no way for an inner function cannot assign to a local 
+and thus no way for an inner function cannot assign to a local
 variable of an outer function.
 However, the inner function may mutate the value of such variables
 until they become frozen.
@@ -1404,7 +1404,7 @@ x = "hello"
 ```
 
 The same is also true for nested loops in comprehensions.
-In the (unnatural) examples below, the scope of the variables `x`, `y`, 
+In the (unnatural) examples below, the scope of the variables `x`, `y`,
 and `z` is the entire compehension block, except the operand of the first
 loop (`[]` or `[1]`), which is resolved in the enclosing environment.
 The second loop may thus refer to variables defined by the third (`z`),
@@ -2009,7 +2009,7 @@ would break several mathematical identities. Thus:
 NaN == NaN
 ```
 
-Applications may define additional types that support ordered comparison. 
+Applications may define additional types that support ordered comparison.
 The application-defined comparison relation must be a
 [strict weak ordering](https://en.wikipedia.org/wiki/Weak_ordering#Strict_weak_orderings).
 <!-- This is a prequisite of the 'sorted' function. -->
@@ -2068,8 +2068,8 @@ and yields the bitwise intersection (AND) of its operands.
 The `|` operator likewise computes bitwise union,
 and the `^` operator bitwise XOR (exclusive OR).
 
-The `<<` and `>>` operators require two operands of type `int`. 
-They shift the first operand to the left or right 
+The `<<` and `>>` operators require two operands of type `int`.
+They shift the first operand to the left or right
 by the number of bits given by the second operand.
 Right shifts are arithmetic, not logical:
 they fill the vacated bits with copies of the sign bit.
@@ -2183,7 +2183,7 @@ e       number          float exponential format, lowercase (1.230000e+12)
 E       number          float exponential format, uppercase (1.230000E+12)
 f       number          float decimal format                (1230000000000.000000)
 F       number          same as %f
-g       number          compact format, lowercase           (0.0, 1.1, 1200, 1e+45, 1.2e+12) 
+g       number          compact format, lowercase           (0.0, 1.1, 1200, 1e+45, 1.2e+12)
 G       number          compact format, uppercase           (0.0, 1.1, 1200, 1e+45, 1.2E+12)
 ```
 
@@ -3102,10 +3102,10 @@ The precise formatting depends on the implementation.
 fail("oops")			# "fail: oops"
 fail("oops", 1, False)		# "fail: oops 1 False"
 ```
-<!-- 
-Note: 
+<!--
+Note:
 
-Neither the template of the error message nor the formatting of the 
+Neither the template of the error message nor the formatting of the
 values is prescribed here. Implementations may use a richer representation
 than str or repr, with additional debugging information.
 The error message is not observable by Starlark programs.
@@ -3722,7 +3722,7 @@ Java implemntation as long as Bazel does the Latin1 hack).
 <a id='string·endswith'></a>
 ### string·endswith
 
-`S.endswith(suffix[, start[, end]])` reports whether the string 
+`S.endswith(suffix[, start[, end]])` reports whether the string
 `S[start:end]` has the specified suffix.
 
 ```python
@@ -4085,7 +4085,7 @@ the final element does not necessarily end with a line terminator.
 <a id='string·startswith'></a>
 ### string·startswith
 
-`S.startswith(prefix[, start[, end]])` reports whether the string 
+`S.startswith(prefix[, start[, end]])` reports whether the string
 `S[start:end]` has the specified prefix.
 
 ```python
