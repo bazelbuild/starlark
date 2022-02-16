@@ -1027,12 +1027,18 @@ fail.
 A dictionary used in a Boolean context is considered true if it is
 non-empty.
 
-The binary `+` operation may be applied to two dictionaries.  It
-yields a new dictionary whose elements are the union of the two
-operands.  If a key is present in both operands, the result contains
-the value from the right operand.
-<b>Note:</b> this feature is deprecated.  Use the
-`dict.update` method instead.
+The binary `|` operation may be applied to two dictionaries. It yields a new
+dictionary whose set of keys is the union of the sets of keys of the two
+operands. The corresponding values are taken from the operands, where the value
+taken from the right operand takes precedence if both contain a given key.
+Iterating over the keys in the resulting dictionary first yields all keys in
+the left operand in insertion order, then all keys in the right operand that
+were not present in the left operand, again in insertion order.
+
+There is also an augmented assignment version of the `|` operation. For two
+dictionaries `d1` and `d2`, the expression `d1 |= d2` behaves similar to
+`d1 = d1 | d2`, but mutates `d1` in-place rather than assigning a new
+dictionary to it.
 
 Dictionaries may be compared for equality using `==` and `!=`.  Two
 dictionaries compare equal if they contain the same number of items
@@ -2055,6 +2061,9 @@ Repetition (string/bytes/list/tuple)
 
 String interpolation
    string % any                 # see String Interpolation
+
+Dictionary union
+     dict | dict                # see Dictionaries
 ```
 
 The operands of the arithmetic operators `+`, `-`, `*`, `//`, and `%`,
