@@ -3240,6 +3240,9 @@ max("two", "three", "four", key=len)            # "three", the longest
 It is an error if any element does not support ordered comparison,
 or if the sequence is empty.
 
+The optional named parameter `key` specifies a function to be applied
+to each element prior to comparison.
+
 ```python
 min([3, 1, 4, 1, 5, 9])                         # 1
 min("two", "three", "four")                     # "four", the lexicographically least
