@@ -4023,7 +4023,7 @@ _last_ occurrence.
 `S.rpartition(x)` is like `partition`, but splits `S` at the last occurrence of `x`.
 
 ```python
-"one/two/three".partition("/")		# ("one/two", "/", "three")
+"one/two/three".rpartition("/")         # ("one/two", "/", "three")
 ```
 
 <a id='string·rsplit'></a>
