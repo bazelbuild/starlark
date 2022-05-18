@@ -1,3 +1,8 @@
+<!--
+This file TOC is generated
+Use `bazel run spec_md_gen` to regenerate it in place.
+-->
+
 # Starlark Language Specification
 
 Starlark is a dialect of Python intended for use as a configuration
@@ -50,6 +55,8 @@ interact with the environment.
   * [Overview](#overview)
   * [Contents](#contents)
   * [Lexical elements](#lexical-elements)
+    * [String literals](#string-literals)
+    * [Bytes literals](#bytes-literals)
   * [Data types](#data-types)
     * [None](#none)
     * [Booleans](#booleans)
@@ -95,7 +102,7 @@ interact with the environment.
     * [For loops](#for-loops)
     * [Break and Continue](#break-and-continue)
     * [Load statements](#load-statements)
-    * [Module execution](#module-execution)
+  * [Module execution](#module-execution)
   * [Built-in constants and functions](#built-in-constants-and-functions)
     * [None](#none)
     * [True and False](#true-and-false)
@@ -106,8 +113,8 @@ interact with the environment.
     * [dict](#dict)
     * [dir](#dir)
     * [enumerate](#enumerate)
-    * [fail](#fail)
     * [float](#float)
+    * [fail](#fail)
     * [getattr](#getattr)
     * [hasattr](#hasattr)
     * [hash](#hash)
@@ -120,7 +127,6 @@ interact with the environment.
     * [range](#range)
     * [repr](#repr)
     * [reversed](#reversed)
-    * [set](#set)
     * [sorted](#sorted)
     * [str](#str)
     * [tuple](#tuple)
@@ -128,7 +134,6 @@ interact with the environment.
     * [zip](#zip)
   * [Built-in methods](#built-in-methods)
     * [bytes·elems](#bytes·elems)
-    * [dict·clear](#dict·clear)
     * [dict·get](#dict·get)
     * [dict·items](#dict·items)
     * [dict·keys](#dict·keys)
