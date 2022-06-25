@@ -24,7 +24,7 @@ aim to remove the differences and provide a
 
 ## IDEs
 
-Some IDEs have a [plugin for Bazel](https://docs.bazel.build/versions/master/ide.html).
+Some IDEs have a [plugin for Bazel](https://bazel.build/install/ide).
 Otherwise, consider using a Python mode.
 
 ## Users
