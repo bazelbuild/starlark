@@ -144,7 +144,6 @@ interact with the environment.
     * [list·insert](#list·insert)
     * [list·pop](#list·pop)
     * [list·remove](#list·remove)
-    * [set·union](#set·union)
     * [string·capitalize](#string·capitalize)
     * [string·count](#string·count)
     * [string·elems](#string·elems)
