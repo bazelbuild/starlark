@@ -378,7 +378,7 @@ It is an error if the value of an octal or hexadecimal escape is greater than de
 '\119'			# "\t9"   = "\11" + "9"
 
 '\x00'			# "\x00"  a string containing a single NUL element
-'\0A'			# "\n"    hexadecimal A = decimal 10
+'\x0A'			# "\n"    hexadecimal A = decimal 10
 "\x41-\x5A"             # "A-Z"
 ```
 
