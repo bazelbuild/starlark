@@ -134,6 +134,7 @@ interact with the environment.
     * [zip](#zip)
   * [Built-in methods](#built-in-methods)
     * [bytes·elems](#bytes·elems)
+    * [dict·clear](#dict·clear)
     * [dict·get](#dict·get)
     * [dict·items](#dict·items)
     * [dict·keys](#dict·keys)
@@ -3441,6 +3442,18 @@ b"ABC".elems()	        # b"ABC".elems()
 list(b"ABC".elems())  	# [65, 66, 67]
 ```
 <!-- TODO: signpost how to convert an single int or list of int to a bytes. -->
+
+<a id='dict·clear'></a>
+### dict·clear
+
+`D.clear()` removes all the entries of dictionary D and returns `None`.
+It fails if the dictionary is frozen or if there are active iterators.
+
+```python
+x = {"one": 1, "two": 2}
+x.clear()                               # None
+print(x)                                # {}
+```
 
 <a id='dict·get'></a>
 ### dict·get
