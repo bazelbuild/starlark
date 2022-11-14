@@ -3042,7 +3042,7 @@ The parameter names serve merely as documentation.
 
 ### abs
 
-`abs(x)` takes either an integer or a float, and returns the absolute value of that number (a positive number with the same magnitude).
+`abs(x)` takes either an integer or a float, and returns the absolute value of that number (a non-negative number with the same magnitude).
 
 ### any
 
