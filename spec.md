@@ -3355,7 +3355,7 @@ reversed({"one": 1, "two": 2}.keys())           # ["two", "one"]
 `sorted(x)` returns a new list containing the elements of the iterable sequence x,
 in sorted order.  The sort algorithm is stable.
 
-The optional named parameter `reverse`, if true, causes `sorted` to
+The optional named boolean parameter `reverse`, if true, causes `sorted` to
 return results in reverse sorted order.
 
 The optional named parameter `key` specifies a function of one
