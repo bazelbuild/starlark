@@ -45,8 +45,40 @@ rules_pkg_dependencies()
 
 git_repository(
     name = "io_bazel",
+    commit = "4853dfd02ac7440a04caada830b7b61b6081bdfe", # 2023-01-11
     remote = "https://github.com/bazelbuild/bazel.git",
-    commit = "69a2f92c7a98e25f70c90a84742d12ea46c7a3b4", # 2021-07-09
+    shallow_since = "1673450740 -0800",
+)
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-4.5",
+    sha256 = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6",
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/4.5.zip",
+)
+
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+# @io_bazel//src/main/java/net/starlark/java/cmd:starlark dependencies
+maven_install(
+    artifacts = [
+       "com.google.guava:guava:31.1-jre",
+       "com.google.errorprone:error_prone_type_annotations:2.16",
+       "com.google.code.findbugs:jsr305:3.0.2",
+       "com.github.stephenc.jcip:jcip-annotations:1.0-1",
+    ],
+    repositories = [
+        "https://dl.google.com/android/maven2",
+        "https://repo1.maven.org/maven2",
+    ],
 )
 
 http_archive(
