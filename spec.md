@@ -3188,7 +3188,7 @@ the base being inferred from an optional base prefix such as
      see bazelbuild/starlark#117.
 -->
 
-When a nonzero `base` is provided explictly,
+When a nonzero `base` is provided explicitly,
 its value must be between 2 and 36.
 The letters `a-z` represent the digits 11 through 35.
 A matching base prefix is also permitted, and has no effect.
