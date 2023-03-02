@@ -39,7 +39,7 @@ extended with custom logic to support new languages and compilers.
     thread-safe execution, shared data becomes immutable.
 *   **Simplicity**. We try to limit the number of concepts needed to understand
     the code. Users should be able to quickly read and write code, even if they
-    are not expert. The language should avoid pitfalls as much as possible.
+    are not experts. The language should avoid pitfalls as much as possible.
 *   **Focus on tooling**. We recognize that the source code will be read,
     analyzed, modified, by both humans and tools.
 *   **Python-like**. Python is a widely used language. Keeping the language
@@ -48,7 +48,7 @@ extended with custom logic to support new languages and compilers.
 
 ## Tour
 
-The code provides an example of the syntax of Starlark:
+This code provides an example of the syntax of Starlark:
 
 ```python
 # Define a number
@@ -89,7 +89,7 @@ fizz_buzz(20)
 ```
 
 If you've ever used Python, this should look very familiar. In fact, the code
-above is also a valid Python code. Still, this short example shows most of the
+above is also valid Python code. Still, this short example shows most of the
 language. Starlark is indeed a very small language.
 
 For more information, see:
