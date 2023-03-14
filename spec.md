@@ -57,6 +57,7 @@ interact with the environment.
   * [Lexical elements](#lexical-elements)
     * [String literals](#string-literals)
     * [Bytes literals](#bytes-literals)
+    * [Special tokens](#special-tokens)
   * [Data types](#data-types)
     * [None](#none)
     * [Booleans](#booleans)
@@ -496,6 +497,13 @@ Any valid string literal that, with a `b` prefix, is also a
 valid bytes literal is equivalent in the sense that
 the bytes value is the UTF-8 encoding of the string value.
 
+### Special tokens
+
+Starlark is space-sensitive language, and indentation is used to
+denote a block of statements.
+
+Unlike Python, indentation can only be composed of space characters (U+0020),
+not tabs.
 
 TODO: define indent, outdent, semicolon, newline, eof
 
