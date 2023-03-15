@@ -57,6 +57,7 @@ interact with the environment.
   * [Lexical elements](#lexical-elements)
     * [String literals](#string-literals)
     * [Bytes literals](#bytes-literals)
+    * [Special tokens](#special-tokens)
   * [Data types](#data-types)
     * [None](#none)
     * [Booleans](#booleans)
@@ -497,6 +498,13 @@ Any valid string literal that, with a `b` prefix, is also a
 valid bytes literal is equivalent in the sense that
 the bytes value is the UTF-8 encoding of the string value.
 
+### Special tokens
+
+Starlark is space-sensitive language, and indentation is used to
+denote a block of statements.
+
+Unlike Python, indentation can only be composed of space characters (U+0020),
+not tabs.
 
 TODO: define indent, outdent, semicolon, newline, eof
 
@@ -3189,7 +3197,7 @@ the base being inferred from an optional base prefix such as
      see bazelbuild/starlark#117.
 -->
 
-When a nonzero `base` is provided explictly,
+When a nonzero `base` is provided explicitly,
 its value must be between 2 and 36.
 The letters `a-z` represent the digits 11 through 35.
 A matching base prefix is also permitted, and has no effect.
@@ -3356,7 +3364,7 @@ reversed({"one": 1, "two": 2}.keys())           # ["two", "one"]
 `sorted(x)` returns a new list containing the elements of the iterable sequence x,
 in sorted order.  The sort algorithm is stable.
 
-The optional named parameter `reverse`, if true, causes `sorted` to
+The optional named boolean parameter `reverse`, if true, causes `sorted` to
 return results in reverse sorted order.
 
 The optional named parameter `key` specifies a function of one
