@@ -63,6 +63,9 @@ Otherwise, consider using a Python mode.
 *  [Tilt](https://tilt.dev/) manages local development instances for teams that
    deploy to Kubernetes. [Tilt files](https://docs.tilt.dev/tiltfile_concepts.html)
    are written in Starlark.
+*  [Vela](https://go-vela.github.io/docs/) is a continuous integration and delivery platform.
+   It supports [Starlark scripting](https://go-vela.github.io/docs/templates/tutorials/starlark/)
+   as an alternative to YAML.
 *  [ytt](https://get-ytt.io/) is a templating tool, built on top of Starlark,
    that understands YAML structure allowing you to focus on your data instead of
    how to properly escape it. Read also [IBM's blog post](
