@@ -2715,13 +2715,6 @@ function's definition, they nevertheless must appear before `*args` in a call
 to the function.
 
 ```python
-def f(a, *, b=2, c):
-  print(a, b, c)
-
-f(1)                    # error: function f missing 1 argument (c)
-f(1, 3)                 # error: function f accepts 1 positional argument (2 given)
-f(1, c=3)               # "1 2 3"
-
 def g(a, *args, b=2, c):
   print(a, b, c, args)
 
@@ -2736,6 +2729,15 @@ by using a bare `*` in place of the `*args` parameter.
 This form does not declare a parameter but marks the boundary
 between the earlier parameters and the keyword-only parameters.
 This form must be followed by at least one optional parameter.
+
+```python
+def f(a, *, b=2, c):
+  print(a, b, c)
+
+f(1)                    # error: function f missing 1 argument (c)
+f(1, 3)                 # error: function f accepts 1 positional argument (2 given)
+f(1, c=3)               # "1 2 3"
+```
 
 Finally, there may be an optional parameter name preceded by `**`.
 This is called the _keyword arguments_ parameter, and accumulates in a
