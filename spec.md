@@ -1231,7 +1231,10 @@ Function arguments are evaluated in the order they appear in the call.
 
 Unlike Python, Starlark does not allow more than one `*args` argument in a
 call, and if a `*args` argument is present it must appear after all
-positional and named arguments.
+positional and named arguments. In particular, even though keyword-only
+arguments ([see below](#function-definitions)) are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
 
 A function call completes normally after the execution of either a
 `return` statement, or of the last statement in the function body.
@@ -2707,6 +2710,10 @@ but these parameters differ from earlier ones in that they are
 _keyword-only_: if a call provides their values, it must do so as
 keyword arguments, not positional ones.
 
+Note that even though keyword-only arguments are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
+
 ```python
 def f(a, *, b=2, c):
   print(a, b, c)
@@ -2719,7 +2726,9 @@ def g(a, *args, b=2, c):
   print(a, b, c, args)
 
 g(1, 3)                 # error: function g missing 1 argument (c)
+g(1, *[4, 5], c=3)      # error: keyword argument c may not follow *args
 g(1, 4, c=3)            # "1 2 3 (4,)"
+g(1, c=3, *[4, 5])      # "1 2 3 (4,5)"
 ```
 
 A non-variadic function may also declare keyword-only parameters,
