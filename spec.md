@@ -2721,7 +2721,7 @@ def g(a, *args, b=2, c):
 g(1, 3)                 # error: function g missing 1 argument (c)
 g(1, *[4, 5], c=3)      # error: keyword argument c may not follow *args
 g(1, 4, c=3)            # "1 2 3 (4,)"
-g(1, c=3, *[4, 5])      # "1 2 3 (4,5)"
+g(1, c=3, *[4, 5])      # "1 2 3 (4, 5)"
 ```
 
 A non-variadic function may also declare keyword-only parameters,
