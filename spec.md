@@ -1199,8 +1199,8 @@ f(x=2, y=1, z=3)        # (2, 1, {"z": 3})
 It is a static error if any two parameters of a function have the same name.
 
 Just as a function definition may accept an arbitrary number of
-positional or keyword arguments, a function call may provide an
-arbitrary number of positional or keyword arguments supplied by a
+positional or named arguments, a function call may provide an
+arbitrary number of positional or named arguments supplied by a
 list or dictionary:
 
 ```python
@@ -1231,7 +1231,10 @@ Function arguments are evaluated in the order they appear in the call.
 
 Unlike Python, Starlark does not allow more than one `*args` argument in a
 call, and if a `*args` argument is present it must appear after all
-positional and named arguments.
+positional and named arguments. In particular, even though keyword-only
+arguments ([see below](#function-definitions)) are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
 
 A function call completes normally after the execution of either a
 `return` statement, or of the last statement in the function body.
@@ -2688,7 +2691,7 @@ the parameter list (which is enclosed in parentheses), a colon, and
 then an indented block of statements which form the body of the function.
 
 The parameter list is a comma-separated list whose elements are of
-four kinds.  First come zero or more required parameters, which are
+several kinds.  First come zero or more required parameters, which are
 simple identifiers; all calls must provide an argument value for these parameters.
 
 The required parameters are followed by zero or more optional
@@ -2699,11 +2702,47 @@ provide an argument value for it.
 The required parameters are optionally followed by a single parameter
 name preceded by a `*`.  This is the called the _varargs_ parameter,
 and it accumulates surplus positional arguments specified by a call.
+It is conventionally named `*args`.
+
+The varargs parameter may be followed by zero or more
+parameters, again of the forms `name` or `name=expression`,
+but these parameters differ from earlier ones in that they are
+_keyword-only_: if a call provides their values, it must do so as
+keyword arguments, not positional ones.
+
+Note that even though keyword-only arguments are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
+
+```python
+def g(a, *args, b=2, c):
+  print(a, b, c, args)
+
+g(1, 3)                 # error: function g missing 1 argument (c)
+g(1, *[4, 5], c=3)      # error: keyword argument c may not follow *args
+g(1, 4, c=3)            # "1 2 3 (4,)"
+g(1, c=3, *[4, 5])      # "1 2 3 (4, 5)"
+```
+
+A non-variadic function may also declare keyword-only parameters,
+by using a bare `*` in place of the `*args` parameter.
+This form does not declare a parameter but marks the boundary
+between the earlier parameters and the keyword-only parameters.
+This form must be followed by at least one optional parameter.
+
+```python
+def f(a, *, b=2, c):
+  print(a, b, c)
+
+f(1)                    # error: function f missing 1 argument (c)
+f(1, 3)                 # error: function f accepts 1 positional argument (2 given)
+f(1, c=3)               # "1 2 3"
+```
 
 Finally, there may be an optional parameter name preceded by `**`.
 This is called the _keyword arguments_ parameter, and accumulates in a
 dictionary any surplus `name=value` arguments that do not match a
-prior parameter.
+prior parameter. It is conventionally named `**kwargs`.
 
 Here are some example parameter lists:
 
@@ -2714,6 +2753,7 @@ def f(a, b, c=1): pass
 def f(a, b, c=1, *args): pass
 def f(a, b, c=1, *args, **kwargs): pass
 def f(**kwargs): pass
+def f(a, b, c=1, *, d=1): pass
 ```
 
 Execution of a `def` statement creates a new function object.  The
@@ -4195,7 +4235,12 @@ DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
 
 Parameters = Parameter {',' Parameter}.
 
-Parameter = identifier | identifier '=' Test | '*' identifier | '**' identifier .
+Parameter  = identifier
+           | identifier '=' Test
+           | '*'
+           | '*' identifier
+           | '**' identifier
+           .
 
 IfStmt = 'if' Test ':' Suite {'elif' Test ':' Suite} ['else' ':' Suite] .
 
