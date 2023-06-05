@@ -254,14 +254,15 @@ appear in the grammar; they are reserved as possible future keywords:
 <!-- and to remain a syntactic subset of Python -->
 
 ```text
-as             import
-assert         is
-class          nonlocal
-del            raise
-except         try
-finally        while
-from           with
-global         yield
+as             global
+assert         import
+async          is
+await          nonlocal
+class          raise
+del            try
+except         while
+finally        with
+from           yield
 ```
 
 *Identifiers*: an identifier is a sequence of Unicode letters, decimal
