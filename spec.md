@@ -107,6 +107,7 @@ interact with the environment.
   * [Built-in constants and functions](#built-in-constants-and-functions)
     * [None](#none)
     * [True and False](#true-and-false)
+    * [abs](#abs)
     * [any](#any)
     * [all](#all)
     * [bool](#bool)
@@ -3038,6 +3039,10 @@ The parameter names serve merely as documentation.
 ### True and False
 
 `True` and `False` are the two values of type `bool`.
+
+### abs
+
+`abs(x)` takes either an integer or a float, and returns the absolute value of that number (a non-negative number with the same magnitude).
 
 ### any
 
