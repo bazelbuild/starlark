@@ -62,6 +62,9 @@ class StarlarkTest(unittest.TestCase):
     for exp in expected:
       exp = exp.lower()
       # Try both substring and regex matching.
+      # TODO(stepancheg): error messages are checked incorrectly on rust,
+      #   because error message contains source snippet.
+      #   Fix it by removing `###` before evaluating.
       if exp not in output_ and not re.search(exp, output_):
         self.seen_error = True
         print("Test L{}: error not found: `{}`".format(line_no, exp.encode('utf-8')))
