@@ -27,7 +27,8 @@ Starlark is an untyped dynamic language with high-level data types,
 first-class functions with lexical scope, and automatic memory
 management or _garbage collection_.
 
-Starlark is strongly influenced by Python, and is almost a subset of
+Starlark is strongly influenced by Python, Starlark syntax is
+a strict subset of Python and Starlark semantics is almost a subset of
 that language.  In particular, its data types and syntax for
 statements and expressions will be very familiar to any Python
 programmer.
@@ -187,6 +188,10 @@ interact with the environment.
   * [Grammar reference](#grammar-reference)
 
 ## Lexical elements
+
+Starlark syntax (but not semantics) is a strict subset of Python syntax.
+Practically it means, tools working with Python AST can be used to work
+with Starlark files.
 
 A Starlark program consists of one or more modules. Each module is defined by a
 single UTF-8-encoded text file.
