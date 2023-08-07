@@ -1,4 +1,14 @@
-load("@rules_python//python:defs.bzl", "py_test")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+py_library(
+    name = "testenv",
+    srcs = [
+        "testenv.py",
+    ],
+    imports = [
+      ".",
+    ],
+)
 
 [
     [
@@ -6,7 +16,6 @@ load("@rules_python//python:defs.bzl", "py_test")
             name = "starlark_" + impl + "_test_" + test_file.replace(".", "_"),
             srcs = [
                 "starlark_test.py",
-                "testenv.py",
             ],
             args = [
                 impl,
@@ -15,6 +24,9 @@ load("@rules_python//python:defs.bzl", "py_test")
             data = [
                 binary_rule,
                 test_file,
+            ],
+            deps = [
+                ":testenv",
             ],
             main = "starlark_test.py",
         )
