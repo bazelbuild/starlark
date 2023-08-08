@@ -63,4 +63,4 @@ compound()
 ---
 1 // 0  ### (division by zero|divide by zero)
 ---
-1 % 0  ### (integer modulo by zero|division by zero|divide by zero)
+1 % 0  ### by zero

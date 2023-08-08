@@ -61,11 +61,20 @@ assert_eq(sorted(["two", "three", "four"], key=len, reverse=True),
         ["three", "four", "two"])
 
 ---
-sorted(1) ### (for parameter iterable: got int, want iterable|not a collection|not iterable|operation.*not supported)
+### java: Error in sorted
+### rust: not supported
+### go: Error in sorted
+sorted(1)
 ---
-sorted([1, 2, None, 3]) ### (not implemented|cannot compare|operation.*not supported)
+### java: unsupported
+### rust: not supported
+### go: Error in sorted
+sorted([1, 2, None, 3])
 ---
-sorted([1, "one"]) ### (string < int not implemented|cannot compare|operation.*not supported)
+### java: unsupported
+### rust: not supported
+### go: Error in sorted
+sorted([1, "one"])
 ---
 # _inconsistency_: java accepts key to be None
 # sorted([1, 2, 3], key=None) ## (want callable|not supported)

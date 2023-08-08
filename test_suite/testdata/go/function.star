@@ -174,6 +174,10 @@ def f(a, b, c, d, e, f, g, h,
       mm):
   pass
 
+### rust: more than once
+### java: multiple values
+### go: multiple values
+
 f(
     1, 2, 3, 4, 5, 6, 7, 8,
     9, 10, 11, 12, 13, 14, 15, 16,
@@ -183,7 +187,7 @@ f(
     41, 42, 43, 44, 45, 46, 47, 48,
     49, 50, 51, 52, 53, 54, 55, 56,
     57, 58, 59, 60, 61, 62, 63, 64, 65,
-    mm = 100) ### (multiple values|argument 'mm' passed both by position and by name|Extraneous parameter|occurs both explicitly and in \*\*kwargs)
+    mm = 100)
 
 ---
 # Regression test for github.com/google/starlark-go/issues/21,
