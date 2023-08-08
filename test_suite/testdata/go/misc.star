@@ -1,21 +1,45 @@
 # Miscellaneous tests of Starlark evaluation.
 
 # Ordered comparisons require values of the same type.
-None < False ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+None < False
 ---
-False < list ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+False < list
 ---
-list < {} ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+list < {}
 ---
-{} < None ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+{} < None
 ---
-None < 0 ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+None < 0
 ---
-0 < [] ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+0 < []
 ---
-[] < "" ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+[] < ""
 ---
-"" < () ### (not impl|cannot compare|operation.*not supported)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+"" < ()
 ---
 
 # _inconsistency_: cyclic data structures not supported in Rust and Java
