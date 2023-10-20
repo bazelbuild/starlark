@@ -72,3 +72,4 @@ Otherwise, consider using a Python mode.
    how to properly escape it. Read also [IBM's blog post](
    https://developer.ibm.com/blogs/yaml-templating-tool-to-simplify-complex-configuration-management/)
    about it.
+*  [Kurtosis](https://github.com/kurtosis-tech/kurtosis) is a developer tool for engineers to define and build composable environments for development, testing, and production.   Starlark is used as the DSL for defining those environments in a deterministic and readible way, without compromising on usability for complex cases.
