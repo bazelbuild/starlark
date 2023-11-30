@@ -234,12 +234,12 @@ Comments are treated like other white space.
 characters are tokens:
 
 ```text
-+    -    *    //   %    **
++    -    *    /    //   %    **
 ~    &    |    ^    <<   >>
 .    ,    =    ;    :
 (    )    [    ]    {    }
 <    >    >=   <=   ==   !=
-+=   -=   *=   //=  %=
++=   -=   *=   /=   //=  %=
 &=   |=   ^=   <<=  >>=
 ```
 
