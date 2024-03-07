@@ -32,7 +32,7 @@ Otherwise, consider using a Python mode.
 *  [Bazel](https://github.com/bazelbuild/bazel) is a fast, scalable,
    multi-language and extensible build system. Starlark has been designed for
    Bazel.
-*  [Buck](https://buckbuild.com/) is a build system from Facebook, using
+*  [Buck2](https://buck2.build/) is a build system from Meta, using
    Starlark in a similar way as Bazel.
 *  [Caddy](https://caddyserver.com/) is a fast, cross-platform HTTP/2 web
    server with automatic HTTPS.
