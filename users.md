@@ -47,6 +47,8 @@ Otherwise, consider using a Python mode.
 *  [Drone](https://drone.io) is a self-service Continuous Delivery platform. It
    supports [Starlark scripting](https://docs.drone.io/starlark/overview/) as an
    alternate to yaml configurations.
+*  [envd](https://github.com/tensorchord/envd) is a CLI to build the docker images
+   for machine learning development and production environments.
 *  [Isopod](https://github.com/cruise-automation/isopod) created by Cruise
    Automation is a DSL framework for Kubernetes configuration. It renders
    Kubernetes objects as Protocol Buffers.
