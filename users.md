@@ -50,6 +50,7 @@ Otherwise, consider using a Python mode.
 *  [Isopod](https://github.com/cruise-automation/isopod) created by Cruise
    Automation is a DSL framework for Kubernetes configuration. It renders
    Kubernetes objects as Protocol Buffers.
+*  [Kurtosis](https://github.com/kurtosis-tech/kurtosis) is a developer tool for engineers to package and run environments of containerized services for development, testing, and production. Starlark is used as the DSL for defining those environments in a deterministic, portable, and readable way, without compromising usability for complex cases.
 *  [lucicfg](https://chromium.googlesource.com/infra/luci/luci-go/+/refs/heads/master/lucicfg/doc/README.md)
    from Chromium CI is a tool for generating low-level configuration files from Starlark.
 *  [Pixlet](https://github.com/tidbyt/pixlet) is a runtime and UX toolkit for generating animations for small LED displays, such as [Tidbyt](https://tidbyt.com/). Starlark is used to write applets whose outputs are WebP animations.
