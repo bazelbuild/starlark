@@ -22,6 +22,17 @@ aim to remove the differences and provide a
 * [Moonlark](https://github.com/obazl/moonlark): Starlark parser in C with Lua
   bindings.
 
+## Libraries and extensions
+
+*  [Skycfg](https://github.com/stripe/skycfg) is a library for Starlark to
+   generate Protocol Buffer messages.
+*  [starlark-go-nethttp](https://github.com/pcj/starlark-go-nethttp) is a wrapper
+   around a minimal subset of `net/http package` for use within starlark-go.
+*  [Starlet](https://github.com/1set/starlet) is a Go wrapper for the [Starlark in Go](https://github.com/google/starlark-go) that
+   simplifies script execution, provides data conversion, and offers useful Starlark libraries and extensions.
+*  [Starlight](https://github.com/starlight-go/starlight) is a wrapper around the
+   Starlark interpreter in Go.
+
 ## IDEs
 
 Some IDEs have a [plugin for Bazel](https://bazel.build/install/ide).
@@ -55,14 +66,6 @@ Otherwise, consider using a Python mode.
 *  [Pixlet](https://github.com/tidbyt/pixlet) is a runtime and UX toolkit for generating animations for small LED displays, such as [Tidbyt](https://tidbyt.com/). Starlark is used to write applets whose outputs are WebP animations.
 *  [qri](http://qri.io/) is versioned, scriptable, exportable,
    collaborative datasets. It uses Starlark to [describe transformations](https://qri.io/docs/reference/starlark_syntax/).
-*  [Skycfg](https://github.com/stripe/skycfg) is a library for Starlark to
-   generate Protocol Buffer messages.
-*  [starlark-go-nethttp](https://github.com/pcj/starlark-go-nethttp) is a wrapper
-   around a minimal subset of `net/http package` for use within starlark-go.
-*  [Starlet](https://github.com/1set/starlet) is a Go wrapper for the [Starlark in Go](https://github.com/google/starlark-go) that
-   simplifies script execution, provides data conversion, and offers useful Starlark libraries and extensions.
-*  [Starlight](https://github.com/starlight-go/starlight) is a wrapper around the
-   Starlark interpreter in Go.
 *  [Tilt](https://tilt.dev/) manages local development instances for teams that
    deploy to Kubernetes. [Tilt files](https://docs.tilt.dev/tiltfile_concepts.html)
    are written in Starlark.
