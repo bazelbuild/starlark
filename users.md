@@ -58,6 +58,9 @@ Otherwise, consider using a Python mode.
 *  [Drone](https://drone.io) is a self-service Continuous Delivery platform. It
    supports [Starlark scripting](https://docs.drone.io/starlark/overview/) as an
    alternate to yaml configurations.
+*  [FizzBee](https://fizzbee.io) is a system design language for verifying distributed systems in cloud,
+   micro-services, and event-driven applications. It uses Starlark to offer an intuitive,
+   Python-like syntax, making it accessible for everyday software developers.   
 *  [Isopod](https://github.com/cruise-automation/isopod) created by Cruise
    Automation is a DSL framework for Kubernetes configuration. It renders
    Kubernetes objects as Protocol Buffers.
