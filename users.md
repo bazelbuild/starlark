@@ -45,10 +45,6 @@ Otherwise, consider using a Python mode.
    Bazel.
 *  [Buck2](https://buck2.build/) is a build system from Meta, using
    Starlark in a similar way as Bazel.
-*  [Caddy](https://caddyserver.com/) is a fast, cross-platform HTTP/2 web
-   server with automatic HTTPS.
-   [Starlark is used](https://github.com/caddyserver/caddy/tree/v2#json-is-declarative-what-if-i-need-more-programmability-ie-imperative-syntax)
-   in Caddy 2 to extend the JSON configuration and add some logic.
 *  [Copybara](https://github.com/google/copybara) is a tool for transforming and
    moving code between repositories. It embeds Starlark to configure the workflow.
 *  [Delve](https://github.com/go-delve/delve) is a debugger for the Go
