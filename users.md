@@ -66,6 +66,10 @@ Otherwise, consider using a Python mode.
 *  [Pixlet](https://github.com/tidbyt/pixlet) is a runtime and UX toolkit for generating animations for small LED displays, such as [Tidbyt](https://tidbyt.com/). Starlark is used to write applets whose outputs are WebP animations.
 *  [qri](http://qri.io/) is versioned, scriptable, exportable,
    collaborative datasets. It uses Starlark to [describe transformations](https://qri.io/docs/reference/starlark_syntax/).
+*  [recur](https://github.com/dbohdan/recur) is a command-line tool that
+   retries a command with exponential backoff plus jitter to mitigate the
+   thundering herd problem. The success condition is written as a Starlark
+   expression.
 *  [Tilt](https://tilt.dev/) manages local development instances for teams that
    deploy to Kubernetes. [Tilt files](https://docs.tilt.dev/tiltfile_concepts.html)
    are written in Starlark.
