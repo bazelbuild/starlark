@@ -9,7 +9,7 @@ configuration language. It was designed for the [Bazel](https://bazel.build/)
 build system, but may be useful for other projects as well. This repository is
 where Starlark features are proposed, discussed, and specified. It contains
 information about the language, including the [specification](spec.md). There
-are [multiple implementations of Starlark](users.md).
+are [multiple implementations of Starlark](https://github.com/laurentlb/awesome-starlark).
 
 
 Starlark is a dialect of [Python](https://www.python.org/). Like Python, it is a
@@ -121,4 +121,5 @@ evolution of Starlark.
 
 ## Implementations, tools, and users
 
-See the [Starlark implementations, tools, and users](users.md) page.
+See [Awesome Starlark](https://github.com/laurentlb/awesome-starlark).
+
