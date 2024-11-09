@@ -88,8 +88,10 @@ setIndex(x9, [], 2) ### (unhashable|not hashable)
 ---
 
 x9a = {}
-x9a[1, 2] = 3  # unparenthesized tuple is allowed here
+x9a[1, 2] = 3  ### rust: left-hand-side of assignment must take
 assert_eq(x9a.keys()[0], (1, 2))
+
+---
 
 # dict.get
 x10 = {"a": 1}

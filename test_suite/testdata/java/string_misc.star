@@ -85,9 +85,15 @@ assert_eq(''.endswith(()), False)
 # https://github.com/facebookexperimental/starlark-rust/issues/23
 # 'a'.endswith(['a']) # # # (Type of parameter.*doesn't match|got list|parameters mismatch)
 # ---
-'1'.endswith((1,)) ### (Type of parameter.*doesn't match|got int|parameters mismatch)
+### rust: Type of parameter
+### java: want string
+### go: want string
+'1'.endswith((1,))
 ---
-'a'.endswith(('1', 1)) ### (Type of parameter.*doesn't match|got int|parameters mismatch)
+### rust: Type of parameter
+### java: want string
+### go: want string
+'a'.endswith(('1', 1))
 ---
 
 # startswith
@@ -116,9 +122,15 @@ assert_eq(''.startswith(()), False)
 # https://github.com/facebookexperimental/starlark-rust/issues/23
 # 'a'.startswith(['a']) # # # (Type of parameter.*doesn't match|got list|expected string)
 # ---
-'1'.startswith((1,)) ### (Type of parameter.*doesn't match|got int|expected string)
+### rust: Type of parameter
+### java: want string
+### go: want string
+'1'.startswith((1,))
 ---
-'a'.startswith(('1', 1)) ### (Type of parameter.*doesn't match|got int|expected string)
+### rust: Type of parameter
+### java: want string
+### go: want string
+'a'.startswith(('1', 1))
 ---
 
 # substring

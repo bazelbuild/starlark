@@ -54,7 +54,13 @@ assert_eq('123'[1:3:-1], "")
 ---
 '123'[1:3:0] ### (slice step cannot be zero|not a valid slice step|out of bound)
 ---
-'123'['a'::] ### (slice start must be an integer, not 'a'|want int|parameters mismatch)
+### java: want int
+### go: invalid start index
+### rust: not supported
+'123'['a'::]
 ---
-'123'[:'b':] ### (slice end must be an integer, not 'b'|want int|parameters mismatch)
+### java: want int
+### go: invalid end index
+### rust: not supported
+'123'[:'b':]
 ---

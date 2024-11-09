@@ -146,7 +146,10 @@ assert_eq("banana"[4::-2], "nnb")
 assert_eq("banana"[::-1], "ananab")
 assert_eq("banana"[None:None:-2], "aaa")
 ---
-"banana"[:"":] ### (got.*want|parameters mismatch)
+### rust: not supported
+### java: want int
+### go: want int
+"banana"[:"":]
 ---
 "banana"[:"":True] ### (got.*want|parameters mismatch)
 ---
@@ -374,7 +377,10 @@ assert_('abc'.startswith(('a', 'A')))
 assert_('ABC'.startswith(('a', 'A')))
 assert_(not 'ABC'.startswith(('b', 'B')))
 ---
-'123'.startswith((1, 2)) ### (got int, for element 0|type of parameter.*doesn't match)
+### rust: Type of parameter
+### java: want string
+### go: want string
+'123'.startswith((1, 2))
 ---
 # _inconsistency_: rust startswith allows a list, not just tuple
 # https://github.com/facebookexperimental/starlark-rust/issues/23
@@ -384,7 +390,10 @@ assert_('abc'.endswith(('c', 'C')))
 assert_('ABC'.endswith(('c', 'C')))
 assert_(not 'ABC'.endswith(('b', 'B')))
 ---
-'123'.endswith((1, 2)) ### (got int, for element 0|type of parameter.*doesn't match)
+### java: want string
+### rust: Type of parameter
+### go: want string
+'123'.endswith((1, 2))
 ---
 # _inconsistency_: rust endswith allows a lists, not just tuple
 # https://github.com/facebookexperimental/starlark-rust/issues/23
@@ -464,16 +473,25 @@ def args(*args): return args
 args(*"abc") ### (must be iterable, not string|not iterable|must be an iterable|operation.*not supported)
 ---
 # list(str)
-list("abc") ### (got string, want iterable|not iterable|not a collection|operation.*not supported)
+### java: got value of type
+### rust: not supported
+### go: got string, want iterable
+list("abc")
 ---
 # tuple(str)
-tuple("abc") ### (got string, want iterable|not iterable|not a collection|operation.*not supported)
+### java: got value of type
+### rust: not supported
+### go: got string, want iterable
+tuple("abc")
 ---
 # enumerate
 enumerate("ab") ### (got string, want iterable|not iterable|expected value of type 'sequence'|operation.*not supported)
 ---
 # sorted
-sorted("abc") ### (got string, want iterable|not iterable|not a collection|operation.*not supported)
+### java: got value of type
+### rust: not supported
+### go: got string, want iterable
+sorted("abc")
 ---
 # list.extend
 [].extend("bc") ### (got string, want iterable|not iterable|expected value of type 'sequence'|operation.*not supported)
@@ -552,8 +570,17 @@ assert_eq("¿Por qué?".title(), "¿Por Qué?")
 
 ---
 # method spell check
-"".starts_with() ### (no .starts_with field.*did you mean .startswith|not supported|no field or method)
+### rust: has no attribute
+### java: has no field or method
+### go: field or method
+"".starts_with()
 ---
-"".StartsWith() ### (no .StartsWith field.*did you mean .startswith|not supported|no field or method)
+### rust: has no attribute
+### java: has no field or method
+### go: field or method
+"".StartsWith()
 ---
-"".fin() ### (no .fin field.*.did you mean .find|not supported|no field or method)
+### rust: has no attribute
+### java: has no field or method
+### go: field or method
+"".fin()

@@ -1,3 +1,8 @@
+<!--
+This file TOC is generated
+Use `bazel run spec_md_gen` to regenerate it in place.
+-->
+
 # Starlark Language Specification
 
 Starlark is a dialect of Python intended for use as a configuration
@@ -22,7 +27,8 @@ Starlark is an untyped dynamic language with high-level data types,
 first-class functions with lexical scope, and automatic memory
 management or _garbage collection_.
 
-Starlark is strongly influenced by Python, and is almost a subset of
+Starlark is strongly influenced by Python, Starlark syntax is
+a strict subset of Python and Starlark semantics is almost a subset of
 that language.  In particular, its data types and syntax for
 statements and expressions will be very familiar to any Python
 programmer.
@@ -50,6 +56,9 @@ interact with the environment.
   * [Overview](#overview)
   * [Contents](#contents)
   * [Lexical elements](#lexical-elements)
+    * [String literals](#string-literals)
+    * [Bytes literals](#bytes-literals)
+    * [Special tokens](#special-tokens)
   * [Data types](#data-types)
     * [None](#none)
     * [Booleans](#booleans)
@@ -96,10 +105,11 @@ interact with the environment.
     * [For loops](#for-loops)
     * [Break and Continue](#break-and-continue)
     * [Load statements](#load-statements)
-    * [Module execution](#module-execution)
+  * [Module execution](#module-execution)
   * [Built-in constants and functions](#built-in-constants-and-functions)
     * [None](#none)
     * [True and False](#true-and-false)
+    * [abs](#abs)
     * [any](#any)
     * [all](#all)
     * [bool](#bool)
@@ -107,8 +117,8 @@ interact with the environment.
     * [dict](#dict)
     * [dir](#dir)
     * [enumerate](#enumerate)
-    * [fail](#fail)
     * [float](#float)
+    * [fail](#fail)
     * [getattr](#getattr)
     * [hasattr](#hasattr)
     * [hash](#hash)
@@ -121,7 +131,6 @@ interact with the environment.
     * [range](#range)
     * [repr](#repr)
     * [reversed](#reversed)
-    * [set](#set)
     * [sorted](#sorted)
     * [str](#str)
     * [tuple](#tuple)
@@ -145,7 +154,6 @@ interact with the environment.
     * [list·insert](#list·insert)
     * [list·pop](#list·pop)
     * [list·remove](#list·remove)
-    * [set·union](#set·union)
     * [string·capitalize](#string·capitalize)
     * [string·count](#string·count)
     * [string·elems](#string·elems)
@@ -181,6 +189,10 @@ interact with the environment.
   * [Grammar reference](#grammar-reference)
 
 ## Lexical elements
+
+Starlark syntax (but not semantics) is a strict subset of Python syntax.
+Practically it means, tools working with Python AST can be used to work
+with Starlark files.
 
 A Starlark program consists of one or more modules. Each module is defined by a
 single UTF-8-encoded text file.
@@ -223,12 +235,12 @@ Comments are treated like other white space.
 characters are tokens:
 
 ```text
-+    -    *    //   %    **
++    -    *    /    //   %    **
 ~    &    |    ^    <<   >>
 .    ,    =    ;    :
 (    )    [    ]    {    }
 <    >    >=   <=   ==   !=
-+=   -=   *=   //=  %=
++=   -=   *=   /=   //=  %=
 &=   |=   ^=   <<=  >>=
 ```
 
@@ -249,14 +261,15 @@ appear in the grammar; they are reserved as possible future keywords:
 <!-- and to remain a syntactic subset of Python -->
 
 ```text
-as             import
-assert         is
-class          nonlocal
-del            raise
-except         try
-finally        while
-from           with
-global         yield
+as             global
+assert         import
+async          is
+await          nonlocal
+class          raise
+del            try
+except         while
+finally        with
+from           yield
 ```
 
 *Identifiers*: an identifier is a sequence of Unicode letters, decimal
@@ -380,7 +393,7 @@ It is an error if the value of an octal or hexadecimal escape is greater than de
 '\119'			# "\t9"   = "\11" + "9"
 
 '\x00'			# "\x00"  a string containing a single NUL element
-'\0A'			# "\n"    hexadecimal A = decimal 10
+'\x0A'			# "\n"    hexadecimal A = decimal 10
 "\x41-\x5A"             # "A-Z"
 ```
 
@@ -493,6 +506,13 @@ Any valid string literal that, with a `b` prefix, is also a
 valid bytes literal is equivalent in the sense that
 the bytes value is the UTF-8 encoding of the string value.
 
+### Special tokens
+
+Starlark is space-sensitive language, and indentation is used to
+denote a block of statements.
+
+Unlike Python, indentation can only be composed of space characters (U+0020),
+not tabs.
 
 TODO: define indent, outdent, semicolon, newline, eof
 
@@ -1316,8 +1336,8 @@ f(x=2, y=1, z=3)        # (2, 1, {"z": 3})
 It is a static error if any two parameters of a function have the same name.
 
 Just as a function definition may accept an arbitrary number of
-positional or keyword arguments, a function call may provide an
-arbitrary number of positional or keyword arguments supplied by a
+positional or named arguments, a function call may provide an
+arbitrary number of positional or named arguments supplied by a
 list or dictionary:
 
 ```python
@@ -1348,7 +1368,10 @@ Function arguments are evaluated in the order they appear in the call.
 
 Unlike Python, Starlark does not allow more than one `*args` argument in a
 call, and if a `*args` argument is present it must appear after all
-positional and named arguments.
+positional and named arguments. In particular, even though keyword-only
+arguments ([see below](#function-definitions)) are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
 
 A function call completes normally after the execution of either a
 `return` statement, or of the last statement in the function body.
@@ -2805,7 +2828,7 @@ the parameter list (which is enclosed in parentheses), a colon, and
 then an indented block of statements which form the body of the function.
 
 The parameter list is a comma-separated list whose elements are of
-four kinds.  First come zero or more required parameters, which are
+several kinds.  First come zero or more required parameters, which are
 simple identifiers; all calls must provide an argument value for these parameters.
 
 The required parameters are followed by zero or more optional
@@ -2816,11 +2839,47 @@ provide an argument value for it.
 The required parameters are optionally followed by a single parameter
 name preceded by a `*`.  This is the called the _varargs_ parameter,
 and it accumulates surplus positional arguments specified by a call.
+It is conventionally named `*args`.
+
+The varargs parameter may be followed by zero or more
+parameters, again of the forms `name` or `name=expression`,
+but these parameters differ from earlier ones in that they are
+_keyword-only_: if a call provides their values, it must do so as
+keyword arguments, not positional ones.
+
+Note that even though keyword-only arguments are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
+
+```python
+def g(a, *args, b=2, c):
+  print(a, b, c, args)
+
+g(1, 3)                 # error: function g missing 1 argument (c)
+g(1, *[4, 5], c=3)      # error: keyword argument c may not follow *args
+g(1, 4, c=3)            # "1 2 3 (4,)"
+g(1, c=3, *[4, 5])      # "1 2 3 (4, 5)"
+```
+
+A non-variadic function may also declare keyword-only parameters,
+by using a bare `*` in place of the `*args` parameter.
+This form does not declare a parameter but marks the boundary
+between the earlier parameters and the keyword-only parameters.
+This form must be followed by at least one optional parameter.
+
+```python
+def f(a, *, b=2, c):
+  print(a, b, c)
+
+f(1)                    # error: function f missing 1 argument (c)
+f(1, 3)                 # error: function f accepts 1 positional argument (2 given)
+f(1, c=3)               # "1 2 3"
+```
 
 Finally, there may be an optional parameter name preceded by `**`.
 This is called the _keyword arguments_ parameter, and accumulates in a
 dictionary any surplus `name=value` arguments that do not match a
-prior parameter.
+prior parameter. It is conventionally named `**kwargs`.
 
 Here are some example parameter lists:
 
@@ -2831,6 +2890,7 @@ def f(a, b, c=1): pass
 def f(a, b, c=1, *args): pass
 def f(a, b, c=1, *args, **kwargs): pass
 def f(**kwargs): pass
+def f(a, b, c=1, *, d=1): pass
 ```
 
 Execution of a `def` statement creates a new function object.  The
@@ -3115,6 +3175,10 @@ The parameter names serve merely as documentation.
 
 `True` and `False` are the two values of type `bool`.
 
+### abs
+
+`abs(x)` takes either an integer or a float, and returns the absolute value of that number (a non-negative number with the same magnitude).
+
 ### any
 
 `any(x)` returns `True` if any element of the iterable sequence x is true.
@@ -3314,7 +3378,7 @@ the base being inferred from an optional base prefix such as
      see bazelbuild/starlark#117.
 -->
 
-When a nonzero `base` is provided explictly,
+When a nonzero `base` is provided explicitly,
 its value must be between 2 and 36.
 The letters `a-z` represent the digits 11 through 35.
 A matching base prefix is also permitted, and has no effect.
@@ -3369,6 +3433,9 @@ max("two", "three", "four", key=len)            # "three", the longest
 
 It is an error if any element does not support ordered comparison,
 or if the sequence is empty.
+
+The optional named parameter `key` specifies a function to be applied
+to each element prior to comparison.
 
 ```python
 min([3, 1, 4, 1, 5, 9])                         # 1
@@ -3493,7 +3560,7 @@ set({"k1": "v1", "k2": "v2"})  # set(["k1", "k2"]), a set of two elements
 `sorted(x)` returns a new list containing the elements of the iterable sequence x,
 in sorted order.  The sort algorithm is stable.
 
-The optional named parameter `reverse`, if true, causes `sorted` to
+The optional named boolean parameter `reverse`, if true, causes `sorted` to
 return results in reverse sorted order.
 
 The optional named parameter `key` specifies a function of one
@@ -3579,6 +3646,18 @@ b"ABC".elems()	        # b"ABC".elems()
 list(b"ABC".elems())  	# [65, 66, 67]
 ```
 <!-- TODO: signpost how to convert an single int or list of int to a bytes. -->
+
+<a id='dict·clear'></a>
+### dict·clear
+
+`D.clear()` removes all the entries of dictionary D and returns `None`.
+It fails if the dictionary is frozen or if there are active iterators.
+
+```python
+x = {"one": 1, "two": 2}
+x.clear()                               # None
+print(x)                                # {}
+```
 
 <a id='dict·get'></a>
 ### dict·get
@@ -4440,7 +4519,7 @@ _last_ occurrence.
 `S.rpartition(x)` is like `partition`, but splits `S` at the last occurrence of `x`.
 
 ```python
-"one/two/three".partition("/")		# ("one/two", "/", "three")
+"one/two/three".rpartition("/")         # ("one/two", "/", "three")
 ```
 
 <a id='string·rsplit'></a>
@@ -4584,7 +4663,12 @@ DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
 
 Parameters = Parameter {',' Parameter}.
 
-Parameter = identifier | identifier '=' Test | '*' identifier | '**' identifier .
+Parameter  = identifier
+           | identifier '=' Test
+           | '*'
+           | '*' identifier
+           | '**' identifier
+           .
 
 IfStmt = 'if' Test ':' Suite {'elif' Test ':' Suite} ['else' ':' Suite] .
 

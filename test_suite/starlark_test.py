@@ -1,4 +1,5 @@
 import sys
+import typing
 import unittest
 import tempfile
 import subprocess
@@ -8,11 +9,14 @@ import glob
 
 import testenv
 
+def indent(s: str) -> str:
+  return "".join("  " + line.rstrip("\n") + "\n" for line in s.splitlines())
+
 class StarlarkTest(unittest.TestCase):
   CHUNK_SEP = "---"
   seen_error = False
 
-  def chunks(self, path):
+  def chunks(self, path) -> typing.Iterable[typing.Tuple[typing.List[str], typing.List[str], int]]:
     code = []
     expected_errors = []
     # Current line no
@@ -22,20 +26,23 @@ class StarlarkTest(unittest.TestCase):
     with open(path, mode="rb") as f:
       for line in f:
         line_no += 1
-        line = line.decode("utf-8")
-        if line.strip() == self.CHUNK_SEP:
+        line = line.decode("utf-8").rstrip()
+        if line == self.CHUNK_SEP:
           yield code, expected_errors, test_line_no
           expected_errors = []
           code = []
           test_line_no = line_no + 1
         else:
-          m = re.search("### *((go|java|rust):)? *(.*)", line)
+          m = re.fullmatch("(.*?) *### *((go|java|rust):)? *(.*)", line)
           if m:
-            error_impl = m.group(2)
+            error_impl = m.group(3)
             assert error_impl is None or error_impl in ["go", "java", "rust"]
             if (not error_impl) or error_impl == impl:
-              expected_errors.append(m.group(3))
-          code.append(line)
+              expected_errors.append(m.group(4))
+            code.append(m.group(1))
+          else:
+            code.append(line)
+          code.append("\n")
     assert len(expected_errors) <= 1
     yield code, expected_errors, test_line_no
 
@@ -49,23 +56,32 @@ class StarlarkTest(unittest.TestCase):
     else:
       return stdout + stderr
 
+  def mark_error(self):
+    if self.seen_error:
+      print()
+    self.seen_error = True
+
   def check_output(self, output, expected, line_no):
     if expected and not output:
-      self.seen_error = True
+      self.mark_error()
       print("Test L{}: expected error: {}".format(line_no, expected))
 
     if output and not expected:
-      self.seen_error = True
+      self.mark_error()
       print("Test L{}: unexpected error: {}".format(line_no, output))
 
     output_ = output.lower()
     for exp in expected:
       exp = exp.lower()
       # Try both substring and regex matching.
+      # TODO(stepancheg): error messages are checked incorrectly on rust,
+      #   because error message contains source snippet.
+      #   Fix it by removing `###` before evaluating.
       if exp not in output_ and not re.search(exp, output_):
-        self.seen_error = True
+        self.mark_error()
         print("Test L{}: error not found: `{}`".format(line_no, exp.encode('utf-8')))
-        print("Got: `{}`".format(output.encode('utf-8')))
+        print("Got:")
+        print(indent(output), end="")
 
   PRELUDE = """
 def assert_eq(x, y):
