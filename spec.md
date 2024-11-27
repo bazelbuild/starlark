@@ -1144,51 +1144,47 @@ set([1, 2]) != [1, 2]       # True
 ```
 
 The `|` operation on two sets returns the union of the two sets: a set
-containing the elements found in either one or both of the original sets. The
-`|` operation has an augmented assignment version; `s |= t` adds to `s` all the
-elements of `t`.
+containing the elements found in either one or both of the original sets.
 
 ```python
 set([1, 2]) | set([3, 2])  # set([1, 2, 3])
-s = set([1, 2])
-s |= set([2, 3, 4])        # s now equals set([1, 2, 3, 4])
 ```
 
 The `&` operation on two sets returns the intersection of the two sets: a set
-containing only the elements found in both of the original sets. The `&`
-operation has an augmented assignment version; `s &= t` removes from `s` all the
-elements not found in `t`.
+containing only the elements found in both of the original sets.
 
 ```python
 set([1, 2]) & set([2, 3])  # set([2])
 set([1, 2]) & set([3, 4])  # set()
-s = set([1, 2])
-s &= set([0, 1])           # s now equals set([1])
 ```
 
 The `-` operation on two sets returns the difference of the two sets: a set
 containing the elements found in the left-hand side set but not the right-hand
-site set. The `-` operation has an augmented assignment version; `s -= t`
-removes from `s` all the elements found in `t`.
+site set.
 
 ```python
 set([1, 2]) - set([2, 3])  # set([1])
 set([1, 2]) - set([3, 4])  # set([1, 2])
-s = set([1, 2])
-s -= set([0, 1])           # s now equals set([2])
 ```
 
 The `^` operation on two sets returns the symmetric difference of the two sets:
 a set containing the elements found in exactly one of the two original sets, but
-not in both. The `^` operation has an augmented assignment version; `s ^= t`
-removes from `s` any element of `t` found in `s` and adds to `s` any element of
-`t` not found in `s`.
+not in both.
 
 ```python
 set([1, 2]) ^ set([2, 3])  # set([1, 3])
 set([1, 2]) ^ set([3, 4])  # set([1, 2, 3, 4])
+```
+
+The corresponding augmented assignments, `|=`, `&=`, `-=`, and `^=`, modify the
+left-hand set in place.
+
+```python
 s = set([1, 2])
-s ^= set([0, 1])           # s now equals set([2, 0])
+s |= set([2, 3, 4])     # s now equals set([1, 2, 3, 4])
+s &= set([0, 1, 2, 3])  # s now equals set([1, 2, 3])
+s -= set([0, 1])        # s now equals set([2, 3])
+s ^= set([3, 4])        # s now equals set([2, 4])
 ```
 
 Like all mutable values in Starlark, a set can be frozen, and once frozen, all
