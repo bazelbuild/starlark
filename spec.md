@@ -1159,7 +1159,7 @@ elements not found in `t`.
 set([1, 2]) & set([2, 3])  # set([2])
 set([1, 2]) & set([3, 4])  # set()
 s = set([1, 2])
-s |= set([0, 1])           # s now equals set([1])
+s &= set([0, 1])           # s now equals set([1])
 ```
 
 The `-` operation on two sets returns the difference of the two sets: a set
@@ -1169,9 +1169,9 @@ removes from `s` all the elements found in `t`.
 
 ```python
 set([1, 2]) - set([2, 3])  # set([1])
-set([1, 2]) & set([3, 4])  # set([1, 2])
+set([1, 2]) - set([3, 4])  # set([1, 2])
 s = set([1, 2])
-s |= set([0, 1])           # s now equals set([2])
+s -= set([0, 1])           # s now equals set([2])
 ```
 
 The `^` operation on two sets returns the symmetric difference of the two sets:
@@ -1182,7 +1182,7 @@ removes from `s` any element of `t` found in `s` and adds to `s` any element of
 
 ```python
 set([1, 2]) ^ set([2, 3])  # set([1, 3])
-set([1, 2]) & set([3, 4])  # set([1, 2, 3, 4])
+set([1, 2]) ^ set([3, 4])  # set([1, 2, 3, 4])
 s = set([1, 2])
 s ^= set([0, 1])           # s now equals set([2, 0])
 ```
@@ -4001,8 +4001,8 @@ s.discard("y")  # None; s == set(["x"])
 
 ### set·intersection
 
-`S.intersection(*others)` returns a new set containing elements found in the set
-`S` but not found in any of the iterable sequences `*others`.
+`S.intersection(*others)` returns a new set containing those elements that the
+set `S` and all of the iterable sequences `*others` have in common.
 
 If `s` and `t` are sets, `s.intersection(t)` is equivalent to `s & t`; however,
 note that the `&` operation requires both sides to be sets, while the
@@ -4020,8 +4020,8 @@ set([1, 2, 3]).intersection([0, 1], [1, 2])  # set([1])
 
 ### set·intersection\_update
 
-`S.intersection_update(*others)` removes from the set `S` any elements found in
-any of the iterable sequences `*others`. It returns `None`.
+`S.intersection_update(*others)` removes from the set `S` any elements not found
+in at least one of the iterable sequences `*others`. It returns `None`.
 
 If `s` and `t` are sets, `s.intersection_update(t)` is equivalent to `s &= t`;
 however, note that the `&=` augmented assignment requires both sides to be sets,
@@ -4072,8 +4072,8 @@ This is equivalent to `S == S.union(x)`.
 
 ### set·pop
 
-`S.pop(x)` removes and returns the first element (in iteration order, which is
-the order in which elements were added to the set) from the set `S`.
+`S.pop()` removes and returns the first element (in iteration order, which is
+the order in which elements were first added to the set) from the set `S`.
 
 `pop` fails if the set is empty, is frozen, or has active iterators.
 
