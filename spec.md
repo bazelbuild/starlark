@@ -1094,7 +1094,7 @@ used as a key of a dictionary.
 
 Sets may be constructed using the [set()](#set) built-in function.
 
-The `in` and `not in` operations check whether a value is in a set:
+The `in` and `not in` operations check whether a value is (or is not) in a set:
 
 ```python
 s = set(["a", "b", "c"])
@@ -1102,9 +1102,11 @@ s = set(["a", "b", "c"])
 "z" in s  # False
 ```
 
-A set is an iterable sequence. Its length can be retrieved using the
-[len()](#len) built-in function, and the order of iteration is the order in
-which elements were first added to the set:
+A set is an iterable sequence, and thus may be used as the operand of a `for`
+loop, a list comprehension, and the various built-in functions that operate on
+sequences. Its length can be retrieved using the [len()](#len) built-in
+function, and the order of iteration is the order in which elements were first
+added to the set:
 
 ```python
 s = set(["z", "y", "z", "y"])
