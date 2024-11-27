@@ -1104,7 +1104,7 @@ s = set(["a", "b", "c"])
 
 A set is an iterable sequence. Its length can be retrieved using the
 [len()](#len) built-in function, and the order of iteration is the order in
-which elements were added to the set:
+which elements were first added to the set:
 
 ```python
 s = set(["z", "y", "z", "y"])
