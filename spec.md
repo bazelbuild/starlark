@@ -1092,7 +1092,10 @@ just like keys of a [dictionary](#dictionaries), elements of a set must be
 hashable. A value may be used as an element of a set if and only if it may be
 used as a key of a dictionary.
 
-Sets may be constructed using the [set()](#set) built-in function.
+Sets may be constructed using the [set()](#set) built-in function, which returns
+a set containing all the elements of its optional argument, which must be an
+iterable sequence. Calling `set()` without an argument constructs an empty set.
+Sets have no literal syntax.
 
 The `in` and `not in` operations check whether a value is (or is not) in a set:
 
@@ -1117,8 +1120,7 @@ for e in s:
     print e  # prints "z", "y", "x"
 ```
 
-A set used in Boolean context is true if and only if it contains one or more
-elements.
+A set used in Boolean context is true if and only if it is non-empty.
 
 ```python
 s = set()
@@ -1127,12 +1129,12 @@ t = set(["x", "y"])
 "non-empty" if t else "empty"  # "non-empty"
 ```
 
-Sets may be compared for equality using `==` and `!=`. A set `s` is equal to `t`
-if and only if `t` is a set containing elements equal to the elements of `s`,
-but possibly in a different iteration order. In particular, a set is *not* equal
-to the list of its elements. Sets are not ordered with respect to other sets,
-and an attempt to compare two sets using `<`, `<=`, `>`, `>=`, or to sort a
-sequence of sets, will fail.
+Sets may be compared for equality or inequality using `==` and `!=`. A set `s`
+is equal to `t` if and only if `t` is a set containing the same elements;
+iteration order is not significant. In particular, a set is *not* equal to the
+list of its elements. Sets are not ordered with respect to other sets, and an
+attempt to compare two sets using `<`, `<=`, `>`, `>=`, or to sort a sequence of
+sets, will fail.
 
 ```python
 set() == set()              # True
@@ -3946,7 +3948,7 @@ the [`|=`](#sets) augmented assignment operation.
 
 If `s` and `t` are sets, `s.difference(t)` is equivalent to `s - t`; however,
 note that the `-` operation requires both sides to be sets, while the
-`difference` method takes arbitrary iterable sequences.
+`difference` method accepts arbitrary iterable sequences.
 
 It is permissible to call `difference` without any arguments; this returns a
 copy of the set `S`.
@@ -3965,7 +3967,7 @@ any of the iterable sequences `*others`. It returns `None`.
 
 If `s` and `t` are sets, `s.difference_update(t)` is equivalent to `s -= t`;
 however, note that the `-=` augmented assignment requires both sides to be sets,
-while the `difference_update` method takes arbitrary iterable sequences.
+while the `difference_update` method accepts arbitrary iterable sequences.
 
 It is permissible to call `difference_update` without any arguments; this leaves
 the set `S` unchanged.
@@ -3982,8 +3984,8 @@ s.difference_update([0, 1], [4, 5])  # None; s is set([3])
 
 ### set·discard
 
-`S.discard(x)` removes the value `x` from the set `S` if `x` is present in `S`.
-It returns `None`.
+`S.discard(x)` removes the value `x` from the set `S` if present. It returns
+`None`.
 
 It is permissible to `discard` a value not present in the set; this leaves the
 set `S` unchanged. If you want to fail on an attempt to remove a non-present
@@ -3991,7 +3993,8 @@ element, use [`remove`](#set·remove) instead. If you need to remove multiple
 elements from a set, see [`difference_update`](#set·difference_update) or the
 [`-=`](#sets) augmented assignment operation.
 
-`discard` fails if the set `S` is frozen or has active iterators.
+`discard` fails if the set `S` is frozen or has active iterators, even if `x` is
+not a member of the set.
 
 ```python
 s = set(["x", "y"])
@@ -4008,7 +4011,7 @@ set `S` and all of the iterable sequences `*others` have in common.
 
 If `s` and `t` are sets, `s.intersection(t)` is equivalent to `s & t`; however,
 note that the `&` operation requires both sides to be sets, while the
-`intersection` method takes arbitrary iterable sequences.
+`intersection` method accepts arbitrary iterable sequences.
 
 It is permissible to call `intersection` without any arguments; this returns a
 copy of the set `S`.
@@ -4027,7 +4030,7 @@ in at least one of the iterable sequences `*others`. It returns `None`.
 
 If `s` and `t` are sets, `s.intersection_update(t)` is equivalent to `s &= t`;
 however, note that the `&=` augmented assignment requires both sides to be sets,
-while the `intersection_update` method takes arbitrary iterable sequences.
+while the `intersection_update` method accepts arbitrary iterable sequences.
 
 It is permissible to call `intersection_update` without any arguments; this
 leaves the set `S` unchanged.
@@ -4045,30 +4048,33 @@ s.intersection_update([0, 1], [1, 2])  # None; s is set([1])
 ### set·isdisjoint
 
 `S.isdisjoint(x)` returns `True` if the set `S` and the iterable sequence `x` do
-not have any values in common, and `False` if they have at least one value in
-common.
+not have any values in common, and `False` otherwise.
 
 This is equivalent to `not S.intersection(x)`.
+
+`isdisjoint` fails if `x` is not an iterable sequence.
 
 <a id='set·issubset'></a>
 
 ### set·issubset
 
 `S.issubset(x)` returns `True` if every element of the set `S` is present in the
-iterable sequence `x`, and `False` if at least one element of `S` is not present
-in `x`.
+iterable sequence `x`, and `False` otherwise.
 
 This is equivalent to `not S.difference(x)`.
+
+`issubset` fails if `x` is not an iterable sequence.
 
 <a id='set·issuperset'></a>
 
 ### set·issuperset
 
 `S.issuperset(x)` returns `True` if every element of the iterable sequence `x`
-is present in the set `S`, and `False` if at least one element of `x` is not
-present in `S`.
+is present in the set `S`, and `False` otherwise.
 
 This is equivalent to `S == S.union(x)`.
+
+`issuperset` fails if `x` is not an iterable sequence.
 
 <a id='set·pop'></a>
 
@@ -4115,7 +4121,7 @@ the set `S` or in the iterable sequence `x` but not those found in both `S` and
 
 If `s` and `t` are sets, `s.symmetric_difference(t)` is equivalent to `s ^ t`;
 however, note that the `^` operation requires both sides to be sets, while the
-`symmetric_difference` method takes an arbitrary iterable sequence.
+`symmetric_difference` method accepts an arbitrary iterable sequence.
 
 `symmetric_difference` fails if any element of `x` is unhashable.
 
@@ -4133,7 +4139,7 @@ in both `S` and the iterable sequence `x`, and adds to `S` any elements found in
 
 If `s` and `t` are sets, `s.symmetric_difference_update(t)` is equivalent to `s
 ^= t`; however, note that the `^=` augmented assignment requires both sides to
-be sets, while the `symmetric_difference_update` method takes an arbitrary
+be sets, while the `symmetric_difference_update` method accepts an arbitrary
 iterable sequence.
 
 `symmetric_difference_update` fails if the set `S` is frozen or has active
@@ -4153,7 +4159,7 @@ in any of the iterable sequences `*others`.
 
 If `s` and `t` are sets, `s.union(t)` is equivalent to `s | t`; however, note
 that the `|` operation requires both sides to be sets, while the `union` method
-takes arbitrary iterable sequences.
+accepts arbitrary iterable sequences.
 
 It is permissible to call `union` without any arguments; this returns a copy of
 the set `S`.
@@ -4172,7 +4178,7 @@ iterable sequences `*others`. It returns `None`.
 
 If `s` and `t` are sets, `s.update(t)` is equivalent to `s |= t`; however, note
 that the `|=` augmented assignment requires both sides to be sets, while the
-`update` method takes arbitrary iterable sequences.
+`update` method accepts arbitrary iterable sequences.
 
 It is permissible to call `update` without any arguments; this leaves the set
 `S` unchanged.
