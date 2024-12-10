@@ -131,6 +131,7 @@ interact with the environment.
     * [range](#range)
     * [repr](#repr)
     * [reversed](#reversed)
+    * [set](#set)
     * [sorted](#sorted)
     * [str](#str)
     * [tuple](#tuple)
@@ -154,6 +155,22 @@ interact with the environment.
     * [list·insert](#list·insert)
     * [list·pop](#list·pop)
     * [list·remove](#list·remove)
+    * [set·add](#set·add)
+    * [set·clear](#set·clear)
+    * [set·difference](#set·difference)
+    * [set·difference_update](#set·difference_update)
+    * [set·discard](#set·discard)
+    * [set·intersection](#set·intersection)
+    * [set·intersection_update](#set·intersection_update)
+    * [set·isdisjoint](#set·isdisjoint)
+    * [set·issubset](#set·issubset)
+    * [set·issuperset](#set·issuperset)
+    * [set·pop](#set·pop)
+    * [set·remove](#set·remove)
+    * [set·symmetric_difference](#set·symmetric_difference)
+    * [set·symmetric_difference_update](#set·symmetric_difference_update)
+    * [set·union](#set·union)
+    * [set·update](#set·update)
     * [string·capitalize](#string·capitalize)
     * [string·count](#string·count)
     * [string·elems](#string·elems)
@@ -1160,7 +1177,7 @@ set([1, 2]) & set([3, 4])  # set()
 
 The `-` operation on two sets returns the difference of the two sets: a set
 containing the elements found in the left-hand side set but not the right-hand
-site set.
+side set.
 
 ```python
 set([1, 2]) - set([2, 3])  # set([1])
@@ -1175,6 +1192,11 @@ not in both.
 set([1, 2]) ^ set([2, 3])  # set([1, 3])
 set([1, 2]) ^ set([3, 4])  # set([1, 2, 3, 4])
 ```
+
+In each of the above operations, the elements of the resulting set retain their
+order from the two operand sets, with all elements that were drawn from the
+left-hand side ordered before any element that was only present in the
+right-hand side.
 
 The corresponding augmented assignments, `|=`, `&=`, `-=`, and `^=`, modify the
 left-hand set in place.
@@ -1750,7 +1772,7 @@ operations they support.
   Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
 * `Indexable`: an _indexed_ type has a fixed length and provides efficient
   random access to its elements, which are identified by integer indices.
-  Examples: `string`, `bytes`, `tuple`, and `list`, but not `set`.
+  Examples: `string`, `bytes`, `tuple`, and `list`, but not `dict` or `set`.
 * `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
   element at a given integer index. Example: `list`.
 * `Mapping`: a mapping is an association of keys to values. Example: `dict`.
@@ -3989,8 +4011,8 @@ element, use [`remove`](#set·remove) instead. If you need to remove multiple
 elements from a set, see [`difference_update`](#set·difference_update) or the
 [`-=`](#sets) augmented assignment operation.
 
-`discard` fails if the set `S` is frozen or has active iterators, even if `x` is
-not a member of the set.
+`discard` fails if the set `S` is frozen or has active iterators. This applies
+even if `x` is not a member of the set.
 
 ```python
 s = set(["x", "y"])
