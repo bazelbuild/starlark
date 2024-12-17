@@ -4123,12 +4123,12 @@ s.pop()  # error: empty set
 
 `S.remove(x)` removes the value `x` from the set `S`. It returns `None`.
 
-`remove` fails if the set does not contain `x` (in particular, if `x` is
-unhashable), or if the set is frozen or has active iterators. If you do not want
-to fail on an attempt to remove a non-present element, use
-[`discard`](#set·discard) instead. If you need to remove multiple elements from
-a set, see [`difference_update`](#set·difference_update) or the [`-=`](#sets)
-augmented assignment operation.
+`remove` fails if the set doesn't contain `x` (which, in particular, implies
+that `remove` fails if `x` is unhashable), or if the set is frozen or has active
+iterators. If you don't want to fail on an attempt to remove a non-present
+element, use [`discard`](#set·discard) instead. If you need to remove multiple
+elements from a set, see [`difference_update`](#set·difference_update) or the
+[`-=`](#sets) augmented assignment operation.
 
 ```python
 s = set([1, 2])
