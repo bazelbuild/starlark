@@ -3971,6 +3971,8 @@ note that the `-` operation requires both sides to be sets, while the
 It is permissible to call `difference` without any arguments; this returns a
 copy of the set `S`.
 
+`difference` fails if any element of any of the `*others` is unhashable.
+
 ```python
 set([1, 2, 3]).difference([2])             # set([1, 3])
 set([1, 2, 3]).difference([0, 1], [3, 4])  # set([2])
@@ -3990,7 +3992,8 @@ while the `difference_update` method accepts arbitrary iterable sequences.
 It is permissible to call `difference_update` without any arguments; this leaves
 the set `S` unchanged.
 
-`difference_update` fails if the set `S` is frozen or has active iterators.
+`difference_update` fails if the set `S` is frozen or has active iterators, or
+if any element of any of the `*others` is unhashable.
 
 ```python
 s = set([1, 2, 3, 4])
@@ -4011,8 +4014,8 @@ element, use [`remove`](#set·remove) instead. If you need to remove multiple
 elements from a set, see [`difference_update`](#set·difference_update) or the
 [`-=`](#sets) augmented assignment operation.
 
-`discard` fails if the set `S` is frozen or has active iterators. This applies
-even if `x` is not a member of the set.
+`discard` fails if the set `S` is frozen or has active iterators, or if `x` is
+unhashable. This applies even if `x` is not a member of the set.
 
 ```python
 s = set(["x", "y"])
@@ -4034,6 +4037,8 @@ note that the `&` operation requires both sides to be sets, while the
 It is permissible to call `intersection` without any arguments; this returns a
 copy of the set `S`.
 
+`intersection` fails if any element of any of the `*others` is unhashable.
+
 ```python
 set([1, 2]).intersection([2, 3])             # set([2])
 set([1, 2, 3]).intersection([0, 1], [1, 2])  # set([1])
@@ -4053,7 +4058,8 @@ while the `intersection_update` method accepts arbitrary iterable sequences.
 It is permissible to call `intersection_update` without any arguments; this
 leaves the set `S` unchanged.
 
-`intersection_update` fails if the set `S` is frozen or has active iterators.
+`intersection_update` fails if the set `S` is frozen or has active iterators, or
+if any element of any of the `*others` is unhashable.
 
 ```python
 s = set([1, 2, 3, 4])
@@ -4070,7 +4076,7 @@ not have any values in common, and `False` otherwise.
 
 This is equivalent to `not S.intersection(x)`.
 
-`isdisjoint` fails if `x` is not an iterable sequence.
+`isdisjoint` fails if any element of `x` is unhashable.
 
 <a id='set·issubset'></a>
 
@@ -4081,7 +4087,7 @@ iterable sequence `x`, and `False` otherwise.
 
 This is equivalent to `not S.difference(x)`.
 
-`issubset` fails if `x` is not an iterable sequence.
+`issubset` fails if any element of `x` is unhashable.
 
 <a id='set·issuperset'></a>
 
@@ -4092,7 +4098,7 @@ is present in the set `S`, and `False` otherwise.
 
 This is equivalent to `S == S.union(x)`.
 
-`issuperset` fails if `x` is not an iterable sequence.
+`issuperset` fails if any element of `x` is unhashable.
 
 <a id='set·pop'></a>
 
@@ -4117,11 +4123,12 @@ s.pop()  # error: empty set
 
 `S.remove(x)` removes the value `x` from the set `S`. It returns `None`.
 
-`remove` fails if the set does not contain `x`, is frozen, or has active
-iterators. If you do not want to fail on an attempt to remove a non-present
-element, use [`discard`](#set·discard) instead. If you need to remove multiple
-elements from a set, see [`difference_update`](#set·difference_update) or the
-[`-=`](#sets) augmented assignment operation.
+`remove` fails if the set does not contain `x` (in particular, if `x` is
+unhashable), or if the set is frozen or has active iterators. If you do not want
+to fail on an attempt to remove a non-present element, use
+[`discard`](#set·discard) instead. If you need to remove multiple elements from
+a set, see [`difference_update`](#set·difference_update) or the [`-=`](#sets)
+augmented assignment operation.
 
 ```python
 s = set([1, 2])
@@ -4181,6 +4188,8 @@ accepts arbitrary iterable sequences.
 
 It is permissible to call `union` without any arguments; this returns a copy of
 the set `S`.
+
+`union` fails if any element of any of the `*others` is unhashable.
 
 ```python
 set([1, 2]).union([2, 3])                    # set([1, 2, 3])
