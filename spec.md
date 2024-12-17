@@ -69,6 +69,7 @@ interact with the environment.
     * [Lists](#lists)
     * [Tuples](#tuples)
     * [Dictionaries](#dictionaries)
+    * [Sets](#sets)
     * [Functions](#functions)
     * [Built-in functions](#built-in-functions)
   * [Name binding and variables](#name-binding-and-variables)
@@ -130,6 +131,7 @@ interact with the environment.
     * [range](#range)
     * [repr](#repr)
     * [reversed](#reversed)
+    * [set](#set)
     * [sorted](#sorted)
     * [str](#str)
     * [tuple](#tuple)
@@ -153,6 +155,22 @@ interact with the environment.
     * [list·insert](#list·insert)
     * [list·pop](#list·pop)
     * [list·remove](#list·remove)
+    * [set·add](#set·add)
+    * [set·clear](#set·clear)
+    * [set·difference](#set·difference)
+    * [set·difference_update](#set·difference_update)
+    * [set·discard](#set·discard)
+    * [set·intersection](#set·intersection)
+    * [set·intersection_update](#set·intersection_update)
+    * [set·isdisjoint](#set·isdisjoint)
+    * [set·issubset](#set·issubset)
+    * [set·issuperset](#set·issuperset)
+    * [set·pop](#set·pop)
+    * [set·remove](#set·remove)
+    * [set·symmetric_difference](#set·symmetric_difference)
+    * [set·symmetric_difference_update](#set·symmetric_difference_update)
+    * [set·union](#set·union)
+    * [set·update](#set·update)
     * [string·capitalize](#string·capitalize)
     * [string·count](#string·count)
     * [string·elems](#string·elems)
@@ -974,8 +992,8 @@ Dictionaries provide constant-time operations to insert an element, to
 look up the value for a key, or to remove an element.  Dictionaries
 are implemented using hash tables, so keys must be hashable.  Hashable
 values include `None`, Booleans, numbers, strings, and bytes, and tuples
-composed from hashable values.  Most mutable values, such as lists
-and dictionaries, are not hashable, unless they are frozen.
+composed from hashable values.  Most mutable values, such as lists,
+dictionaries, and sets, are not hashable, unless they are frozen.
 Attempting to use a non-hashable value as a key in a dictionary
 results in a dynamic error.
 
@@ -1078,6 +1096,140 @@ A dictionary value has these methods:
 * [`setdefault`](#dict·setdefault)
 * [`update`](#dict·update)
 * [`values`](#dict·values)
+
+
+### Sets
+
+A set is a mutable, iterable collection of unique values - the set's *elements*.
+The [type](#type) of a set is `"set"`.
+
+Sets provide constant-time operations to insert, remove, or check for the
+presence of a value. Sets are implemented using a hash table, and therefore,
+just like keys of a [dictionary](#dictionaries), elements of a set must be
+hashable. A value may be used as an element of a set if and only if it may be
+used as a key of a dictionary.
+
+Sets may be constructed using the [set()](#set) built-in function, which returns
+a set containing all the elements of its optional argument, which must be an
+iterable sequence. Calling `set()` without an argument constructs an empty set.
+Sets have no literal syntax.
+
+The `in` and `not in` operations check whether a value is (or is not) in a set:
+
+```python
+s = set(["a", "b", "c"])
+"a" in s  # True
+"z" in s  # False
+```
+
+A set is an iterable sequence, and thus may be used as the operand of a `for`
+loop, a list comprehension, and the various built-in functions that operate on
+sequences. Its length can be retrieved using the [len()](#len) built-in
+function, and the order of iteration is the order in which elements were first
+added to the set:
+
+```python
+s = set(["z", "y", "z", "y"])
+len(s)       # prints 2
+s.add("x")
+len(s)       # prints 3
+for e in s:
+    print e  # prints "z", "y", "x"
+```
+
+A set used in Boolean context is true if and only if it is non-empty.
+
+```python
+s = set()
+"non-empty" if s else "empty"  # "empty"
+t = set(["x", "y"])
+"non-empty" if t else "empty"  # "non-empty"
+```
+
+Sets may be compared for equality or inequality using `==` and `!=`. A set `s`
+is equal to `t` if and only if `t` is a set containing the same elements;
+iteration order is not significant. In particular, a set is *not* equal to the
+list of its elements. Sets are not ordered with respect to other sets, and an
+attempt to compare two sets using `<`, `<=`, `>`, `>=`, or to sort a sequence of
+sets, will fail.
+
+```python
+set() == set()              # True
+set() != []                 # True
+set([1, 2]) == set([2, 1])  # True
+set([1, 2]) != [1, 2]       # True
+```
+
+The `|` operation on two sets returns the union of the two sets: a set
+containing the elements found in either one or both of the original sets.
+
+```python
+set([1, 2]) | set([3, 2])  # set([1, 2, 3])
+```
+
+The `&` operation on two sets returns the intersection of the two sets: a set
+containing only the elements found in both of the original sets.
+
+```python
+set([1, 2]) & set([2, 3])  # set([2])
+set([1, 2]) & set([3, 4])  # set()
+```
+
+The `-` operation on two sets returns the difference of the two sets: a set
+containing the elements found in the left-hand side set but not the right-hand
+side set.
+
+```python
+set([1, 2]) - set([2, 3])  # set([1])
+set([1, 2]) - set([3, 4])  # set([1, 2])
+```
+
+The `^` operation on two sets returns the symmetric difference of the two sets:
+a set containing the elements found in exactly one of the two original sets, but
+not in both.
+
+```python
+set([1, 2]) ^ set([2, 3])  # set([1, 3])
+set([1, 2]) ^ set([3, 4])  # set([1, 2, 3, 4])
+```
+
+In each of the above operations, the elements of the resulting set retain their
+order from the two operand sets, with all elements that were drawn from the
+left-hand side ordered before any element that was only present in the
+right-hand side.
+
+The corresponding augmented assignments, `|=`, `&=`, `-=`, and `^=`, modify the
+left-hand set in place.
+
+```python
+s = set([1, 2])
+s |= set([2, 3, 4])     # s now equals set([1, 2, 3, 4])
+s &= set([0, 1, 2, 3])  # s now equals set([1, 2, 3])
+s -= set([0, 1])        # s now equals set([2, 3])
+s ^= set([3, 4])        # s now equals set([2, 4])
+```
+
+Like all mutable values in Starlark, a set can be frozen, and once frozen, all
+subsequent operations that attempt to update it will fail.
+
+A set has the following methods:
+
+  * [`add`](#set·add)
+  * [`clear`](#set·clear)
+  * [`difference`](#set·difference)
+  * [`difference_update`](#set·difference_update)
+  * [`discard`](#set·discard)
+  * [`intersection`](#set·intersection)
+  * [`intersection_update`](#set·intersection_update)
+  * [`isdisjoint`](#set·isdisjoint)
+  * [`issubset`](#set·issubset)
+  * [`issuperset`](#set·issuperset)
+  * [`pop`](#set·pop)
+  * [`remove`](#set·remove)
+  * [`symmetric_difference`](#set·symmetric_difference)
+  * [`symmetric_difference_update`](#set·symmetric_difference_update)
+  * [`union`](#set·union)
+  * [`update`](#set·update)
 
 
 ### Functions
@@ -1614,13 +1766,13 @@ We can classify different kinds of sequence types based on the
 operations they support.
 
 * `Iterable`: an _iterable_ value lets us process each of its elements in a fixed order.
-  Examples: `dict`, `list`, `tuple`, but not `string` or `bytes`.
+  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
 * `Sequence`: a _sequence of known length_ lets us know how many elements it
   contains without processing them.
-  Examples: `dict`, `list`, `tuple`, but not `string` or `bytes`.
+  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
 * `Indexable`: an _indexed_ type has a fixed length and provides efficient
   random access to its elements, which are identified by integer indices.
-  Examples: `string`, `bytes`, `tuple`, and `list`.
+  Examples: `string`, `bytes`, `tuple`, and `list`, but not `dict` or `set`.
 * `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
   element at a given integer index. Example: `list`.
 * `Mapping`: a mapping is an association of keys to values. Example: `dict`.
@@ -3410,6 +3562,21 @@ reversed(range(5))                              # [4, 3, 2, 1, 0]
 reversed({"one": 1, "two": 2}.keys())           # ["two", "one"]
 ```
 
+### set
+
+`set(x)` returns a new set containing the unique elements of the iterable
+sequence `x` in iteration order.
+
+`set(x)` fails if any element of `x` is unhashable.
+
+With no argument, `set()` returns a new empty set.
+
+```python
+set()                          # an empty set
+set([3, 1, 1, 2])              # set([3, 1, 2]), a set of three elements
+set({"k1": "v1", "k2": "v2"})  # set(["k1", "k2"]), a set of two elements
+```
+
 ### sorted
 
 `sorted(x)` returns a new list containing the elements of the iterable sequence x,
@@ -3765,6 +3932,291 @@ x = [1, 2, 3, 2]
 x.remove(2)                             # None (x == [1, 3, 2])
 x.remove(2)                             # None (x == [1, 3])
 x.remove(2)                             # error: element not found
+```
+
+<a id='set·add'></a>
+
+### set·add
+
+`S.add(x)` adds the value `x` to the set `S`. It returns `None`.
+
+It is permissible to `add` a value already present in the set; this leaves the
+set `S` unchanged.
+
+`add` fails if the set `S` is frozen or has active iterators, or if `x` is
+unhashable.
+
+If you need to add multiple elements to a set, see [`update`](#set·update) or
+the [`|=`](#sets) augmented assignment operation.
+
+<a id='set·clear'></a>
+
+### set·clear
+
+`S.clear()` removes all elements from the set `S`. It returns `None`.
+
+`clear` fails if the set `S` is frozen or has active iterators.
+
+<a id='set·difference'></a>
+
+### set·difference
+
+`S.difference(*others)` returns a new set containing elements found in the set
+`S` but not found in any of the iterable sequences `*others`.
+
+If `s` and `t` are sets, `s.difference(t)` is equivalent to `s - t`; however,
+note that the `-` operation requires both sides to be sets, while the
+`difference` method accepts arbitrary iterable sequences.
+
+It is permissible to call `difference` without any arguments; this returns a
+copy of the set `S`.
+
+`difference` fails if any element of any of the `*others` is unhashable.
+
+```python
+set([1, 2, 3]).difference([2])             # set([1, 3])
+set([1, 2, 3]).difference([0, 1], [3, 4])  # set([2])
+```
+
+<a id='set·difference_update'></a>
+
+### set·difference\_update
+
+`S.difference_update(*others)` removes from the set `S` any elements found in
+any of the iterable sequences `*others`. It returns `None`.
+
+If `s` and `t` are sets, `s.difference_update(t)` is equivalent to `s -= t`;
+however, note that the `-=` augmented assignment requires both sides to be sets,
+while the `difference_update` method accepts arbitrary iterable sequences.
+
+It is permissible to call `difference_update` without any arguments; this leaves
+the set `S` unchanged.
+
+`difference_update` fails if the set `S` is frozen or has active iterators, or
+if any element of any of the `*others` is unhashable.
+
+```python
+s = set([1, 2, 3, 4])
+s.difference_update([2])             # None; s is set([1, 3, 4])
+s.difference_update([0, 1], [4, 5])  # None; s is set([3])
+```
+
+<a id='set·discard'></a>
+
+### set·discard
+
+`S.discard(x)` removes the value `x` from the set `S` if present. It returns
+`None`.
+
+It is permissible to `discard` a value not present in the set; this leaves the
+set `S` unchanged. If you want to fail on an attempt to remove a non-present
+element, use [`remove`](#set·remove) instead. If you need to remove multiple
+elements from a set, see [`difference_update`](#set·difference_update) or the
+[`-=`](#sets) augmented assignment operation.
+
+`discard` fails if the set `S` is frozen or has active iterators, or if `x` is
+unhashable. This applies even if `x` is not a member of the set.
+
+```python
+s = set(["x", "y"])
+s.discard("y")  # None; s == set(["x"])
+s.discard("y")  # None; s == set(["x"])
+```
+
+<a id='set·intersection'></a>
+
+### set·intersection
+
+`S.intersection(*others)` returns a new set containing those elements that the
+set `S` and all of the iterable sequences `*others` have in common.
+
+If `s` and `t` are sets, `s.intersection(t)` is equivalent to `s & t`; however,
+note that the `&` operation requires both sides to be sets, while the
+`intersection` method accepts arbitrary iterable sequences.
+
+It is permissible to call `intersection` without any arguments; this returns a
+copy of the set `S`.
+
+`intersection` fails if any element of any of the `*others` is unhashable.
+
+```python
+set([1, 2]).intersection([2, 3])             # set([2])
+set([1, 2, 3]).intersection([0, 1], [1, 2])  # set([1])
+```
+
+<a id='set·intersection_update'></a>
+
+### set·intersection\_update
+
+`S.intersection_update(*others)` removes from the set `S` any elements not found
+in at least one of the iterable sequences `*others`. It returns `None`.
+
+If `s` and `t` are sets, `s.intersection_update(t)` is equivalent to `s &= t`;
+however, note that the `&=` augmented assignment requires both sides to be sets,
+while the `intersection_update` method accepts arbitrary iterable sequences.
+
+It is permissible to call `intersection_update` without any arguments; this
+leaves the set `S` unchanged.
+
+`intersection_update` fails if the set `S` is frozen or has active iterators, or
+if any element of any of the `*others` is unhashable.
+
+```python
+s = set([1, 2, 3, 4])
+s.intersection_update([0, 1, 2])       # None; s is set([1, 2])
+s.intersection_update([0, 1], [1, 2])  # None; s is set([1])
+```
+
+<a id='set·isdisjoint'></a>
+
+### set·isdisjoint
+
+`S.isdisjoint(x)` returns `True` if the set `S` and the iterable sequence `x` do
+not have any values in common, and `False` otherwise.
+
+This is equivalent to `not S.intersection(x)`.
+
+`isdisjoint` fails if any element of `x` is unhashable.
+
+<a id='set·issubset'></a>
+
+### set·issubset
+
+`S.issubset(x)` returns `True` if every element of the set `S` is present in the
+iterable sequence `x`, and `False` otherwise.
+
+This is equivalent to `not S.difference(x)`.
+
+`issubset` fails if any element of `x` is unhashable.
+
+<a id='set·issuperset'></a>
+
+### set·issuperset
+
+`S.issuperset(x)` returns `True` if every element of the iterable sequence `x`
+is present in the set `S`, and `False` otherwise.
+
+This is equivalent to `S == S.union(x)`.
+
+`issuperset` fails if any element of `x` is unhashable.
+
+<a id='set·pop'></a>
+
+### set·pop
+
+`S.pop()` removes and returns the first element (in iteration order, which is
+the order in which elements were first added to the set) from the set `S`.
+
+`pop` fails if the set is empty, is frozen, or has active iterators.
+
+```python
+s = set([3, 1, 2])
+s.pop()  # 3; s == set([1, 2])
+s.pop()  # 1; s == set([2])
+s.pop()  # 2; s == set()
+s.pop()  # error: empty set
+```
+
+<a id='set·remove'></a>
+
+### set·remove
+
+`S.remove(x)` removes the value `x` from the set `S`. It returns `None`.
+
+`remove` fails if the set doesn't contain `x` (which, in particular, implies
+that `remove` fails if `x` is unhashable), or if the set is frozen or has active
+iterators. If you don't want to fail on an attempt to remove a non-present
+element, use [`discard`](#set·discard) instead. If you need to remove multiple
+elements from a set, see [`difference_update`](#set·difference_update) or the
+[`-=`](#sets) augmented assignment operation.
+
+```python
+s = set([1, 2])
+s.remove(2)  # None; s == set([1])
+s.remove(2)  # error: element not found
+```
+
+<a id='set·symmetric_difference'></a>
+
+### set·symmetric\_difference
+
+`S.symmetric_difference(x)` returns a new set containing elements found only in
+the set `S` or in the iterable sequence `x` but not those found in both `S` and
+`x`.
+
+If `s` and `t` are sets, `s.symmetric_difference(t)` is equivalent to `s ^ t`;
+however, note that the `^` operation requires both sides to be sets, while the
+`symmetric_difference` method accepts an arbitrary iterable sequence.
+
+`symmetric_difference` fails if any element of `x` is unhashable.
+
+```python
+set([1, 2]).symmetric_difference([2, 3])  # set([1, 3])
+```
+
+<a id='set·symmetric_difference_update'></a>
+
+### set·symmetric\_difference\_update
+
+`S.symmetric_difference_update(x)` removes from the set `S` any elements found
+in both `S` and the iterable sequence `x`, and adds to `S` any elements found in
+`x` but not in `S`. It returns `None`.
+
+If `s` and `t` are sets, `s.symmetric_difference_update(t)` is equivalent to `s
+^= t`; however, note that the `^=` augmented assignment requires both sides to
+be sets, while the `symmetric_difference_update` method accepts an arbitrary
+iterable sequence.
+
+`symmetric_difference_update` fails if the set `S` is frozen or has active
+iterators, or if any element of `x` is unhashable.
+
+```python
+s = set([1, 2])
+s.symmetric_difference_update([2, 3])  # None; s == set([1, 3])
+```
+
+<a id='set·union'></a>
+
+### set·union
+
+`S.union(*others)` returns a new set containing elements found in the set `S` or
+in any of the iterable sequences `*others`.
+
+If `s` and `t` are sets, `s.union(t)` is equivalent to `s | t`; however, note
+that the `|` operation requires both sides to be sets, while the `union` method
+accepts arbitrary iterable sequences.
+
+It is permissible to call `union` without any arguments; this returns a copy of
+the set `S`.
+
+`union` fails if any element of any of the `*others` is unhashable.
+
+```python
+set([1, 2]).union([2, 3])                    # set([1, 2, 3])
+set([1, 2]).union([2, 3], {3: "a", 4: "b"})  # set([1, 2, 3, 4])
+```
+
+<a id='set·update'></a>
+
+### set·update
+
+`S.update(*others)` adds to the set `S` any elements found in any of the
+iterable sequences `*others`. It returns `None`.
+
+If `s` and `t` are sets, `s.update(t)` is equivalent to `s |= t`; however, note
+that the `|=` augmented assignment requires both sides to be sets, while the
+`update` method accepts arbitrary iterable sequences.
+
+It is permissible to call `update` without any arguments; this leaves the set
+`S` unchanged.
+
+`update` fails if the set `S` is frozen or has active iterators, or if any
+element of any of the `*others` is unhashable.
+
+```python
+s = set()
+s.update([1, 2])          # None; s is set([1, 2])
+s.update([2, 3], [3, 4])  # None; s is set([1, 2, 3, 4])
 ```
 
 <a id='string·capitalize'></a>
