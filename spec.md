@@ -787,7 +787,7 @@ with respect to code point values.)
 
 Strings are _not_ iterable sequences, so they cannot be used as the operand of
 a `for`-loop, list comprehension, or any other operation than requires
-an iterable sequence. One must expliitly call a method of a string value
+an iterable sequence. One must explicitly call a method of a string value
 to obtain an iterable view.
 
 Any value may formatted as a string using the `str` or `repr` built-in
