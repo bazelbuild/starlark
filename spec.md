@@ -1539,11 +1539,6 @@ function, and a _comprehension_ block for each top-level comprehension.
 Bindings in either of these kinds of block,
 and in the file block itself, are called _local_.
 (In the example, the bindings for `e`, `f`, `g`, and `i` are all local.)
-
-A module block contains a _function_ block for each top-level
-function, and a _comprehension_ block for each top-level
-comprehension.
-Bindings inside either of these kinds of block are called _local_.
 Additional functions and comprehensions, and their blocks, may be
 nested in any order, to any depth.
 
