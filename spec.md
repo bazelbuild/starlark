@@ -3296,27 +3296,6 @@ enumerate(["zero", "one", "two"])               # [(0, "zero"), (1, "one"), (2, 
 enumerate(["one", "two"], 1)                    # [(1, "one"), (2, "two")]
 ```
 
-### float
-
-`float(x)` interprets its argument as a floating-point number.
-
-If x is a `float`, the result is x.
-
-If x is an `int`, the result is the floating-point value nearest x.
-The call fails if x is too large to represent as a finite `float`.
-
-If x is a `bool`, the result is `1.0` for `True` and `0.0` for `False`.
-
-If x is a string, the string is interpreted as a floating-point literal.
-The function also recognizes the names `Inf` (or `Infinity`) and `NaN`,
-optionally preceded by a `+` or `-` sign.
-These construct the IEEE 754 non-finite values.
-Letter case is not significant.
-The call fails if the literal denotes a value too large to represent as
-a finite `float`.
-
-With no argument, `float()` returns `0.0`.
-
 ### fail
 
 The `fail(*args)` function causes execution to fail
@@ -3341,6 +3320,27 @@ The Java implementation also accepts two (deprecated) named parameters:
 and the Go implementation accepts a sep=... parameter, like print().
 See https://github.com/bazelbuild/starlark/issues/47.
 -->
+
+### float
+
+`float(x)` interprets its argument as a floating-point number.
+
+If x is a `float`, the result is x.
+
+If x is an `int`, the result is the floating-point value nearest x.
+The call fails if x is too large to represent as a finite `float`.
+
+If x is a `bool`, the result is `1.0` for `True` and `0.0` for `False`.
+
+If x is a string, the string is interpreted as a floating-point literal.
+The function also recognizes the names `Inf` (or `Infinity`) and `NaN`,
+optionally preceded by a `+` or `-` sign.
+These construct the IEEE 754 non-finite values.
+Letter case is not significant.
+The call fails if the literal denotes a value too large to represent as
+a finite `float`.
+
+With no argument, `float()` returns `0.0`.
 
 ### getattr
 
