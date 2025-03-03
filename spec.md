@@ -547,6 +547,7 @@ bytes                        # a byte string
 list                         # a fixed-length sequence of values
 tuple                        # a fixed-length sequence of values, unmodifiable
 dict                         # a mapping from values to values
+set                          # a collection of unique values 
 function                     # a function
 ```
 
@@ -2219,6 +2220,11 @@ Bitwise operations:
    int << int                   # bitwise left shift
    int >> int                   # bitwise right shift (arithmetic)
 
+Set operations:
+   set & set                    # set intersection
+   set - set                    # set difference
+   set ^ set                    # set symmetric difference 
+
 Concatenation
    string + string
     bytes + bytes
@@ -2232,8 +2238,8 @@ Repetition (string/bytes/list/tuple)
 String interpolation
    string % any                 # see String Interpolation
 
-Dictionary union
-     dict | dict                # see Dictionaries
+Set or dictionary union
+     dict | dict                # see Dictionaries, Sets
 ```
 
 The operands of the arithmetic operators `+`, `-`, `*`, `//`, and `%`,
@@ -2291,12 +2297,12 @@ these operators.
 #### Membership tests
 
 ```text
-      any in     sequence		(list, tuple, dict, string, bytes, range)
+      any in     sequence		(list, tuple, dict, set, string, bytes, range)
       any not in sequence
 ```
 
 The `in` operator reports whether its first operand is a member of its
-second operand, which must be a list, tuple, dict, string, or bytes.
+second operand, which must be a list, tuple, dict, set, string, or bytes.
 The `not in` operator is its negation.
 Both return a Boolean.
 
@@ -2527,7 +2533,7 @@ of the value `x`.
 
 Fields are possessed by none of the main Starlark [data types](#data-types),
 but some application-defined types have them.
-Methods belong to the built-in types `string`, `list`, and `dict`,
+Methods belong to the built-in types `string`, `list`, `dict`, and `set`
 and to many application-defined types.
 
 ```text
