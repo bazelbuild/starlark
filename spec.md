@@ -23,7 +23,7 @@ now maintained by the Bazel team.
 
 ## Overview
 
-Starlark is an untyped dynamic language with high-level data types,
+Starlark is a typed dynamic language with high-level data types,
 first-class functions with lexical scope, and automatic memory
 management or _garbage collection_.
 
@@ -254,7 +254,7 @@ characters are tokens:
 ```text
 +    -    *    /    //   %    **
 ~    &    |    ^    <<   >>
-.    ,    =    ;    :
+.    ,    =    ;    :    ->
 (    )    [    ]    {    }
 <    >    >=   <=   ==   !=
 +=   -=   *=   /=   //=  %=
@@ -2832,7 +2832,7 @@ a[i] = a[i] * 2
 A `def` statement creates a named function and assigns it to a variable.
 
 ```text
-DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
+DefStmt = 'def' identifier '(' [Parameters [',']] ')' ['->' TypeExpr ]  ':' Suite .
 ```
 
 Example:
@@ -2847,17 +2847,19 @@ twice("two")            # "twotwo"
 ```
 
 The function's name is preceded by the `def` keyword and followed by
-the parameter list (which is enclosed in parentheses), a colon, and
-then an indented block of statements which form the body of the function.
+the parameter list (which is enclosed in parentheses), optionally the return 
+type, a colon, and then an indented block of statements which form the body of 
+the function.
 
 The parameter list is a comma-separated list whose elements are of
 several kinds.  First come zero or more required parameters, which are
-simple identifiers; all calls must provide an argument value for these parameters.
+simple identifiers with optionally a type annotation; 
+all calls must provide an argument value for these parameters.
 
 The required parameters are followed by zero or more optional
-parameters, of the form `name=expression`.  The expression specifies
-the default value for the parameter for use in calls that do not
-provide an argument value for it.
+parameters, of the form `name = expression` or `name: type = expression`.
+The expression specifies the default value for the parameter for use in calls 
+that do not provide an argument value for it.
 
 The required parameters are optionally followed by a single parameter
 name preceded by a `*`.  This is the called the _varargs_ parameter,
@@ -2914,6 +2916,7 @@ def f(a, b, c=1, *args): pass
 def f(a, b, c=1, *args, **kwargs): pass
 def f(**kwargs): pass
 def f(a, b, c=1, *, d=1): pass
+def f(a: int, *, b: bool = True, c): pass
 ```
 
 Execution of a `def` statement creates a new function object.  The
@@ -4695,16 +4698,38 @@ File = {Statement | newline} eof .
 
 Statement = DefStmt | IfStmt | ForStmt | SimpleStmt .
 
-DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
+DefStmt = 'def' identifier '(' [Parameters [',']] ')' ['->' TypeExpr ]  ':' Suite .
 
 Parameters = Parameter {',' Parameter}.
 
-Parameter  = identifier
-           | identifier '=' Test
+Parameter  = identifier [':' TypeExpr] ['=' Test]
            | '*'
-           | '*' identifier
-           | '**' identifier
+           | '*' identifier [':' TypeExpr]
+           | '**' identifier [':' TypeExpr]
            .
+
+LambdaParameters = LambdaParameter {',' LambdaParameter}.
+
+LambdaParameter  = identifier ['=' Test]
+                 | '*'
+                 | '*' identifier
+                 | '**' identifier
+                 .
+           
+TypeExpr = Type {'|' Type}.
+
+Type = identifier [TypeArguments].
+
+TypeArguments = '[' TypeArgument {',' TypeArgument} ']'.
+
+TypeArgument = Type
+             | ListOfTypes
+             | DictOfTypes
+             .
+
+ListOfTypes = '[' [TypeArgument {',' TypeArgument} [',']] ']'.
+DictOfTypes = '{' [TypeEntry {',' TypeEntry} [',']] '}' .
+TypeEntry    = string ':' TypeArgument .
 
 IfStmt = 'if' Test ':' Suite {'elif' Test ':' Suite} ['else' ':' Suite] .
 
@@ -4786,7 +4811,7 @@ Binop = 'or'
       | '*' | '%' | '/' | '//'
       .
 
-LambdaExpr = 'lambda' [Parameters] ':' Test .
+LambdaExpr = 'lambda' [LambdaParameters] ':' Test .
 
 Expression = Test {',' Test} .
 # NOTE: trailing comma permitted only when within [...] or (...).
