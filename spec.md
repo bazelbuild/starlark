@@ -4722,7 +4722,7 @@ Type = identifier [TypeArguments].
 
 TypeArguments = '[' TypeArgument {',' TypeArgument} ']'.
 
-TypeArgument = Type
+TypeArgument = TypeExpr
              | ListOfTypes
              | DictOfTypes
              | string
