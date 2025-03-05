@@ -4725,6 +4725,7 @@ TypeArguments = '[' TypeArgument {',' TypeArgument} ']'.
 TypeArgument = Type
              | ListOfTypes
              | DictOfTypes
+             | string
              .
 
 ListOfTypes = '[' [TypeArgument {',' TypeArgument} [',']] ']'.
