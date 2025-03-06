@@ -2852,14 +2852,14 @@ type, a colon, and then an indented block of statements which form the body of
 the function.
 
 The parameter list is a comma-separated list whose elements are of
-several kinds.  First come zero or more required parameters, which are
-simple identifiers with optionally a type annotation; 
+several kinds. Any parameter name may be associated with a type expression.
+First come zero or more required parameters, which are simple identifiers;
 all calls must provide an argument value for these parameters.
 
 The required parameters are followed by zero or more optional
-parameters, of the form `name = expression` or `name: type = expression`.
-The expression specifies the default value for the parameter for use in calls 
-that do not provide an argument value for it.
+parameters, of the form `name=expression`. The expression specifies
+the default value for the parameter for use in calls that do not
+provide an argument value for it.
 
 The required parameters are optionally followed by a single parameter
 name preceded by a `*`.  This is the called the _varargs_ parameter,
@@ -4716,9 +4716,9 @@ LambdaParameter  = identifier ['=' Test]
                  | '**' identifier
                  .
            
-TypeExpr = Type {'|' Type}.
+TypeExpr = TypeAtom {'|' TypeAtom}.
 
-Type = identifier [TypeArguments].
+TypeAtom = identifier [TypeArguments].
 
 TypeArguments = '[' TypeArgument {',' TypeArgument} ']'.
 
