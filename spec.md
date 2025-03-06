@@ -2852,9 +2852,8 @@ type, a colon, and then an indented block of statements which form the body of
 the function.
 
 The parameter list is a comma-separated list whose elements are of
-several kinds. Any parameter name may be associated with a type expression.
-First come zero or more required parameters, which are simple identifiers;
-all calls must provide an argument value for these parameters.
+several kinds.  First come zero or more required parameters, which are
+simple identifiers; all calls must provide an argument value for these parameters.
 
 The required parameters are followed by zero or more optional
 parameters, of the form `name=expression`. The expression specifies
@@ -2871,6 +2870,8 @@ parameters, again of the forms `name` or `name=expression`,
 but these parameters differ from earlier ones in that they are
 _keyword-only_: if a call provides their values, it must do so as
 keyword arguments, not positional ones.
+
+Any parameter name may be associated with a type expression.
 
 Note that even though keyword-only arguments are declared after `*args` in a
 function's definition, they nevertheless must appear before `*args` in a call
