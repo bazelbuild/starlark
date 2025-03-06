@@ -7,8 +7,6 @@ import os
 import re
 import glob
 
-import testenv
-
 def indent(s: str) -> str:
   return "".join("  " + line.rstrip("\n") + "\n" for line in s.splitlines())
 
@@ -99,8 +97,7 @@ def assert_(cond, msg="assertion failed"):
 
   def testFile(self):
     print("=== {} with {} ===".format(test_file, impl))
-    f = os.path.join(testenv.STARLARK_TESTDATA_PATH, test_file)
-    for chunk, expected, line_no in self.chunks(f):
+    for chunk, expected, line_no in self.chunks(test_file):
       with tempfile.NamedTemporaryFile(
           mode="wb", suffix=".star", delete=False) as tmp:
         lines = [line.encode("utf-8") for line in
@@ -114,8 +111,8 @@ def assert_(cond, msg="assertion failed"):
     pass
 
 if __name__ == "__main__":
-  # Test filename is the last argument on the command-line.
-  impl = sys.argv[-2]
+  # <test args...> <"java"|"go"|"rust"> <path to interpreter> <path to Starlark file>
+  impl = sys.argv[-3]
+  binary_path = sys.argv[-2]
   test_file = sys.argv[-1]
-  binary_path = glob.glob(testenv.STARLARK_BINARY_PATH[impl])[0]
-  unittest.main(argv=sys.argv[2:])
+  unittest.main(argv=sys.argv[:-3])
