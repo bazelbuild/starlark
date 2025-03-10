@@ -158,17 +158,17 @@ interact with the environment.
     * [set·add](#set·add)
     * [set·clear](#set·clear)
     * [set·difference](#set·difference)
-    * [set·difference_update](#set·difference_update)
+    * [set·difference\_update](#set·difference\_update)
     * [set·discard](#set·discard)
     * [set·intersection](#set·intersection)
-    * [set·intersection_update](#set·intersection_update)
+    * [set·intersection\_update](#set·intersection\_update)
     * [set·isdisjoint](#set·isdisjoint)
     * [set·issubset](#set·issubset)
     * [set·issuperset](#set·issuperset)
     * [set·pop](#set·pop)
     * [set·remove](#set·remove)
-    * [set·symmetric_difference](#set·symmetric_difference)
-    * [set·symmetric_difference_update](#set·symmetric_difference_update)
+    * [set·symmetric\_difference](#set·symmetric\_difference)
+    * [set·symmetric\_difference\_update](#set·symmetric\_difference\_update)
     * [set·union](#set·union)
     * [set·update](#set·update)
     * [string·capitalize](#string·capitalize)
@@ -547,7 +547,7 @@ bytes                        # a byte string
 list                         # a fixed-length sequence of values
 tuple                        # a fixed-length sequence of values, unmodifiable
 dict                         # a mapping from values to values
-set                          # a collection of unique values 
+set                          # a collection of unique values
 function                     # a function
 ```
 
@@ -2223,7 +2223,7 @@ Bitwise operations:
 Set operations:
    set & set                    # set intersection
    set - set                    # set difference
-   set ^ set                    # set symmetric difference 
+   set ^ set                    # set symmetric difference
 
 Concatenation
    string + string
