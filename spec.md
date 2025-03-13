@@ -2847,8 +2847,8 @@ twice("two")            # "twotwo"
 ```
 
 The function's name is preceded by the `def` keyword and followed by
-the parameter list (which is enclosed in parentheses), optionally the return 
-type, a colon, and then an indented block of statements which form the body of 
+the parameter list (which is enclosed in parentheses), optionally the return
+type, a colon, and then an indented block of statements which form the body of
 the function.
 
 The parameter list is a comma-separated list whose elements are of
@@ -4716,10 +4716,12 @@ LambdaParameter  = identifier ['=' Test]
                  | '*' identifier
                  | '**' identifier
                  .
-           
-TypeExpr = TypeAtom {'|' TypeAtom}.
 
-TypeAtom = identifier [TypeArguments].
+TypeExpr = Type {'|' Type}.
+
+Type = identifier
+     | identifier TypeArguments
+     .
 
 TypeArguments = '[' TypeArgument {',' TypeArgument} ']'.
 
