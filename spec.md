@@ -347,7 +347,7 @@ magnitude is too large to be represented as a finite `float` value.
 
 ### String literals
 
-A Starlark string literal denotes a string value.
+A Starlark string literal denotes a string value. Its type is `str`.
 In its simplest form, it consists of the desired text
 surrounded by matching single- or double-quotation marks:
 
@@ -494,7 +494,7 @@ than as part of one of the escapes described above.
 
 ### Bytes literals
 
-A Starlark bytes literal denotes a bytes value,
+A Starlark bytes literal denotes a bytes value, its type is `bytes`,
 and looks like a string literal, in any of its various forms
 (single-quoted, double-quoted, triple-quoted, raw)
 preceded by the letter `b`.
@@ -538,17 +538,18 @@ TODO: define indent, outdent, semicolon, newline, eof
 These are the main data types built in to the interpreter:
 
 ```text
-NoneType                     # the type of None
-bool                         # True or False
-int                          # a signed integer of arbitrary magnitude
-float                        # an IEEE 754 double-precision floating-point number
-string                       # a text string, with Unicode encoded as UTF-8 or UTF-16
-bytes                        # a byte string
-list                         # a fixed-length sequence of values
-tuple                        # a fixed-length sequence of values, unmodifiable
-dict                         # a mapping from values to values
-set                          # a collection of unique values
-function                     # a function
+None                   # the type of None
+bool                   # True or False
+int                    # a signed integer of arbitrary magnitude
+float                  # an IEEE 754 double-precision floating-point number
+str                    # a text string, with Unicode encoded as UTF-8 or UTF-16
+bytes                  # a byte string
+<!-- TODO: re-review collections and function types when this TODO is removed -->
+list[E]                # a fixed-length sequence of values
+tuple[A,B,...]         # a fixed-length sequence of values, unmodifiable
+dict[K,V]              # a mapping from values to values
+set[E]                 # a collection of unique values
+Callable[[A,B,...],R]  # a function
 ```
 
 Some functions, such as the `range` function, return instances of
@@ -576,14 +577,14 @@ types by the operators they support.
 `None` is a distinguished value used to indicate the absence of any other value.
 For example, the result of a call to a function that contains no return statement is `None`.
 
-`None` is equal only to itself.  Its [type](#type) is `"NoneType"`.
+`None` is equal only to itself.  Its type is `None`.
 The truth value of `None` is `False`.
 
 
 ### Booleans
 
 There are two Boolean values, `True` and `False`, representing the
-truth or falsehood of a predicate.  The [type](#type) of a Boolean is `"bool"`.
+truth or falsehood of a predicate. The type of a Boolean is `bool`.
 
 Boolean values are typically used as conditions in `if`-statements,
 although any Starlark value used as a condition is implicitly
@@ -610,7 +611,7 @@ but Booleans are not numbers.
 
 ### Integers
 
-The Starlark integer type represents integers.  Its [type](#type) is `"int"`.
+The Starlark integer type represents integers.  Its type `int`.
 
 Integers may be positive or negative, and arbitrarily large.
 Integer arithmetic is exact.
@@ -653,7 +654,7 @@ int("0xffff", 16)               # 65535
 
 The Starlark floating-point data type represents an IEEE 754
 double-precision floating-point number.
-Its [type](#type) is `"float"`.
+Its type is `float`.
 
 Arithmetic on floats using the `+`, `-`, `*`, `/`, `//`, and `%`
 operators follows the IEEE 754 standard.
@@ -754,7 +755,7 @@ float(3) / 2                                    # 1.5
 ### Strings
 
 A string is an immutable sequence of elements that encode Unicode text.
-The [type](#type) of a string is `"string"`.
+The type of a string is `str`.
 
 For reasons of efficiency and interoperability with the host language,
 the number of bits in each string element, which we call K,
@@ -836,7 +837,7 @@ Strings have several built-in methods:
 ### Bytes
 
 A _bytes_ is an immutable sequence of values in the range 0-255.
-The [type](#type) of a bytes is `"bytes"`.
+The type of a bytes is `bytes`.
 
 Unlike a string, which is intended for text, a bytes may represent binary data,
 such as the contents of an arbitrary file, without loss.
@@ -873,7 +874,7 @@ TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 ### Lists
 
 A list is a mutable sequence of values.
-The [type](#type) of a list is `"list"`.
+The type of a list is `list[E]`.
 
 Lists are indexable sequences: the elements of a list may be iterated
 over by `for`-loops, list comprehensions, and various built-in
@@ -934,7 +935,7 @@ A list value has these methods:
 ### Tuples
 
 A tuple is an immutable sequence of values.
-The [type](#type) of a tuple is `"tuple"`.
+The type of a tuple is `tuple[A,B,C,...]`.
 
 Tuples are constructed using parenthesized list notation:
 
@@ -987,7 +988,7 @@ non-empty.
 ### Dictionaries
 
 A dictionary is a mutable mapping from keys to values.
-The [type](#type) of a dictionary is `"dict"`.
+The type of a dictionary is `dict[K,V]`.
 
 Dictionaries provide constant-time operations to insert an element, to
 look up the value for a key, or to remove an element.  Dictionaries
@@ -1102,7 +1103,7 @@ A dictionary value has these methods:
 ### Sets
 
 A set is a mutable, iterable collection of unique values - the set's *elements*.
-The [type](#type) of a set is `"set"`.
+The type of a set is `set[E]`.
 
 Sets provide constant-time operations to insert, remove, or check for the
 presence of a value. Sets are implemented using a hash table, and therefore,
@@ -1236,7 +1237,7 @@ A set has the following methods:
 ### Functions
 
 A function value represents a function defined in Starlark.
-Its [type](#type) is `"function"`.
+Its type is `Callable[[A,B,C,...], R]`.
 A function value used in a Boolean context is always considered true.
 
 Functions defined by a [`def` statement](#function-definitions) are named;
@@ -1451,7 +1452,7 @@ allowing unbounded recursion.
 
 A built-in function is a function or method implemented by the interpreter
 or the application into which the interpreter is embedded.
-Its [type](#type) is `"builtin_function_or_method"`.
+Its type is `Callable[[A,B,C,...],R]`.
 
 A built-in function value used in a Boolean context is always considered true.
 
@@ -1662,8 +1663,8 @@ For example, an assignment statement updates the value held by a
 variable, and calls to some built-in functions such as `print` change
 the state of the application that embeds the interpreter.
 
-Values of some data types, such as `NoneType`, `bool`, `int`, `float`,
-`string`, and `bytes`, are _immutable_; they can never change.
+Values of some data types, such as `None`, `bool`, `int`, `float`,
+`str`, and `bytes`, are _immutable_; they can never change.
 Immutable values have no notion of _identity_: it is impossible for a
 Starlark program to tell whether two integers, for instance, are
 represented by the same object; it can tell only whether they are
@@ -1736,7 +1737,7 @@ The hash of a value is an unspecified integer chosen so that two equal
 values have the same hash, in other words, `x == y => hash(x) == hash(y)`.
 A hashable value has the same hash throughout its lifetime.
 
-Values of the types `NoneType`, `bool`, `int`, `float`, `string`, and `bytes`,
+Values of the types `None`, `bool`, `int`, `float`, `str`, and `bytes`,
 which are all immutable, are hashable.
 
 Values of mutable types such as `list` and `dict` are not
@@ -1762,13 +1763,13 @@ We can classify different kinds of sequence types based on the
 operations they support.
 
 * `Iterable`: an _iterable_ value lets us process each of its elements in a fixed order.
-  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
+  Examples: `dict`, `list`, `tuple`, `set`, but not `str` or `bytes`.
 * `Sequence`: a _sequence of known length_ lets us know how many elements it
   contains without processing them.
-  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
+  Examples: `dict`, `list`, `tuple`, `set`, but not `str` or `bytes`.
 * `Indexable`: an _indexed_ type has a fixed length and provides efficient
   random access to its elements, which are identified by integer indices.
-  Examples: `string`, `bytes`, `tuple`, and `list`, but not `dict` or `set`.
+  Examples: `str`, `bytes`, `tuple`, and `list`, but not `dict` or `set`.
 * `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
   element at a given integer index. Example: `list`.
 * `Mapping`: a mapping is an association of keys to values. Example: `dict`.
@@ -2280,7 +2281,7 @@ the same type.
 ```
 
 The `*` operator may be applied to an integer _n_ and a value of type
-`string`, `bytes`, `list`, or `tuple`, in which case it yields a new value
+`str`, `bytes`, `list`, or `tuple`, in which case it yields a new value
 of the same sequence type consisting of _n_ repetitions of the original sequence.
 The order of the operands is immaterial.
 Negative values of _n_ behave like zero.
@@ -2533,7 +2534,7 @@ of the value `x`.
 
 Fields are possessed by none of the main Starlark [data types](#data-types),
 but some application-defined types have them.
-Methods belong to the built-in types `string`, `list`, `dict`, and `set`
+Methods belong to the built-in types `str`, `list`, `dict`, and `set`
 and to many application-defined types.
 
 ```text
@@ -3196,7 +3197,7 @@ The parameter names serve merely as documentation.
 
 ### None
 
-`None` is the distinguished value of the type `NoneType`.
+`None` is the distinguished value of the type `None`.
 
 ### True and False
 
@@ -3632,6 +3633,22 @@ With no arguments, `tuple()` returns the empty tuple.
 ### type
 
 `type(x)` returns a string describing the type of its operand.
+
+The returned description of the type is following:
+
+```text
+None                   "NoneType"
+bool                   "bool"
+int                    "int"
+float                  "float"
+str                    "string"
+bytes                  "bytes"
+list[E]                "list"
+tuple[A,B,...]         "tuple"
+dict[K,V]              "dict"
+set[E]                 "set"
+Callable[[A,B,...],R]  "function" or "builtin_function_or_method"
+```
 
 ```python
 type(None)              # "NoneType"
