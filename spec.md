@@ -3368,6 +3368,8 @@ provided `default` value instead of failing.
 
 ### hash
 
+`hash(/, x: str) -> int`
+
 `hash(x)` returns an integer hash of a string or bytes x
 such that two equal values have the same hash.
 In other words `x == y` implies `hash(x) == hash(y)`.
