@@ -1,5 +1,7 @@
 # Starlark
 
+[![Build status](https://badge.buildkite.com/8b4240b7092ded039cad0d825d7a6ebff115623ec8af217121.svg)](https://buildkite.com/bazel/starlark)
+
 ## Overview
 
 Starlark (formerly known as Skylark) is a language intended for use as a
@@ -7,7 +9,7 @@ configuration language. It was designed for the [Bazel](https://bazel.build/)
 build system, but may be useful for other projects as well. This repository is
 where Starlark features are proposed, discussed, and specified. It contains
 information about the language, including the [specification](spec.md). There
-are [multiple implementations of Starlark](users.md).
+are [multiple implementations of Starlark](https://github.com/laurentlb/awesome-starlark).
 
 
 Starlark is a dialect of [Python](https://www.python.org/). Like Python, it is a
@@ -37,7 +39,7 @@ extended with custom logic to support new languages and compilers.
     thread-safe execution, shared data becomes immutable.
 *   **Simplicity**. We try to limit the number of concepts needed to understand
     the code. Users should be able to quickly read and write code, even if they
-    are not expert. The language should avoid pitfalls as much as possible.
+    are not experts. The language should avoid pitfalls as much as possible.
 *   **Focus on tooling**. We recognize that the source code will be read,
     analyzed, modified, by both humans and tools.
 *   **Python-like**. Python is a widely used language. Keeping the language
@@ -119,4 +121,5 @@ evolution of Starlark.
 
 ## Implementations, tools, and users
 
-See the [Starlark implementations, tools, and users](users.md) page.
+See [Awesome Starlark](https://github.com/laurentlb/awesome-starlark).
+

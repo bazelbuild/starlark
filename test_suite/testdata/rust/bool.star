@@ -1,3 +1,6 @@
 # Boolean tests
 
-True + 1000 ### (parameters mismatch|unknown binary op|unsupported)
+### java: unsupported binary operation
+### rust: not supported
+### go: unknown binary op
+True + 1000

@@ -109,7 +109,7 @@ assert_eq("abc"[2], "c")
 # x[i] = ...
 x2 = "abc"
 def f(): x2[1] = 'B'
-f() ### (string.*does not support.*assignment|not supported|can only assign an element in a dictionary or a list)
+f() ### (string.*does not support.*assignment|not supported|can only assign an element in a dictionary or a list|immutable)
 ---
 
 # slicing, x[i:j]
@@ -146,7 +146,10 @@ assert_eq("banana"[4::-2], "nnb")
 assert_eq("banana"[::-1], "ananab")
 assert_eq("banana"[None:None:-2], "aaa")
 ---
-"banana"[:"":] ### (got.*want|parameters mismatch)
+### rust: not supported
+### java: want int
+### go: want int
+"banana"[:"":]
 ---
 "banana"[:"":True] ### (got.*want|parameters mismatch)
 ---
@@ -188,11 +191,11 @@ gothash = {s: hash(s) for s in wanthash}
 assert_eq("%s %r" % ("hi", "hi"), 'hi "hi"')
 assert_eq("%%d %d" % 1, "%d 1")
 ---
-"%d %d" % 1 ### (not enough arguments|not iterable)
+"%d %d" % 1 ### (not enough arguments|not iterable|operation.*not supported)
 ---
 "%d %d" % (1, 2, 3) ### (too many arguments for format string|not all arguments converted)
 ---
-"" % 1 ### (too many arguments for format string|not all arguments converted|not iterable)
+"" % 1 ### (too many arguments for format string|not all arguments converted|not iterable|operation.*not supported)
 ---
 # _inconsistency_: java doesn't support format character %c
 # %c
@@ -241,7 +244,7 @@ assert_eq("{012}".format(*range(100)), "12") # decimal, despite leading zeros
 ---
 assert_eq("a{010}b".format(0,1,2,3,4,5,6,7,8,9,10), "a10b") # index is decimal
 ---
-"a{}b{1}c".format(1, 2) ### (cannot switch from automatic field numbering to manual|manual and automatic)
+"a{}b{1}c".format(1, 2) ### (cannot switch from automatic field numbering to manual|manual.* and automatic.*)
 ---
 # _inconsistency_: java doesn't support '!' in format
 # assert_eq("a{!s}c".format("b"), "abc")
@@ -368,27 +371,33 @@ assert_(not "foo".endswith("x"))
 assert_("foo".startswith("fo"))
 assert_(not "foo".startswith("x"))
 ---
-"foo".startswith(1) ### (got.*want|expected string)
+"foo".startswith(1) ### (got.*want|expected string|type of parameter.*doesn't match)
 ---
-# _inconsistency_: rust startswith accepts only string, not tuple
-# assert_('abc'.startswith(('a', 'A')))
-# assert_('ABC'.startswith(('a', 'A')))
-# assert_(not 'ABC'.startswith(('b', 'B')))
+assert_('abc'.startswith(('a', 'A')))
+assert_('ABC'.startswith(('a', 'A')))
+assert_(not 'ABC'.startswith(('b', 'B')))
 ---
-# _inconsistency_: rust startswith accepts only string not tuple
-# '123'.startswith((1, 2)) ## got int, for element 0
+### rust: Type of parameter
+### java: want string
+### go: want string
+'123'.startswith((1, 2))
 ---
-'123'.startswith(['3']) ### (got.*want|expected string)
+# _inconsistency_: rust startswith allows a list, not just tuple
+# https://github.com/facebookexperimental/starlark-rust/issues/23
+# '123'.startswith(['3']) ## (got.*want|expected string|type of parameter.*doesn't match)
 ---
-# _inconsistency_: rust endswith accepts only string, not tuple
-# assert_('abc'.endswith(('c', 'C')))
-# assert_('ABC'.endswith(('c', 'C')))
-# assert_(not 'ABC'.endswith(('b', 'B')))
+assert_('abc'.endswith(('c', 'C')))
+assert_('ABC'.endswith(('c', 'C')))
+assert_(not 'ABC'.endswith(('b', 'B')))
 ---
-# _inconsistency_: rust startswith accepts only string not tuple
-# '123'.endswith((1, 2)) ## got int, for element 0
+### java: want string
+### rust: Type of parameter
+### go: want string
+'123'.endswith((1, 2))
 ---
-'123'.endswith(['3']) ### (got.*want|mismatch)
+# _inconsistency_: rust endswith allows a lists, not just tuple
+# https://github.com/facebookexperimental/starlark-rust/issues/23
+# '123'.endswith(['3']) ## (got.*want|mismatch)
 ---
 # _inconsistency_: rust startswith/endswith accept a single argument only
 # start/end
@@ -461,28 +470,37 @@ assert_eq("abc"[1], "b")                       # indexing
 def args(*args): return args
 
 # varargs
-args(*"abc") ### (must be iterable, not string|not iterable|must be an iterable)
+args(*"abc") ### (must be iterable, not string|not iterable|must be an iterable|operation.*not supported)
 ---
 # list(str)
-list("abc") ### (got string, want iterable|not iterable|not a collection)
+### java: got value of type
+### rust: not supported
+### go: got string, want iterable
+list("abc")
 ---
 # tuple(str)
-tuple("abc") ### (got string, want iterable|not iterable|not a collection)
+### java: got value of type
+### rust: not supported
+### go: got string, want iterable
+tuple("abc")
 ---
 # enumerate
-enumerate("ab") ### (got string, want iterable|not iterable|expected value of type 'sequence')
+enumerate("ab") ### (got string, want iterable|not iterable|expected value of type 'sequence'|operation.*not supported)
 ---
 # sorted
-sorted("abc") ### (got string, want iterable|not iterable|not a collection)
+### java: got value of type
+### rust: not supported
+### go: got string, want iterable
+sorted("abc")
 ---
 # list.extend
-[].extend("bc") ### (got string, want iterable|not iterable|expected value of type 'sequence')
+[].extend("bc") ### (got string, want iterable|not iterable|expected value of type 'sequence'|operation.*not supported)
 ---
 # string.join
-",".join("abc") ### (got string, want iterable|not iterable|expected value of type 'sequence')
+",".join("abc") ### (got string, want iterable|not iterable|expected value of type 'sequence'|operation.*not supported)
 ---
 # dict
-dict(["ab"]) ### (not iterable .*string|non-pair element|cannot convert)
+dict(["ab"]) ### (not iterable .*string|non-pair element|cannot convert|operation.*not supported)
 ---
 def for_string():
   for x in "abc":
@@ -490,22 +508,22 @@ def for_string():
 
 # The Java implementation does not correctly reject the following cases:
 # (See Google Issue b/34385336)
-for_string() ### not iterable
+for_string() ### (not iterable|operation.*not supported)
 ---
 # comprehension
-[x for x in "abc"] ### not iterable
+[x for x in "abc"] ### (not iterable|operation.*not supported)
 ---
 # all
-all("abc") ### (got string, want iterable|not iterable)
+all("abc") ### (got string, want iterable|not iterable|operation.*not supported)
 ---
 # any
-any("abc") ### (got string, want iterable|not iterable)
+any("abc") ### (got string, want iterable|not iterable|operation.*not supported)
 ---
 # reversed
-reversed("abc") ### (got.*want|not iterable)
+reversed("abc") ### (got.*want|not iterable|operation.*not supported)
 ---
 # zip
-zip("ab" , "cd") ### (not iterable: string|not iterable)
+zip("ab" , "cd") ### (not iterable: string|not iterable|operation.*not supported)
 ---
 
 # str.join
@@ -516,9 +534,9 @@ assert_eq(','.join(["a", "b", "c"]), 'a,b,c')
 assert_eq(','.join(("a", "b", "c")), 'a,b,c')
 assert_eq(''.join(("a", "b", "c")), 'abc')
 ---
-''.join(None) ### (got NoneType, want iterable|not iterable|parameter 'elements' cannot be None)
+''.join(None) ### (got NoneType, want iterable|not iterable|parameter 'elements' cannot be None|operation.*not supported)
 ---
-''.join(["one", 2]) ### (join: in list, want string, got int|expected string|must be a string)
+''.join(["one", 2]) ### (join: in list, want string, got int|expected string|must be a string|type of parameter.*doesn't match)
 ---
 
 # _inconsistency_: string.capitalize works differently in rust
@@ -552,8 +570,17 @@ assert_eq("¿Por qué?".title(), "¿Por Qué?")
 
 ---
 # method spell check
-"".starts_with() ### (no .starts_with field.*did you mean .startswith|not supported|no field or method)
+### rust: has no attribute
+### java: has no field or method
+### go: field or method
+"".starts_with()
 ---
-"".StartsWith() ### (no .StartsWith field.*did you mean .startswith|not supported|no field or method)
+### rust: has no attribute
+### java: has no field or method
+### go: field or method
+"".StartsWith()
 ---
-"".fin() ### (no .fin field.*.did you mean .find|not supported|no field or method)
+### rust: has no attribute
+### java: has no field or method
+### go: field or method
+"".fin()

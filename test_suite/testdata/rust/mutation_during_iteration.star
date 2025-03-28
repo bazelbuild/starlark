@@ -5,14 +5,14 @@ def fun():
   for x in a:
     a.append(1)
 
-fun()  ### (Cannot mutate an iterable while iterating|cannot append|temporarily immutable)
+fun()  ### (mutate an iterable for an iterator while iterating|cannot append|temporarily immutable)
 ---
 def increment_values(dict):
   for k in dict:
     dict[k] += 1
 
 dict = {"one": 1, "two": 2}
-increment_values(dict)   ### (Cannot mutate an iterable while iterating|cannot insert|temporarily immutable)
+increment_values(dict)   ### (mutate an iterable for an iterator while iterating|cannot insert|temporarily immutable)
 ---
 # modifying deep content is allowed
 def modify_deep_content():

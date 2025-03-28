@@ -50,9 +50,9 @@ assert_eq('abababa'.index('ab', 1), 2)
 assert_eq('banana'.rindex('na'), 4)
 assert_eq('abababa'.rindex('ab', 1), 4)
 ---
-'banana'.index('foo') ### substring (\"foo\" )?not found
+'banana'.index('foo') ### substring ([\'\"]foo[\"\'] )?not found
 ---
-'banana'.rindex('foo') ### substring (\"foo\" )?not found
+'banana'.rindex('foo') ### substring ([\'\"]foo[\"\'] )?not found
 ---
 
 # endswith
@@ -61,30 +61,39 @@ assert_eq('a'.endswith(''), True)
 assert_eq(''.endswith(''), True)
 assert_eq('Apricot'.endswith('co'), False)
 
-# _inconsistency_: rust endwith() accepts only a single argument
+# _inconsistency_: rust endswith() accepts only one parameter
 # assert_eq('Apricot'.endswith('co', -1), False)
 # assert_eq('abcd'.endswith('c', -2, -1), True)
 # assert_eq('abcd'.endswith('c', 1, 8), False)
 # assert_eq('abcd'.endswith('d', 1, 8), True)
-# assert_eq('Apricot'.endswith(('cot', 'toc')), True)
-# assert_eq('Apricot'.endswith(('toc', 'cot')), True)
-# assert_eq('a'.endswith(('', '')), True)
-# assert_eq('a'.endswith(('', 'a')), True)
-# assert_eq('a'.endswith(('a', 'a')), True)
-# assert_eq(''.endswith(('a', '')), True)
-# assert_eq(''.endswith(('', '')), True)
-# assert_eq(''.endswith(('a', 'a')), False)
-# assert_eq('a'.endswith(('a')), True)
-# assert_eq('a'.endswith(('a',)), True)
-# assert_eq('a'.endswith(('b',)), False)
-# assert_eq('a'.endswith(()), False)
-# assert_eq(''.endswith(()), False)
+
+assert_eq('Apricot'.endswith(('cot', 'toc')), True)
+assert_eq('Apricot'.endswith(('toc', 'cot')), True)
+assert_eq('a'.endswith(('', '')), True)
+assert_eq('a'.endswith(('', 'a')), True)
+assert_eq('a'.endswith(('a', 'a')), True)
+assert_eq(''.endswith(('a', '')), True)
+assert_eq(''.endswith(('', '')), True)
+assert_eq(''.endswith(('a', 'a')), False)
+assert_eq('a'.endswith(('a')), True)
+assert_eq('a'.endswith(('a',)), True)
+assert_eq('a'.endswith(('b',)), False)
+assert_eq('a'.endswith(()), False)
+assert_eq(''.endswith(()), False)
 ---
-'a'.endswith(['a']) ### (got value of type 'list'|got list|parameters mismatch)
+# _inconsistency_: rust endswith() accepts a list (not just a tuple) as the prefix argument
+# https://github.com/facebookexperimental/starlark-rust/issues/23
+# 'a'.endswith(['a']) # # # (Type of parameter.*doesn't match|got list|parameters mismatch)
+# ---
+### rust: Type of parameter
+### java: want string
+### go: want string
+'1'.endswith((1,))
 ---
-'1'.endswith((1,)) ### (want string|got int|parameters mismatch)
----
-'a'.endswith(('1', 1)) ### (want string|got int|parameters mismatch)
+### rust: Type of parameter
+### java: want string
+### go: want string
+'a'.endswith(('1', 1))
 ---
 
 # startswith
@@ -95,26 +104,33 @@ assert_eq('Apricot'.startswith('z'), False)
 assert_eq(''.startswith(''), True)
 assert_eq(''.startswith('a'), False)
 
-# _inconsistency_: rust startswith() accepts only a single argument
-# assert_eq('Apricot'.startswith(('Apr', 'rpA')), True)
-# assert_eq('Apricot'.startswith(('rpA', 'Apr')), True)
-# assert_eq('a'.startswith(('', '')), True)
-# assert_eq('a'.startswith(('', 'a')), True)
-# assert_eq('a'.startswith(('a', 'a')), True)
-# assert_eq(''.startswith(('a', '')), True)
-# assert_eq(''.startswith(('', '')), True)
-# assert_eq(''.startswith(('a', 'a')), False)
-# assert_eq('a'.startswith(('a')), True)
-# assert_eq('a'.startswith(('a',)), True)
-# assert_eq('a'.startswith(('b',)), False)
-# assert_eq('a'.startswith(()), False)
-# assert_eq(''.startswith(()), False)
+assert_eq('Apricot'.startswith(('Apr', 'rpA')), True)
+assert_eq('Apricot'.startswith(('rpA', 'Apr')), True)
+assert_eq('a'.startswith(('', '')), True)
+assert_eq('a'.startswith(('', 'a')), True)
+assert_eq('a'.startswith(('a', 'a')), True)
+assert_eq(''.startswith(('a', '')), True)
+assert_eq(''.startswith(('', '')), True)
+assert_eq(''.startswith(('a', 'a')), False)
+assert_eq('a'.startswith(('a')), True)
+assert_eq('a'.startswith(('a',)), True)
+assert_eq('a'.startswith(('b',)), False)
+assert_eq('a'.startswith(()), False)
+assert_eq(''.startswith(()), False)
 ---
-'a'.startswith(['a']) ### (got.*want|got list|expected string)
+# _inconsistency_: rust startswith() accepts a list (not just a tuple) as the prefix argument
+# https://github.com/facebookexperimental/starlark-rust/issues/23
+# 'a'.startswith(['a']) # # # (Type of parameter.*doesn't match|got list|expected string)
+# ---
+### rust: Type of parameter
+### java: want string
+### go: want string
+'1'.startswith((1,))
 ---
-'1'.startswith((1,)) ### (got.*want|got int|expected string)
----
-'a'.startswith(('1', 1)) ### (got.*want|got int|expected string)
+### rust: Type of parameter
+### java: want string
+### go: want string
+'a'.startswith(('1', 1))
 ---
 
 # substring

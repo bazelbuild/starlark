@@ -1,6 +1,6 @@
 ---
 platforms:
-  ubuntu1604:
+  ubuntu2404:
     shell_commands:
       - sh setup_workspace.sh
     build_targets:

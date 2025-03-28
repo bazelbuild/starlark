@@ -88,7 +88,8 @@ compound()
 # We follow Python 3 here, but I can't see the method in its madness.
 # int from bool/int/float
 ---
-int() ### (missing .*argument|not enough parameters)
+# _inconsistency_: rust allows int() without parameters
+# int() ## (missing .*argument|not enough parameters)
 ---
 assert_eq(int(False), 0)
 assert_eq(int(True), 1)
@@ -163,15 +164,15 @@ assert_eq(int("0b00000", 0), 0)
 assert_eq(11111 * 11111, 123454321)
 
 ---
-int("0x123", 8) ### (invalid literal.*base 8|not a base 8)
+int("0x123", 8) ### base
 ---
-int("-0x123", 8) ### (invalid literal.*base 8|not a base 8)
+int("-0x123", 8) ### base
 ---
-int("0o123", 16) ### (invalid literal.*base 16|not a base 16)
+int("0o123", 16) ### base
 ---
-int("-0o123", 16) ### (invalid literal.*base 16|not a base 16)
+int("-0o123", 16) ### base
 ---
-int("0x110", 2) ### (invalid literal.*base 2|not a base 2)
+int("0x110", 2) ### base
 ---
 # int from string, auto detect base
 assert_eq(int("123", 0), 123)
@@ -193,7 +194,7 @@ assert_eq(int("-0o123", 0), -83)
 
 
 # github.com/google/starlark-go/issues/108
-int("0Oxa", 8) ### (invalid literal|not a base 8)
+int("0Oxa", 8) ### base
 ---
 
 # _inconsistency_: some implementations allow some of these conversions

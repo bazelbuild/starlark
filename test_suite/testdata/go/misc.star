@@ -1,21 +1,45 @@
 # Miscellaneous tests of Starlark evaluation.
 
 # Ordered comparisons require values of the same type.
-None < False ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+None < False
 ---
-False < list ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+False < list
 ---
-list < {} ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+list < {}
 ---
-{} < None ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+{} < None
 ---
-None < 0 ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+None < 0
 ---
-0 < [] ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+0 < []
 ---
-[] < "" ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+[] < ""
 ---
-"" < () ### (not impl|cannot compare)
+### java: unsupported
+### go: not implemented
+### rust: not supported
+"" < ()
 ---
 
 # _inconsistency_: cyclic data structures not supported in Rust and Java
@@ -76,8 +100,8 @@ assert_eq([] + [1] + [2, 3], [1, 2, 3])
 assert_eq([] + [1] + l + [2, 3], [1, 4, 2, 3])
 
 ---
-"a" + "b" + 1 + "c" ### ((unknown|unsupported) binary op|parameters mismatch)
+"a" + "b" + 1 + "c" ### ((unknown|unsupported) binary op|parameters mismatch|operation.*not supported)
 ---
-() + () + 1 + () ### ((unknown|unsupported) binary op|parameters mismatch)
+() + () + 1 + () ### ((unknown|unsupported) binary op|parameters mismatch|operation.*not supported)
 ---
-[] + [] + 1 + [] ### ((unknown|unsupported) binary op|parameters mismatch)
+[] + [] + 1 + [] ### ((unknown|unsupported) binary op|parameters mismatch|operation.*not supported)

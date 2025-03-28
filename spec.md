@@ -1,3 +1,8 @@
+<!--
+This file TOC is generated
+Use `bazel run spec_md_gen` to regenerate it in place.
+-->
+
 # Starlark Language Specification
 
 Starlark is a dialect of Python intended for use as a configuration
@@ -22,7 +27,8 @@ Starlark is an untyped dynamic language with high-level data types,
 first-class functions with lexical scope, and automatic memory
 management or _garbage collection_.
 
-Starlark is strongly influenced by Python, and is almost a subset of
+Starlark is strongly influenced by Python, Starlark syntax is
+a strict subset of Python and Starlark semantics is almost a subset of
 that language.  In particular, its data types and syntax for
 statements and expressions will be very familiar to any Python
 programmer.
@@ -47,17 +53,19 @@ interact with the environment.
 
 ## Contents
 
-<!-- WTF? No automatic TOC? -->
-
   * [Overview](#overview)
   * [Contents](#contents)
   * [Lexical elements](#lexical-elements)
+    * [String literals](#string-literals)
+    * [Bytes literals](#bytes-literals)
+    * [Special tokens](#special-tokens)
   * [Data types](#data-types)
     * [None](#none)
     * [Booleans](#booleans)
     * [Integers](#integers)
     * [Floating-point numbers](#floating-point-numbers)
     * [Strings](#strings)
+    * [Bytes](#bytes)
     * [Lists](#lists)
     * [Tuples](#tuples)
     * [Dictionaries](#dictionaries)
@@ -97,14 +105,15 @@ interact with the environment.
     * [For loops](#for-loops)
     * [Break and Continue](#break-and-continue)
     * [Load statements](#load-statements)
-    * [Module execution](#module-execution)
+  * [Module execution](#module-execution)
   * [Built-in constants and functions](#built-in-constants-and-functions)
     * [None](#none)
     * [True and False](#true-and-false)
+    * [abs](#abs)
     * [any](#any)
     * [all](#all)
     * [bool](#bool)
-    * [chr](#chr)
+    * [bytes](#bytes)
     * [dict](#dict)
     * [dir](#dir)
     * [enumerate](#enumerate)
@@ -118,7 +127,6 @@ interact with the environment.
     * [list](#list)
     * [max](#max)
     * [min](#min)
-    * [ord](#ord)
     * [print](#print)
     * [range](#range)
     * [repr](#repr)
@@ -130,6 +138,7 @@ interact with the environment.
     * [type](#type)
     * [zip](#zip)
   * [Built-in methods](#built-in-methods)
+    * [bytes·elems](#bytes·elems)
     * [dict·clear](#dict·clear)
     * [dict·get](#dict·get)
     * [dict·items](#dict·items)
@@ -146,12 +155,24 @@ interact with the environment.
     * [list·insert](#list·insert)
     * [list·pop](#list·pop)
     * [list·remove](#list·remove)
+    * [set·add](#set·add)
+    * [set·clear](#set·clear)
+    * [set·difference](#set·difference)
+    * [set·difference\_update](#set·difference\_update)
+    * [set·discard](#set·discard)
+    * [set·intersection](#set·intersection)
+    * [set·intersection\_update](#set·intersection\_update)
+    * [set·isdisjoint](#set·isdisjoint)
+    * [set·issubset](#set·issubset)
+    * [set·issuperset](#set·issuperset)
+    * [set·pop](#set·pop)
+    * [set·remove](#set·remove)
+    * [set·symmetric\_difference](#set·symmetric\_difference)
+    * [set·symmetric\_difference\_update](#set·symmetric\_difference\_update)
     * [set·union](#set·union)
+    * [set·update](#set·update)
     * [string·capitalize](#string·capitalize)
-    * [string·codepoint_ords](#string·codepoint_ords)
-    * [string·codepoints](#string·codepoints)
     * [string·count](#string·count)
-    * [string·elem_ords](#string·elem_ords)
     * [string·elems](#string·elems)
     * [string·endswith](#string·endswith)
     * [string·find](#string·find)
@@ -168,6 +189,8 @@ interact with the environment.
     * [string·lower](#string·lower)
     * [string·lstrip](#string·lstrip)
     * [string·partition](#string·partition)
+    * [string·removeprefix](#string·removeprefix)
+    * [string·removesuffix](#string·removesuffix)
     * [string·replace](#string·replace)
     * [string·rfind](#string·rfind)
     * [string·rindex](#string·rindex)
@@ -184,11 +207,15 @@ interact with the environment.
 
 ## Lexical elements
 
+Starlark syntax (but not semantics) is a strict subset of Python syntax.
+Practically it means, tools working with Python AST can be used to work
+with Starlark files.
+
 A Starlark program consists of one or more modules. Each module is defined by a
 single UTF-8-encoded text file.
 
 Starlark grammar is introduced gradually throughout this document as shown below,
-and a [complete Starlark grammar reference](#grammar) is provided at the end.
+and a [complete Starlark grammar reference](#grammar-reference) is provided at the end.
 
 Grammar notation:
 
@@ -216,7 +243,7 @@ returns (U+000D), and newlines (U+000A).  Within a line, white space
 has no effect other than to delimit the previous token, but newlines,
 and spaces at the start of a line, are significant tokens.
 
-*Comments*: A hash character (`#`) appearing outside of a string
+*Comments*: A hash character (`#`) appearing outside of a string or bytes
 literal marks the start of a comment; the comment extends to the end
 of the line, not including the newline character.
 Comments are treated like other white space.
@@ -225,12 +252,12 @@ Comments are treated like other white space.
 characters are tokens:
 
 ```text
-+    -    *    //   %    **
++    -    *    /    //   %    **
 ~    &    |    ^    <<   >>
 .    ,    =    ;    :
 (    )    [    ]    {    }
 <    >    >=   <=   ==   !=
-+=   -=   *=   //=  %=
++=   -=   *=   /=   //=  %=
 &=   |=   ^=   <<=  >>=
 ```
 
@@ -251,14 +278,15 @@ appear in the grammar; they are reserved as possible future keywords:
 <!-- and to remain a syntactic subset of Python -->
 
 ```text
-as             import
-assert         is
-class          nonlocal
-del            raise
-except         try
-finally        while
-from           with
-global         yield
+as             global
+assert         import
+async          is
+await          nonlocal
+class          raise
+del            try
+except         while
+finally        with
+from           yield
 ```
 
 *Identifiers*: an identifier is a sequence of Unicode letters, decimal
@@ -273,7 +301,7 @@ x       index   starts_with     arg0
 ```
 
 *Literals*: literals are tokens that denote specific values.  Starlark
-has integer, floating-point, and string literals.
+has integer, floating-point, string, and bytes literals.
 
 ```text
 0                               # int
@@ -288,6 +316,10 @@ has integer, floating-point, and string literals.
 "hello"      'hello'            # string
 '''hello'''  """hello"""        # triple-quoted string
 r'hello'     r"hello"           # raw string literal
+
+b"hello"     b'hello'           # bytes
+b'''hello''' b"""hello"""       # triple-quoted bytes
+rb'hello'    br"hello"          # raw bytes literal
 ```
 
 Integer and floating-point literal tokens are defined by the following grammar:
@@ -365,16 +397,56 @@ allowing a long string to be split across multiple lines of the source file.
 def"			# "abcdef"
 ```
 
-An *octal escape* encodes a single byte using its octal value.
+An *octal escape* encodes a single string element using its octal value.
 It consists of a backslash followed by one, two, or three octal digits [0-7].
-It is error if the value is greater than decimal 255.
+Simiarly, a *hexadecimal escape* encodes a single string element using its hexadecimal value.
+It consists of `\x` followed by two hexadecimal digits [0-9a-fA-F].
+It is an error if the value of an octal or hexadecimal escape is greater than decimal 127.
 
 ```python
-'\0'			# "\x00"  a string containing a single NUL byte
+'\0'			# "\x00"  a string containing a single NUL element
 '\12'			# "\n"    octal 12 = decimal 10
 '\101-\132'		# "A-Z"
 '\119'			# "\t9"   = "\11" + "9"
+
+'\x00'			# "\x00"  a string containing a single NUL element
+'\x0A'			# "\n"    hexadecimal A = decimal 10
+"\x41-\x5A"             # "A-Z"
 ```
+
+A *Unicode escape* denotes the UTF-K encoding of a single, valid Unicode code point,
+where K is the implementation-defined number of bits in each string element
+(see [strings](#strings)).
+The `\uXXXX` form, with exactly four hexadecimal digits,
+denotes a 16-bit code point, and the `\UXXXXXXXX`,
+with exactly eight digits, denotes a 32-bit code point.
+It is an error if the value lies in the surrogate range (U+D800 to U+DFFF)
+or is greater than U+10FFFF.
+
+```python
+'\u0041'		# "A", an ASCII letter (U+0041)
+'\u0414' 		# "Д", a Cyrillic capital letter (U+0414)
+'\u754c                 # "界", a Chinese character (U+754C)
+'\U0001F600'            # "😀", an Emoji (U+1F600)
+```
+
+The length of the encoding of a single Unicode code point may vary
+based on the implementation's value of K:
+
+```python
+len("A") 		# 1
+len("Д") 		# 2 (UTF-8) or 1 (UTF-16)
+len("界")               # 3 (UTF-8) or 1 (UTF-16)
+len("😀")               # 4 (UTF-8) or 2 (UTF-16)
+```
+
+Although string values may be capable of representing any sequence elements,
+string  _literals_ can denote only sequences of UTF-K code
+units that are valid encodings of text.
+(Any literal syntax capable of representing arbitrary element sequences
+would inherently be non-portable across implementations.)
+Consequently, when the `repr` function is applied to a string
+containing an invalid encoding, its result is not a valid string literal.
 
 An ordinary string literal may not contain an unescaped newline,
 but a *multiline string literal* may spread over multiple source lines.
@@ -419,6 +491,46 @@ b"		# "a\\\nb"
 It is an error for a backslash to appear within a string literal other
 than as part of one of the escapes described above.
 
+
+### Bytes literals
+
+A Starlark bytes literal denotes a bytes value,
+and looks like a string literal, in any of its various forms
+(single-quoted, double-quoted, triple-quoted, raw)
+preceded by the letter `b`.
+
+```python
+b"abc"       b'abc'
+b"""abc"""   b'''abc'''
+br"abc"      br'abc'
+rb"abc"      rb'abc'
+```
+
+A raw bytes literal may be indicated by either a `br` or `rb` prefix.
+
+Non-escaped text within a bytes literal denotes the UTF-8 encoding of that text.
+Bytes literals support the same escape sequences as text strings,
+with the following differences:
+
+- Octal and hexadecimal escapes may specify any byte value from
+  zero (`\000` or `\x00`) to 255 (`\377` or `\xFF`).
+
+- A Unicode escape `\uXXXX` or `\UXXXXXXXX` denotes the byte
+  sequence of the UTF-8 encoding of the specified 16- or 32-bit code point.
+  (As with text strings, the code point value must not lie in the surrogate range.)
+
+Any valid string literal that, with a `b` prefix, is also a
+valid bytes literal is equivalent in the sense that
+the bytes value is the UTF-8 encoding of the string value.
+
+### Special tokens
+
+Starlark is space-sensitive language, and indentation is used to
+denote a block of statements.
+
+Unlike Python, indentation can only be composed of space characters (U+0020),
+not tabs.
+
 TODO: define indent, outdent, semicolon, newline, eof
 
 ## Data types
@@ -430,10 +542,12 @@ NoneType                     # the type of None
 bool                         # True or False
 int                          # a signed integer of arbitrary magnitude
 float                        # an IEEE 754 double-precision floating-point number
-string                       # a byte string
+string                       # a text string, with Unicode encoded as UTF-8 or UTF-16
+bytes                        # a byte string
 list                         # a fixed-length sequence of values
 tuple                        # a fixed-length sequence of values, unmodifiable
 dict                         # a mapping from values to values
+set                          # a collection of unique values
 function                     # a function
 ```
 
@@ -451,7 +565,7 @@ every value has a type string that can be obtained with the expression
 `type(x)`, and any value may be converted to a string using the
 expression `str(x)`, or to a Boolean truth value using the expression
 `bool(x)`.  Other operations apply only to certain types.  For
-example, the indexing operation `a[i]` works only with strings, lists,
+example, the indexing operation `a[i]` works only with strings, bytes values, lists,
 and tuples, and any application-defined types that are _indexable_.
 The [_value concepts_](#value-concepts) section explains the groupings of
 types by the operators they support.
@@ -582,7 +696,7 @@ which requires that all comparisons with NaN are false, except NaN != NaN.)
 This choice greatly simplifies the logic for float arithmetic by
 ensuring many standard identities and invariants such as:
 - float < float (also < <= == => >) are transitive relations
-- float < float is a strict weak order: the relation eq is transitive, 
+- float < float is a strict weak order: the relation eq is transitive,
   where eq(x, y) = not (x < y) and not (y < x).
 - not (float < float) <=> (float >= float)
 - sorting a list of values that includes NaN is stable.
@@ -639,28 +753,43 @@ float(3) / 2                                    # 1.5
 
 ### Strings
 
-A string represents an immutable sequence of bytes.
+A string is an immutable sequence of elements that encode Unicode text.
 The [type](#type) of a string is `"string"`.
 
-Strings can represent arbitrary binary data, including zero bytes, but
-most strings contain text, encoded by convention using UTF-8.
+For reasons of efficiency and interoperability with the host language,
+the number of bits in each string element, which we call K,
+is specified to be either 8 or 16, depending on the implementation.
+For example, in the Go and Rust implementations,
+each string element is an 8-bit value (a byte) and Unicode text is encoded as UTF-8,
+whereas in the Java implementation,
+string elements are 16-bit values (Java `char`s) and Unicode text is encoded as UTF-16.
 
-The built-in `len` function returns the number of bytes in a string.
+An implementation may permit strings to hold arbitrary values of the element type,
+including sequences that do not denote encode valid Unicode text;
+or, it may disallow invalid sequences, and operations that would form them.
+
+The built-in `len` function returns the number of elements in a string.
 
 Strings may be concatenated with the `+` operator.
 
 The substring expression `s[i:j]` returns the substring of `s` from
-index `i` up to index `j`.  The index expression `s[i]` returns the
-1-byte substring `s[i:i+1]`.
+element index `i` up to index `j`.
+<!-- TODO: The Rust implementation of s[i:j] may fail if it cuts a
+     UTF-8 sequence in half. Need to accommodate that here. -->
+The index expression `s[i]` returns the
+1-element substring `s[i:i+1]`.
 
 Strings are hashable, and thus may be used as keys in a dictionary.
 
 Strings are totally ordered lexicographically, so strings may be
 compared using operators such as `==` and `<`.
+(Beware that the UTF-16 string encoding is not order-preserving
+with respect to code point values.)
 
 Strings are _not_ iterable sequences, so they cannot be used as the operand of
 a `for`-loop, list comprehension, or any other operation than requires
-an iterable sequence.
+an iterable sequence. One must explicitly call a method of a string value
+to obtain an iterable view.
 
 Any value may formatted as a string using the `str` or `repr` built-in
 functions, the `str % tuple` operator, or the `str.format` method.
@@ -688,6 +817,8 @@ Strings have several built-in methods:
 * [`lower`](#string·lower)
 * [`lstrip`](#string·lstrip)
 * [`partition`](#string·partition)
+* [`removeprefix`](#string·removeprefix)
+* [`removesuffix`](#string·removesuffix)
 * [`replace`](#string·replace)
 * [`rfind`](#string·rfind)
 * [`rindex`](#string·rindex)
@@ -701,6 +832,43 @@ Strings have several built-in methods:
 * [`title`](#string·title)
 * [`upper`](#string·upper)
 
+
+### Bytes
+
+A _bytes_ is an immutable sequence of values in the range 0-255.
+The [type](#type) of a bytes is `"bytes"`.
+
+Unlike a string, which is intended for text, a bytes may represent binary data,
+such as the contents of an arbitrary file, without loss.
+
+The built-in `len` function returns the number of elements (bytes) in a `bytes`.
+
+Two bytes values may be concatenated with the `+` operator.
+
+The slice expression `b[i:j]` returns the subsequence of `b`
+from index `i` up to but not including index `j`.
+The index expression `b[i]` returns the int value of the ith element.
+
+The `in` operator may be used to test for the presence of one bytes
+as a subsequence of another, or for the presence of a single `int` byte value.
+
+Like strings, bytes values are hashable, totally ordered, and not iterable,
+and are considered True if they are non-empty.
+
+A bytes value has these methods:
+
+* [`elems`](#bytes·elems)
+```
+TODO(https://github.com/bazelbuild/starlark/issues/112)
+- more methods: likely the same as string (minus those concerned with text):
+    join
+    {start,end}with
+    {r,}{find,index,partition,split,strip}
+    replace
+TODO: encode, decode methods?
+TODO: ord, chr.
+TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
+```
 
 ### Lists
 
@@ -824,9 +992,9 @@ The [type](#type) of a dictionary is `"dict"`.
 Dictionaries provide constant-time operations to insert an element, to
 look up the value for a key, or to remove an element.  Dictionaries
 are implemented using hash tables, so keys must be hashable.  Hashable
-values include `None`, Booleans, numbers, and strings, and tuples
+values include `None`, Booleans, numbers, strings, and bytes, and tuples
 composed from hashable values.  Most mutable values, such as lists,
-and dictionaries, are not hashable, unless they are frozen.
+dictionaries, and sets, are not hashable, unless they are frozen.
 Attempting to use a non-hashable value as a key in a dictionary
 results in a dynamic error.
 
@@ -867,8 +1035,7 @@ len(coins)				# 5, existing item was updated
 A dictionary can also be constructed using a [dictionary
 comprehension](#comprehension), which evaluates a pair of expressions,
 the _key_ and the _value_, for every element of another iterable such
-as a list.  This example builds a mapping from each word to its length
-in bytes:
+as a list.  This example builds a mapping from each word to its length:
 
 ```python
 words = ["able", "baker", "charlie"]
@@ -899,12 +1066,18 @@ fail.
 A dictionary used in a Boolean context is considered true if it is
 non-empty.
 
-The binary `+` operation may be applied to two dictionaries.  It
-yields a new dictionary whose elements are the union of the two
-operands.  If a key is present in both operands, the result contains
-the value from the right operand.
-<b>Note:</b> this feature is deprecated.  Use the
-`dict.update` method instead.
+The binary `|` operation may be applied to two dictionaries. It yields a new
+dictionary whose set of keys is the union of the sets of keys of the two
+operands. The corresponding values are taken from the operands, where the value
+taken from the right operand takes precedence if both contain a given key.
+Iterating over the keys in the resulting dictionary first yields all keys in
+the left operand in insertion order, then all keys in the right operand that
+were not present in the left operand, again in insertion order.
+
+There is also an augmented assignment version of the `|` operation. For two
+dictionaries `d1` and `d2`, the expression `d1 |= d2` behaves similar to
+`d1 = d1 | d2`, but mutates `d1` in-place rather than assigning a new
+dictionary to it.
 
 Dictionaries may be compared for equality using `==` and `!=`.  Two
 dictionaries compare equal if they contain the same number of items
@@ -926,6 +1099,140 @@ A dictionary value has these methods:
 * [`values`](#dict·values)
 
 
+### Sets
+
+A set is a mutable, iterable collection of unique values - the set's *elements*.
+The [type](#type) of a set is `"set"`.
+
+Sets provide constant-time operations to insert, remove, or check for the
+presence of a value. Sets are implemented using a hash table, and therefore,
+just like keys of a [dictionary](#dictionaries), elements of a set must be
+hashable. A value may be used as an element of a set if and only if it may be
+used as a key of a dictionary.
+
+Sets may be constructed using the [set()](#set) built-in function, which returns
+a set containing all the elements of its optional argument, which must be an
+iterable sequence. Calling `set()` without an argument constructs an empty set.
+Sets have no literal syntax.
+
+The `in` and `not in` operations check whether a value is (or is not) in a set:
+
+```python
+s = set(["a", "b", "c"])
+"a" in s  # True
+"z" in s  # False
+```
+
+A set is an iterable sequence, and thus may be used as the operand of a `for`
+loop, a list comprehension, and the various built-in functions that operate on
+sequences. Its length can be retrieved using the [len()](#len) built-in
+function, and the order of iteration is the order in which elements were first
+added to the set:
+
+```python
+s = set(["z", "y", "z", "y"])
+len(s)       # prints 2
+s.add("x")
+len(s)       # prints 3
+for e in s:
+    print e  # prints "z", "y", "x"
+```
+
+A set used in Boolean context is true if and only if it is non-empty.
+
+```python
+s = set()
+"non-empty" if s else "empty"  # "empty"
+t = set(["x", "y"])
+"non-empty" if t else "empty"  # "non-empty"
+```
+
+Sets may be compared for equality or inequality using `==` and `!=`. A set `s`
+is equal to `t` if and only if `t` is a set containing the same elements;
+iteration order is not significant. In particular, a set is *not* equal to the
+list of its elements. Sets are not ordered with respect to other sets, and an
+attempt to compare two sets using `<`, `<=`, `>`, `>=`, or to sort a sequence of
+sets, will fail.
+
+```python
+set() == set()              # True
+set() != []                 # True
+set([1, 2]) == set([2, 1])  # True
+set([1, 2]) != [1, 2]       # True
+```
+
+The `|` operation on two sets returns the union of the two sets: a set
+containing the elements found in either one or both of the original sets.
+
+```python
+set([1, 2]) | set([3, 2])  # set([1, 2, 3])
+```
+
+The `&` operation on two sets returns the intersection of the two sets: a set
+containing only the elements found in both of the original sets.
+
+```python
+set([1, 2]) & set([2, 3])  # set([2])
+set([1, 2]) & set([3, 4])  # set()
+```
+
+The `-` operation on two sets returns the difference of the two sets: a set
+containing the elements found in the left-hand side set but not the right-hand
+side set.
+
+```python
+set([1, 2]) - set([2, 3])  # set([1])
+set([1, 2]) - set([3, 4])  # set([1, 2])
+```
+
+The `^` operation on two sets returns the symmetric difference of the two sets:
+a set containing the elements found in exactly one of the two original sets, but
+not in both.
+
+```python
+set([1, 2]) ^ set([2, 3])  # set([1, 3])
+set([1, 2]) ^ set([3, 4])  # set([1, 2, 3, 4])
+```
+
+In each of the above operations, the elements of the resulting set retain their
+order from the two operand sets, with all elements that were drawn from the
+left-hand side ordered before any element that was only present in the
+right-hand side.
+
+The corresponding augmented assignments, `|=`, `&=`, `-=`, and `^=`, modify the
+left-hand set in place.
+
+```python
+s = set([1, 2])
+s |= set([2, 3, 4])     # s now equals set([1, 2, 3, 4])
+s &= set([0, 1, 2, 3])  # s now equals set([1, 2, 3])
+s -= set([0, 1])        # s now equals set([2, 3])
+s ^= set([3, 4])        # s now equals set([2, 4])
+```
+
+Like all mutable values in Starlark, a set can be frozen, and once frozen, all
+subsequent operations that attempt to update it will fail.
+
+A set has the following methods:
+
+  * [`add`](#set·add)
+  * [`clear`](#set·clear)
+  * [`difference`](#set·difference)
+  * [`difference_update`](#set·difference_update)
+  * [`discard`](#set·discard)
+  * [`intersection`](#set·intersection)
+  * [`intersection_update`](#set·intersection_update)
+  * [`isdisjoint`](#set·isdisjoint)
+  * [`issubset`](#set·issubset)
+  * [`issuperset`](#set·issuperset)
+  * [`pop`](#set·pop)
+  * [`remove`](#set·remove)
+  * [`symmetric_difference`](#set·symmetric_difference)
+  * [`symmetric_difference_update`](#set·symmetric_difference_update)
+  * [`union`](#set·union)
+  * [`update`](#set·update)
+
+
 ### Functions
 
 A function value represents a function defined in Starlark.
@@ -935,10 +1242,10 @@ A function value used in a Boolean context is always considered true.
 Functions defined by a [`def` statement](#function-definitions) are named;
 functions defined by a [`lambda` expression](#lambda-expressions) are anonymous.
 
-Function definitions may be nested, and an inner function may refer 
+Function definitions may be nested, and an inner function may refer
 to a local variable of an outer function.
 Starlark has no equivalent of Python's `nonlocal` keyword,
-and thus no way for an inner function cannot assign to a local 
+and thus no way for an inner function cannot assign to a local
 variable of an outer function.
 However, the inner function may mutate the value of such variables
 until they become frozen.
@@ -1052,8 +1359,8 @@ f(x=2, y=1, z=3)        # (2, 1, {"z": 3})
 It is a static error if any two parameters of a function have the same name.
 
 Just as a function definition may accept an arbitrary number of
-positional or keyword arguments, a function call may provide an
-arbitrary number of positional or keyword arguments supplied by a
+positional or named arguments, a function call may provide an
+arbitrary number of positional or named arguments supplied by a
 list or dictionary:
 
 ```python
@@ -1084,7 +1391,10 @@ Function arguments are evaluated in the order they appear in the call.
 
 Unlike Python, Starlark does not allow more than one `*args` argument in a
 call, and if a `*args` argument is present it must appear after all
-positional and named arguments.
+positional and named arguments. In particular, even though keyword-only
+arguments ([see below](#function-definitions)) are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
 
 A function call completes normally after the execution of either a
 `return` statement, or of the last statement in the function body.
@@ -1145,10 +1455,10 @@ Its [type](#type) is `"builtin_function_or_method"`.
 
 A built-in function value used in a Boolean context is always considered true.
 
-Many built-in functions are predeclared in the environment
-(see [Name Resolution](#name-resolution)), and are thus available to	(see [Name Resolution](#name-resolution)).
-all Skylark programs.	Some built-in functions such as `len` are _universal_, that is,
-available to all Skylark programs.
+Many built-in functions are predeclared in the environment;
+see [Name Resolution](#name-resolution).
+Some built-in functions such as `len` are _universal_, that is,
+available to all Starlark programs.
 The host application may predeclare additional built-in functions
 in the environment of a specific module.
 
@@ -1230,11 +1540,6 @@ function, and a _comprehension_ block for each top-level comprehension.
 Bindings in either of these kinds of block,
 and in the file block itself, are called _local_.
 (In the example, the bindings for `e`, `f`, `g`, and `i` are all local.)
-
-A module block contains a _function_ block for each top-level
-function, and a _comprehension_ block for each top-level
-comprehension.
-Bindings inside either of these kinds of block are called _local_.
 Additional functions and comprehensions, and their blocks, may be
 nested in any order, to any depth.
 
@@ -1275,7 +1580,7 @@ x = "hello"
 ```
 
 The same is also true for nested loops in comprehensions.
-In the (unnatural) examples below, the scope of the variables `x`, `y`, 
+In the (unnatural) examples below, the scope of the variables `x`, `y`,
 and `z` is the entire compehension block, except the operand of the first
 loop (`[]` or `[1]`), which is resolved in the enclosing environment.
 The second loop may thus refer to variables defined by the third (`z`),
@@ -1358,7 +1663,7 @@ variable, and calls to some built-in functions such as `print` change
 the state of the application that embeds the interpreter.
 
 Values of some data types, such as `NoneType`, `bool`, `int`, `float`,
-and `string`, are _immutable_; they can never change.
+`string`, and `bytes`, are _immutable_; they can never change.
 Immutable values have no notion of _identity_: it is impossible for a
 Starlark program to tell whether two integers, for instance, are
 represented by the same object; it can tell only whether they are
@@ -1431,7 +1736,7 @@ The hash of a value is an unspecified integer chosen so that two equal
 values have the same hash, in other words, `x == y => hash(x) == hash(y)`.
 A hashable value has the same hash throughout its lifetime.
 
-Values of the types `NoneType`, `bool`, `int`, `float`, and `string`,
+Values of the types `NoneType`, `bool`, `int`, `float`, `string`, and `bytes`,
 which are all immutable, are hashable.
 
 Values of mutable types such as `list` and `dict` are not
@@ -1457,13 +1762,13 @@ We can classify different kinds of sequence types based on the
 operations they support.
 
 * `Iterable`: an _iterable_ value lets us process each of its elements in a fixed order.
-  Examples: `dict`, `list`, `tuple`, but not `string`.
+  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
 * `Sequence`: a _sequence of known length_ lets us know how many elements it
   contains without processing them.
-  Examples: `dict`, `list`, `tuple`, but not `string`.
+  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
 * `Indexable`: an _indexed_ type has a fixed length and provides efficient
   random access to its elements, which are identified by integer indices.
-  Examples: `string`, `tuple`, and `list`.
+  Examples: `string`, `bytes`, `tuple`, and `list`, but not `dict` or `set`.
 * `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
   element at a given integer index. Example: `list`.
 * `Mapping`: a mapping is an association of keys to values. Example: `dict`.
@@ -1473,11 +1778,11 @@ least the `Sequence` contract, it's possible for an an application
 that embeds the Starlark interpreter to define additional data types
 representing sequences of unknown length that implement only the `Iterable` contract.
 
-Strings are not iterable, though they do support the `len(s)` and
+Strings and bytes values are not iterable, though they do support the `len(s)` and
 `s[i]` operations. Starlark deviates from Python here to avoid a common
 pitfall in which a string is used by mistake where a list containing a
 single string was intended, resulting in its interpretation as a sequence
-of bytes.
+of letters.
 
 Most Starlark operators and built-in functions that need a sequence
 of values will accept any iterable.
@@ -1590,7 +1895,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | float | string
+        | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expressions] [,] ')'
@@ -1599,6 +1904,8 @@ Operand = identifier
 DotSuffix   = '.' identifier .
 CallSuffix  = '(' [Arguments [',']] ')' .
 SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
+            | '[' Expressions ']'
+            .
 ```
 
 ### Identifiers
@@ -1613,14 +1920,13 @@ Lookup of locals and globals may fail if not yet defined.
 
 ### Literals
 
-Starlark supports string literals of three different kinds:
+Starlark supports literals of four different kinds:
 
 ```text
-Operand = int | float | string
+Operand = int | float | string | bytes
 ```
 
-Evaluation of a literal yields a value of the given type
-(int, float, or string) with the given value.
+Evaluation of an int, float, string, or bytes literal yields the value of that literal.
 See [Literals](#lexical elements) for details.
 
 ### Parenthesized expressions
@@ -1864,6 +2170,7 @@ bool            # False < True
 int             # mathematical
 float           # as defined by IEEE 754, except NaN > +Inf
 string          # lexicographical
+bytes           # lexicographical
 tuple           # lexicographical
 list            # lexicographical
 ```
@@ -1878,7 +2185,7 @@ would break several mathematical identities. Thus:
 NaN == NaN
 ```
 
-Applications may define additional types that support ordered comparison. 
+Applications may define additional types that support ordered comparison.
 The application-defined comparison relation must be a
 [strict weak ordering](https://en.wikipedia.org/wiki/Weak_ordering#Strict_weak_orderings).
 <!-- This is a prequisite of the 'sorted' function. -->
@@ -1913,17 +2220,26 @@ Bitwise operations:
    int << int                   # bitwise left shift
    int >> int                   # bitwise right shift (arithmetic)
 
+Set operations:
+   set & set                    # set intersection
+   set - set                    # set difference
+   set ^ set                    # set symmetric difference
+
 Concatenation
    string + string
+    bytes + bytes
      list + list
     tuple + tuple
 
-Repetition (string/list/tuple)
+Repetition (string/bytes/list/tuple)
       int * sequence
  sequence * int
 
 String interpolation
    string % any                 # see String Interpolation
+
+Set or dictionary union
+     dict | dict                # see Dictionaries, Sets
 ```
 
 The operands of the arithmetic operators `+`, `-`, `*`, `//`, and `%`,
@@ -1936,8 +2252,8 @@ and yields the bitwise intersection (AND) of its operands.
 The `|` operator likewise computes bitwise union,
 and the `^` operator bitwise XOR (exclusive OR).
 
-The `<<` and `>>` operators require two operands of type `int`. 
-They shift the first operand to the left or right 
+The `<<` and `>>` operators require two operands of type `int`.
+They shift the first operand to the left or right
 by the number of bits given by the second operand.
 Right shifts are arithmetic, not logical:
 they fill the vacated bits with copies of the sign bit.
@@ -1953,7 +2269,7 @@ It is a dynamic error if the second operand is negative.
 ```
 
 The `+` operator may be applied to non-numeric operands of the same
-type, such as two lists, two tuples, or two strings, in which case it
+type, such as two lists, two tuples, two strings, or two bytes, in which case it
 computes the concatenation of the two operands and yields a new value of
 the same type.
 
@@ -1964,7 +2280,7 @@ the same type.
 ```
 
 The `*` operator may be applied to an integer _n_ and a value of type
-`string`, `list`, or `tuple`, in which case it yields a new value
+`string`, `bytes`, `list`, or `tuple`, in which case it yields a new value
 of the same sequence type consisting of _n_ repetitions of the original sequence.
 The order of the operands is immaterial.
 Negative values of _n_ behave like zero.
@@ -1981,19 +2297,20 @@ these operators.
 #### Membership tests
 
 ```text
-      any in     sequence		(list, tuple, dict, string)
+      any in     sequence		(list, tuple, dict, set, string, bytes, range)
       any not in sequence
 ```
 
 The `in` operator reports whether its first operand is a member of its
-second operand, which must be a list, tuple, dict, or string.
+second operand, which must be a list, tuple, dict, set, string, or bytes.
 The `not in` operator is its negation.
 Both return a Boolean.
 
 The meaning of membership varies by the type of the second operand:
 the members of a list or tuple are its elements;
 the members of a dict are its keys;
-the members of a string are all its substrings.
+the members of a string or bytes are all its substrings.
+Additionally, the members of a bytes include the int values of its (byte) elements.
 
 ```python
 1 in [1, 2, 3]                  # True
@@ -2007,6 +2324,9 @@ d = {"one": 1, "two": 2}
 "nasty" in "dynasty"            # True
 "a" in "banana"                 # True
 "f" not in "way"                # True
+
+b"nasty" in b"dynasty"          # True
+97 in b"abc"                    # True (97 = 'a')
 ```
 
 #### String interpolation
@@ -2047,7 +2367,7 @@ e       number          float exponential format, lowercase (1.230000e+12)
 E       number          float exponential format, uppercase (1.230000E+12)
 f       number          float decimal format                (1230000000000.000000)
 F       number          same as %f
-g       number          compact format, lowercase           (0.0, 1.1, 1200, 1e+45, 1.2e+12) 
+g       number          compact format, lowercase           (0.0, 1.1, 1200, 1e+45, 1.2e+12)
 G       number          compact format, uppercase           (0.0, 1.1, 1200, 1e+45, 1.2E+12)
 ```
 
@@ -2213,7 +2533,7 @@ of the value `x`.
 
 Fields are possessed by none of the main Starlark [data types](#data-types),
 but some application-defined types have them.
-Methods belong to the built-in types `string`, `list`, and `dict`,
+Methods belong to the built-in types `string`, `list`, `dict`, and `set`
 and to many application-defined types.
 
 ```text
@@ -2252,12 +2572,14 @@ f("n")                                          # 2
 ### Index expressions
 
 An index expression `a[i]` yields the `i`th element of an _indexable_
-type such as a string, tuple, or list.  The index `i` must be an `int`
+type such as a string, bytes, tuple, list, or range.  The index `i` must be an `int`
 value in the range -`n` ≤ `i` < `n`, where `n` is `len(a)`; any other
 index results in an error.
 
 ```text
 SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
+            | '[' Expressions ']'
+            .
 ```
 
 A valid negative index `i` behaves like the non-negative index `n+i`,
@@ -2294,10 +2616,13 @@ type, such as a tuple or string, or a frozen value of a mutable type.
 ### Slice expressions
 
 A slice expression `a[start:stop:stride]` yields a new value containing a
-subsequence of `a`, which must be a string, tuple, or list.
+subsequence of `a`, which must be an indexable sequence such as string,
+bytes, tuple, list, or range.
 
 ```text
 SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
+            | '[' Expressions ']'
+            .
 ```
 
 Each of the `start`, `stop`, and `stride` operands is optional;
@@ -2339,8 +2664,8 @@ nearest value in the range -1 to `n`-1, inclusive.
 Unlike Python, Starlark does not allow a slice expression on the left
 side of an assignment.
 
-Slicing a tuple or string may be more efficient than slicing a list
-because tuples and strings are immutable, so the result of the
+Slicing a tuple, string, or bytes may be more efficient than slicing a list
+because tuple, string, and bytes values are immutable, so the result of the
 operation can share the underlying representation of the original
 operand (when the stride is 1). By contrast, slicing a list requires
 the creation of a new list and copying of the necessary elements.
@@ -2526,7 +2851,7 @@ the parameter list (which is enclosed in parentheses), a colon, and
 then an indented block of statements which form the body of the function.
 
 The parameter list is a comma-separated list whose elements are of
-four kinds.  First come zero or more required parameters, which are
+several kinds.  First come zero or more required parameters, which are
 simple identifiers; all calls must provide an argument value for these parameters.
 
 The required parameters are followed by zero or more optional
@@ -2537,11 +2862,47 @@ provide an argument value for it.
 The required parameters are optionally followed by a single parameter
 name preceded by a `*`.  This is the called the _varargs_ parameter,
 and it accumulates surplus positional arguments specified by a call.
+It is conventionally named `*args`.
+
+The varargs parameter may be followed by zero or more
+parameters, again of the forms `name` or `name=expression`,
+but these parameters differ from earlier ones in that they are
+_keyword-only_: if a call provides their values, it must do so as
+keyword arguments, not positional ones.
+
+Note that even though keyword-only arguments are declared after `*args` in a
+function's definition, they nevertheless must appear before `*args` in a call
+to the function.
+
+```python
+def g(a, *args, b=2, c):
+  print(a, b, c, args)
+
+g(1, 3)                 # error: function g missing 1 argument (c)
+g(1, *[4, 5], c=3)      # error: keyword argument c may not follow *args
+g(1, 4, c=3)            # "1 2 3 (4,)"
+g(1, c=3, *[4, 5])      # "1 2 3 (4, 5)"
+```
+
+A non-variadic function may also declare keyword-only parameters,
+by using a bare `*` in place of the `*args` parameter.
+This form does not declare a parameter but marks the boundary
+between the earlier parameters and the keyword-only parameters.
+This form must be followed by at least one optional parameter.
+
+```python
+def f(a, *, b=2, c):
+  print(a, b, c)
+
+f(1)                    # error: function f missing 1 argument (c)
+f(1, 3)                 # error: function f accepts 1 positional argument (2 given)
+f(1, c=3)               # "1 2 3"
+```
 
 Finally, there may be an optional parameter name preceded by `**`.
 This is called the _keyword arguments_ parameter, and accumulates in a
 dictionary any surplus `name=value` arguments that do not match a
-prior parameter.
+prior parameter. It is conventionally named `**kwargs`.
 
 Here are some example parameter lists:
 
@@ -2552,6 +2913,7 @@ def f(a, b, c=1): pass
 def f(a, b, c=1, *args): pass
 def f(a, b, c=1, *args, **kwargs): pass
 def f(**kwargs): pass
+def f(a, b, c=1, *, d=1): pass
 ```
 
 Execution of a `def` statement creates a new function object.  The
@@ -2836,6 +3198,10 @@ The parameter names serve merely as documentation.
 
 `True` and `False` are the two values of type `bool`.
 
+### abs
+
+`abs(x)` takes either an integer or a float, and returns the absolute value of that number (a non-negative number with the same magnitude).
+
 ### any
 
 `any(x)` returns `True` if any element of the iterable sequence x is true.
@@ -2850,6 +3216,29 @@ If the iterable is empty, it returns `True`.
 
 `bool(x)` interprets `x` as a Boolean value---`True` or `False`.
 With no argument, `bool()` returns `False`.
+
+### bytes
+
+`bytes(x)` converts its argument to a `bytes`.
+
+If x is a `bytes`, the result is x.
+
+If x is a string, the result is a `bytes` whose elements are
+the UTF-8 encoding of the string. Each element of the string that is
+not part of a valid encoding of a code point is replaced by the
+UTF-8 encoding of the replacement character, U+FFFD.
+
+If x is an iterable sequence of int values,
+the result is a `bytes` whose elements are those integers.
+It is an error if any element is not in the range 0-255.
+
+```python
+bytes("hello 😃")		# b"hello 😃"
+bytes(b"hello 😃")		# b"hello 😃"
+bytes("hello 😃"[:-1])          # b"hello ���"
+bytes([65, 66, 67])		# b"ABC"
+bytes(65)			# error: got int, want string, bytes, or iterable of int
+```
 
 ### dict
 
@@ -2907,6 +3296,31 @@ enumerate(["zero", "one", "two"])               # [(0, "zero"), (1, "one"), (2, 
 enumerate(["one", "two"], 1)                    # [(1, "one"), (2, "two")]
 ```
 
+### fail
+
+The `fail(*args)` function causes execution to fail
+with an error message that includes the string forms of the argument values.
+The precise formatting depends on the implementation.
+
+```python
+fail("oops")			# "fail: oops"
+fail("oops", 1, False)		# "fail: oops 1 False"
+```
+<!--
+Note:
+
+Neither the template of the error message nor the formatting of the
+values is prescribed here. Implementations may use a richer representation
+than str or repr, with additional debugging information.
+The error message is not observable by Starlark programs.
+
+The Java implementation also accepts two (deprecated) named parameters:
+- msg=value, an optional leading argument.
+- attr=value..., which adds an attribute prefix.
+and the Go implementation accepts a sep=... parameter, like print().
+See https://github.com/bazelbuild/starlark/issues/47.
+-->
+
 ### float
 
 `float(x)` interprets its argument as a floating-point number.
@@ -2927,31 +3341,6 @@ The call fails if the literal denotes a value too large to represent as
 a finite `float`.
 
 With no argument, `float()` returns `0.0`.
-
-### fail
-
-The `fail(*args)` function causes execution to fail
-with an error message that includes the string forms of the argument values.
-The precise formatting depends on the implementation.
-
-```python
-fail("oops")			# "fail: oops"
-fail("oops", 1, False)		# "fail: oops 1 False"
-```
-<!-- 
-Note: 
-
-Neither the template of the error message nor the formatting of the 
-values is prescribed here. Implementations may use a richer representation
-than str or repr, with additional debugging information.
-The error message is not observable by Starlark programs.
-
-The Java implementation also accepts two (deprecated) named parameters:
-- msg=value, an optional leading argument.
-- attr=value..., which adds an attribute prefix.
-and the Go implementation accepts a sep=... parameter, like print().
-See https://github.com/bazelbuild/starlark/issues/47.
--->
 
 ### getattr
 
@@ -2974,20 +3363,20 @@ provided `default` value instead of failing.
 
 ### hash
 
-`hash(x)` returns an integer hash of a string x
-such that two equal strings have the same hash.
+`hash(x)` returns an integer hash of a string or bytes x
+such that two equal values have the same hash.
 In other words `x == y` implies `hash(x) == hash(y)`.
+Any other type of argument in an error, even if it is suitable as the key of a dict.
+
 In the interests of reproducibility of Starlark program behavior over time and
-across implementations, the specific hash function is the same as that implemented by
+across implementations, the specific hash function for bytes is 32-bit FNV-1a,
+and the hash function for strings is the same as that implemented by
 [java.lang.String.hashCode](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#hashCode),
 a simple polynomial accumulator over the UTF-16 transcoding of the string:
 
 ```python
 s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
 ```
-
-`hash(x)` returns an integer hash value for a string x such that `x == y`
-implies `hash(x) == hash(y)`.
 
 ### int
 
@@ -3001,18 +3390,32 @@ or infinity).
 
 If x is a `bool`, the result is 0 for `False` or 1 for `True`.
 
-If `x` is a string, it is interpreted as a sequence of digits in the specified
-base, decimal by default. If `base` is zero, `x` is interpreted like an integer
-literal, the base being inferred from an optional base marker such as `0b`,
-`0o`, or `0x` preceding the first digit. These markers may also be used if
-`base` is the corresponding base. Irrespective of base, the string may start
-with an optional `+` or `-` sign indicating the sign of the result.
+If x is a string, it is interpreted as a sequence of digits in the
+specified base, decimal by default.
+
+If `base` is zero, x is interpreted like an integer literal,
+the base being inferred from an optional base prefix such as
+`0b`, `0o`, or `0x` preceding the first digit.
+<!-- Note: the spec does not currently support 0b literals, but
+     int("0b...") works in both implementation;
+     see bazelbuild/starlark#117.
+-->
+
+When a nonzero `base` is provided explicitly,
+its value must be between 2 and 36.
+The letters `a-z` represent the digits 11 through 35.
+A matching base prefix is also permitted, and has no effect.
+
+Irrespective of base, the string may start with an optional `+` or `-`,
+indicating the sign of the result.
 
 ```python
 int("21")          # 21
 int("1234", 16)    # 4660
 int("0x1234", 16)  # 4660
 int("0x1234", 0)   # 4660
+int("0b0", 16)     # 176
+int("0b111", 0)    # 7
 int("0x1234")      # error (invalid base 10 number)
 ```
 
@@ -3053,6 +3456,9 @@ max("two", "three", "four", key=len)            # "three", the longest
 
 It is an error if any element does not support ordered comparison,
 or if the sequence is empty.
+
+The optional named parameter `key` specifies a function to be applied
+to each element prior to comparison.
 
 ```python
 min([3, 1, 4, 1, 5, 9])                         # 1
@@ -3136,6 +3542,18 @@ repr("x")               # '"x"'
 repr([1, "x"])          # '[1, "x"]'
 ```
 
+When applied to a string containing valid text,
+`repr` returns a string literal that denotes that string.
+When applied to a string containing an invalid UTF-K sequence,
+`repr` uses `\x` and `\u` escapes with out-of-range values to indicate
+the invalid elements; the result is not a valid literal.
+
+```python
+repr("🙂"[:1])		# "\xf0" (UTF-8) or "\ud83d" (UTF-16)
+"\xf0"                  # error: non-ASCII hex escape
+"\ud83d"                # error: invalid Unicode code point U+D83D
+```
+
 ### reversed
 
 `reversed(x)` returns a new list containing the elements of the iterable sequence x in reverse order.
@@ -3145,12 +3563,27 @@ reversed(range(5))                              # [4, 3, 2, 1, 0]
 reversed({"one": 1, "two": 2}.keys())           # ["two", "one"]
 ```
 
+### set
+
+`set(x)` returns a new set containing the unique elements of the iterable
+sequence `x` in iteration order.
+
+`set(x)` fails if any element of `x` is unhashable.
+
+With no argument, `set()` returns a new empty set.
+
+```python
+set()                          # an empty set
+set([3, 1, 1, 2])              # set([3, 1, 2]), a set of three elements
+set({"k1": "v1", "k2": "v2"})  # set(["k1", "k2"]), a set of two elements
+```
+
 ### sorted
 
 `sorted(x)` returns a new list containing the elements of the iterable sequence x,
 in sorted order.  The sort algorithm is stable.
 
-The optional named parameter `reverse`, if true, causes `sorted` to
+The optional named boolean parameter `reverse`, if true, causes `sorted` to
 return results in reverse sorted order.
 
 The optional named parameter `key` specifies a function of one
@@ -3179,7 +3612,12 @@ str(1)                          # '1'
 str("x")                        # 'x'
 str([1, "x"])                   # '[1, "x"]'
 str(0.0)                        # '0.0'        (formatted as if by "%g")
+str(b"abc")                     # 'abc'
 ```
+
+The string form of a bytes value is the UTF-K decoding of the bytes.
+Each byte that is not part of a valid encoding is replaced by the
+UTF-K encoding of the replacement character, U+FFFD.
 
 ### tuple
 
@@ -3189,7 +3627,7 @@ With no arguments, `tuple()` returns the empty tuple.
 
 ### type
 
-type(x) returns a string describing the type of its operand.
+`type(x)` returns a string describing the type of its operand.
 
 ```python
 type(None)              # "NoneType"
@@ -3219,6 +3657,30 @@ using [dot expressions](#dot-expressions).
 For example, strings have a `count` method that counts
 occurrences of a substring; `"banana".count("a")` yields `3`.
 
+<a id='bytes·elems'></a>
+### bytes·elems
+
+`b.elems()` returns an opaque iterable value containing successive int elements of b.
+Its type is `"bytes.elems"`, and its string representation is of the form `b"...".elems()`.
+
+```python
+type(b"ABC".elems())	# "bytes.elems"
+b"ABC".elems()	        # b"ABC".elems()
+list(b"ABC".elems())  	# [65, 66, 67]
+```
+<!-- TODO: signpost how to convert an single int or list of int to a bytes. -->
+
+<a id='dict·clear'></a>
+### dict·clear
+
+`D.clear()` removes all the entries of dictionary D and returns `None`.
+It fails if the dictionary is frozen or if there are active iterators.
+
+```python
+x = {"one": 1, "two": 2}
+x.clear()                               # None
+print(x)                                # {}
+```
 
 <a id='dict·get'></a>
 ### dict·get
@@ -3328,6 +3790,9 @@ and value `value` is inserted into D.
 
 All insertions overwrite any previous entries having the same key.
 
+It is permissible to update the dict with itself given as pairs.
+The operation is no-op.
+
 `update` fails if the dictionary is frozen or has active iterators.
 
 ```python
@@ -3383,6 +3848,9 @@ x                                       # []
 `L.extend(x)` appends the elements of `x`, which must be iterable, to
 the list L, and returns `None`.
 
+It is permissible to extend the list with itself. The operation
+doubles the list.
+
 `extend` fails if `x` is not iterable, or if the list L is frozen or has active iterators.
 
 ```python
@@ -3390,6 +3858,10 @@ x = []
 x.extend([1, 2, 3])                     # None
 x.extend(["foo"])                       # None
 x                                       # [1, 2, 3, "foo"]
+
+y = [1, 2]
+y.extend(y)
+y                                       # [1, 2, 1, 2]
 ```
 
 <a id='list·index'></a>
@@ -3463,6 +3935,291 @@ x.remove(2)                             # None (x == [1, 3])
 x.remove(2)                             # error: element not found
 ```
 
+<a id='set·add'></a>
+
+### set·add
+
+`S.add(x)` adds the value `x` to the set `S`. It returns `None`.
+
+It is permissible to `add` a value already present in the set; this leaves the
+set `S` unchanged.
+
+`add` fails if the set `S` is frozen or has active iterators, or if `x` is
+unhashable.
+
+If you need to add multiple elements to a set, see [`update`](#set·update) or
+the [`|=`](#sets) augmented assignment operation.
+
+<a id='set·clear'></a>
+
+### set·clear
+
+`S.clear()` removes all elements from the set `S`. It returns `None`.
+
+`clear` fails if the set `S` is frozen or has active iterators.
+
+<a id='set·difference'></a>
+
+### set·difference
+
+`S.difference(*others)` returns a new set containing elements found in the set
+`S` but not found in any of the iterable sequences `*others`.
+
+If `s` and `t` are sets, `s.difference(t)` is equivalent to `s - t`; however,
+note that the `-` operation requires both sides to be sets, while the
+`difference` method accepts arbitrary iterable sequences.
+
+It is permissible to call `difference` without any arguments; this returns a
+copy of the set `S`.
+
+`difference` fails if any element of any of the `*others` is unhashable.
+
+```python
+set([1, 2, 3]).difference([2])             # set([1, 3])
+set([1, 2, 3]).difference([0, 1], [3, 4])  # set([2])
+```
+
+<a id='set·difference_update'></a>
+
+### set·difference\_update
+
+`S.difference_update(*others)` removes from the set `S` any elements found in
+any of the iterable sequences `*others`. It returns `None`.
+
+If `s` and `t` are sets, `s.difference_update(t)` is equivalent to `s -= t`;
+however, note that the `-=` augmented assignment requires both sides to be sets,
+while the `difference_update` method accepts arbitrary iterable sequences.
+
+It is permissible to call `difference_update` without any arguments; this leaves
+the set `S` unchanged.
+
+`difference_update` fails if the set `S` is frozen or has active iterators, or
+if any element of any of the `*others` is unhashable.
+
+```python
+s = set([1, 2, 3, 4])
+s.difference_update([2])             # None; s is set([1, 3, 4])
+s.difference_update([0, 1], [4, 5])  # None; s is set([3])
+```
+
+<a id='set·discard'></a>
+
+### set·discard
+
+`S.discard(x)` removes the value `x` from the set `S` if present. It returns
+`None`.
+
+It is permissible to `discard` a value not present in the set; this leaves the
+set `S` unchanged. If you want to fail on an attempt to remove a non-present
+element, use [`remove`](#set·remove) instead. If you need to remove multiple
+elements from a set, see [`difference_update`](#set·difference_update) or the
+[`-=`](#sets) augmented assignment operation.
+
+`discard` fails if the set `S` is frozen or has active iterators, or if `x` is
+unhashable. This applies even if `x` is not a member of the set.
+
+```python
+s = set(["x", "y"])
+s.discard("y")  # None; s == set(["x"])
+s.discard("y")  # None; s == set(["x"])
+```
+
+<a id='set·intersection'></a>
+
+### set·intersection
+
+`S.intersection(*others)` returns a new set containing those elements that the
+set `S` and all of the iterable sequences `*others` have in common.
+
+If `s` and `t` are sets, `s.intersection(t)` is equivalent to `s & t`; however,
+note that the `&` operation requires both sides to be sets, while the
+`intersection` method accepts arbitrary iterable sequences.
+
+It is permissible to call `intersection` without any arguments; this returns a
+copy of the set `S`.
+
+`intersection` fails if any element of any of the `*others` is unhashable.
+
+```python
+set([1, 2]).intersection([2, 3])             # set([2])
+set([1, 2, 3]).intersection([0, 1], [1, 2])  # set([1])
+```
+
+<a id='set·intersection_update'></a>
+
+### set·intersection\_update
+
+`S.intersection_update(*others)` removes from the set `S` any elements not found
+in at least one of the iterable sequences `*others`. It returns `None`.
+
+If `s` and `t` are sets, `s.intersection_update(t)` is equivalent to `s &= t`;
+however, note that the `&=` augmented assignment requires both sides to be sets,
+while the `intersection_update` method accepts arbitrary iterable sequences.
+
+It is permissible to call `intersection_update` without any arguments; this
+leaves the set `S` unchanged.
+
+`intersection_update` fails if the set `S` is frozen or has active iterators, or
+if any element of any of the `*others` is unhashable.
+
+```python
+s = set([1, 2, 3, 4])
+s.intersection_update([0, 1, 2])       # None; s is set([1, 2])
+s.intersection_update([0, 1], [1, 2])  # None; s is set([1])
+```
+
+<a id='set·isdisjoint'></a>
+
+### set·isdisjoint
+
+`S.isdisjoint(x)` returns `True` if the set `S` and the iterable sequence `x` do
+not have any values in common, and `False` otherwise.
+
+This is equivalent to `not S.intersection(x)`.
+
+`isdisjoint` fails if any element of `x` is unhashable.
+
+<a id='set·issubset'></a>
+
+### set·issubset
+
+`S.issubset(x)` returns `True` if every element of the set `S` is present in the
+iterable sequence `x`, and `False` otherwise.
+
+This is equivalent to `not S.difference(x)`.
+
+`issubset` fails if any element of `x` is unhashable.
+
+<a id='set·issuperset'></a>
+
+### set·issuperset
+
+`S.issuperset(x)` returns `True` if every element of the iterable sequence `x`
+is present in the set `S`, and `False` otherwise.
+
+This is equivalent to `S == S.union(x)`.
+
+`issuperset` fails if any element of `x` is unhashable.
+
+<a id='set·pop'></a>
+
+### set·pop
+
+`S.pop()` removes and returns the first element (in iteration order, which is
+the order in which elements were first added to the set) from the set `S`.
+
+`pop` fails if the set is empty, is frozen, or has active iterators.
+
+```python
+s = set([3, 1, 2])
+s.pop()  # 3; s == set([1, 2])
+s.pop()  # 1; s == set([2])
+s.pop()  # 2; s == set()
+s.pop()  # error: empty set
+```
+
+<a id='set·remove'></a>
+
+### set·remove
+
+`S.remove(x)` removes the value `x` from the set `S`. It returns `None`.
+
+`remove` fails if the set doesn't contain `x` (which, in particular, implies
+that `remove` fails if `x` is unhashable), or if the set is frozen or has active
+iterators. If you don't want to fail on an attempt to remove a non-present
+element, use [`discard`](#set·discard) instead. If you need to remove multiple
+elements from a set, see [`difference_update`](#set·difference_update) or the
+[`-=`](#sets) augmented assignment operation.
+
+```python
+s = set([1, 2])
+s.remove(2)  # None; s == set([1])
+s.remove(2)  # error: element not found
+```
+
+<a id='set·symmetric_difference'></a>
+
+### set·symmetric\_difference
+
+`S.symmetric_difference(x)` returns a new set containing elements found only in
+the set `S` or in the iterable sequence `x` but not those found in both `S` and
+`x`.
+
+If `s` and `t` are sets, `s.symmetric_difference(t)` is equivalent to `s ^ t`;
+however, note that the `^` operation requires both sides to be sets, while the
+`symmetric_difference` method accepts an arbitrary iterable sequence.
+
+`symmetric_difference` fails if any element of `x` is unhashable.
+
+```python
+set([1, 2]).symmetric_difference([2, 3])  # set([1, 3])
+```
+
+<a id='set·symmetric_difference_update'></a>
+
+### set·symmetric\_difference\_update
+
+`S.symmetric_difference_update(x)` removes from the set `S` any elements found
+in both `S` and the iterable sequence `x`, and adds to `S` any elements found in
+`x` but not in `S`. It returns `None`.
+
+If `s` and `t` are sets, `s.symmetric_difference_update(t)` is equivalent to `s
+^= t`; however, note that the `^=` augmented assignment requires both sides to
+be sets, while the `symmetric_difference_update` method accepts an arbitrary
+iterable sequence.
+
+`symmetric_difference_update` fails if the set `S` is frozen or has active
+iterators, or if any element of `x` is unhashable.
+
+```python
+s = set([1, 2])
+s.symmetric_difference_update([2, 3])  # None; s == set([1, 3])
+```
+
+<a id='set·union'></a>
+
+### set·union
+
+`S.union(*others)` returns a new set containing elements found in the set `S` or
+in any of the iterable sequences `*others`.
+
+If `s` and `t` are sets, `s.union(t)` is equivalent to `s | t`; however, note
+that the `|` operation requires both sides to be sets, while the `union` method
+accepts arbitrary iterable sequences.
+
+It is permissible to call `union` without any arguments; this returns a copy of
+the set `S`.
+
+`union` fails if any element of any of the `*others` is unhashable.
+
+```python
+set([1, 2]).union([2, 3])                    # set([1, 2, 3])
+set([1, 2]).union([2, 3], {3: "a", 4: "b"})  # set([1, 2, 3, 4])
+```
+
+<a id='set·update'></a>
+
+### set·update
+
+`S.update(*others)` adds to the set `S` any elements found in any of the
+iterable sequences `*others`. It returns `None`.
+
+If `s` and `t` are sets, `s.update(t)` is equivalent to `s |= t`; however, note
+that the `|=` augmented assignment requires both sides to be sets, while the
+`update` method accepts arbitrary iterable sequences.
+
+It is permissible to call `update` without any arguments; this leaves the set
+`S` unchanged.
+
+`update` fails if the set `S` is frozen or has active iterators, or if any
+element of any of the `*others` is unhashable.
+
+```python
+s = set()
+s.update([1, 2])          # None; s is set([1, 2])
+s.update([2, 3], [3, 4])  # None; s is set([1, 2, 3, 4])
+```
+
 <a id='string·capitalize'></a>
 ### string·capitalize
 
@@ -3489,17 +4246,33 @@ They are interpreted according to Starlark's [indexing conventions](#indexing).
 <a id='string·elems'></a>
 ### string·elems
 
-`S.elems()` returns an iterable value containing successive
-1-byte substrings of S.
+`S.elems()` returns an opaque iterable value containing successive
+1-element substrings of S.
+Its type is `"string.elems"`, and its string representation is of the form `"...".elems()`.
 
 ```python
-'Hello, 123'.elems()  # ["H", "e", "l", "l", "o", ",", " ", "1", "2", "3"]
+"Hello, 123".elems()	        # "Hello, 123".elems()
+type("Hello, 123".elems())	# "string.elems"
+list("Hello, 123".elems())	# ["H", "e", "l", "l", "o", ",", " ", "1", "2", "3"]
 ```
+
+<!-- TODO:
+This is not very useful, because it splits codepoints into strings that are not valid text.
+Nor is it compatible with Rust strings, which must be valid UTF-8.
+Better would be for elems() to return int values of string elements,
+analogous to bytes.elems(), and just as elem_ords does (in the Go impl).
+However, that's a breaking change, and .elems() is in use in Bazel code, so cleanup is required.
+
+Users that want single-codepoint substrings can use .codepoints() and codepoint_ords(),
+both implemented in Go, but neither yet in the spec (and both hard to support in the
+Java implemntation as long as Bazel does the Latin1 hack).
+-->
+
 
 <a id='string·endswith'></a>
 ### string·endswith
 
-`S.endswith(suffix[, start[, end]])` reports whether the string 
+`S.endswith(suffix[, start[, end]])` reports whether the string
 `S[start:end]` has the specified suffix.
 
 ```python
@@ -3707,6 +4480,36 @@ If S does not contain `x`, `partition` returns `(S, "", "")`.
 "one/two/three".partition("/")		# ("one", "/", "two/three")
 ```
 
+<a id='string·removeprefix'></a>
+### string·removeprefix
+
+`S.removeprefix(x)` removes the prefix `x` from the string S at most once,
+and returns the rest of the string.
+If the prefix string is not found then it returns the original string.
+
+`removeprefix` fails if `x` is not a string.
+
+```python
+"banana".removeprefix("ban")		# "ana"
+"banana".removeprefix("ana")		# "banana"
+"bbaa".removeprefix("b")		# "baa"
+```
+
+<a id='string·removesuffix'></a>
+### string·removesuffix
+
+`S.removesuffix(x)` removes the suffix `x` from the string S at most once,
+and returns the rest of the string.
+If the suffix string is not found then it returns the original string.
+
+`removesuffix` fails if `x` is not a string.
+
+```python
+"banana".removesuffix("ana")		# "ban"
+"banana".removesuffix("ban")		# "banana"
+"bbaa".removesuffix("a")		# "bba"
+```
+
 <a id='string·replace'></a>
 ### string·replace
 
@@ -3752,7 +4555,7 @@ _last_ occurrence.
 `S.rpartition(x)` is like `partition`, but splits `S` at the last occurrence of `x`.
 
 ```python
-"one/two/three".partition("/")		# ("one/two", "/", "three")
+"one/two/three".rpartition("/")         # ("one/two", "/", "three")
 ```
 
 <a id='string·rsplit'></a>
@@ -3832,7 +4635,7 @@ the final element does not necessarily end with a line terminator.
 <a id='string·startswith'></a>
 ### string·startswith
 
-`S.startswith(prefix[, start[, end]])` reports whether the string 
+`S.startswith(prefix[, start[, end]])` reports whether the string
 `S[start:end]` has the specified prefix.
 
 ```python
@@ -3896,7 +4699,12 @@ DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
 
 Parameters = Parameter {',' Parameter}.
 
-Parameter = identifier | identifier '=' Expression | '*' identifier | '**' identifier .
+Parameter  = identifier
+           | identifier '=' Expression
+           | '*'
+           | '*' identifier
+           | '**' identifier
+           .
 
 IfStmt = 'if' Expression ':' Suite {'elif' Expression ':' Suite} ['else' ':' Suite] .
 
@@ -3934,7 +4742,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | float | string
+        | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expressions [',']] ')'
@@ -3942,6 +4750,8 @@ Operand = identifier
 
 DotSuffix   = '.' identifier .
 SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
+            | '[' Expressions ']'
+            .
 CallSuffix  = '(' [Arguments [',']] ')' .
 
 Arguments = Argument {',' Argument} .
@@ -3988,11 +4798,11 @@ Tokens:
 
 - spaces: newline, eof, indent, outdent.
 - identifier.
-- literals: string, int, float.
+- literals: string, bytes, int, float.
 - plus all quoted tokens such as '+=', 'return'.
 
 Notes:
 
 - Ambiguity is resolved using operator precedence.
 - The grammar does not enforce the legal order of params and args,
-  nor that the first compclause must be a 'for'.
+  nor that the first CompClause must be a 'for'.

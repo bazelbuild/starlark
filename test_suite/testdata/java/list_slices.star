@@ -57,9 +57,15 @@ assert_eq([0, 1, 2][-1], 2)
 assert_eq([0, 1, 2][0], 0)
 
 ---
-'123'['a'::] ### (got.*want|invalid start index|parameters mismatch)
+### java: want int
+### rust: not supported
+### go: invalid start index
+'123'['a'::]
 ---
-'123'[:'b':] ### (got.*want|invalid end index|parameters mismatch)
+### java: want int
+### rust: not supported
+### go: invalid end index
+'123'[:'b':]
 ---
 (1, 2, 3)[1::0] ### (slice step cannot be zero|zero is not a valid slice step|out of bound)
 ---

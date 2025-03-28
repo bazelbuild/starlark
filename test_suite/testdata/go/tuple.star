@@ -36,7 +36,10 @@ assert_eq(tuple(["a", "b", "c"]), ("a", "b", "c"))
 assert_eq(tuple(["a", "b", "c"]), ("a", "b", "c"))
 assert_eq(tuple([1]), (1,))
 ---
-tuple(1) ### (got int, want iterable|not iterable|not a collection)
+### go: want iterable
+### java: got value of type
+### rust: not supported
+tuple(1)
 ---
 
 # tuple * int,  int * tuple
