@@ -1516,7 +1516,8 @@ An application may pre-declare additional names
 to provide domain-specific functions to that file, for example.
 These additional functions may have side effects on the application.
 Starlark programs cannot change the set of predeclared bindings
-or assign new values to them.
+or assign new values to them (but they can be redefined in a
+smaller block).
 
 Nested beneath the predeclared block is the _module_ block,
 which contains the bindings of the current module.
