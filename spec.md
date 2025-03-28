@@ -1880,13 +1880,13 @@ suffixes, to form a _primary_ expression.
 In some places in the Starlark grammar where an expression is expected,
 it is legal to provide a comma-separated list of expressions denoting
 a tuple.
-The grammar uses `Expression` where a multiple-component expression is allowed,
-and `Test` where it accepts an expression of only a single component.
+The grammar uses `Expressions` where a multiple-component expression is allowed,
+and `Expression` where it accepts an expression of only a single component.
 
 ```text
-Expression = Test {',' Test} .
+Expressions = Expression {',' Expression} .
 
-Test = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
+Expression = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
 
 PrimaryExpr = Operand
             | PrimaryExpr DotSuffix
@@ -1898,13 +1898,13 @@ Operand = identifier
         | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
-        | '(' [Expression] [,] ')'
+        | '(' [Expressions] [,] ')'
         .
 
 DotSuffix   = '.' identifier .
 CallSuffix  = '(' [Arguments [',']] ')' .
-SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
-            | '[' Expression ']'
+SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']'
+            | '[' Expressions ']'
             .
 ```
 
@@ -1932,7 +1932,7 @@ See [Literals](#lexical elements) for details.
 ### Parenthesized expressions
 
 ```text
-Operand = '(' [Expression] ')'
+Operand = '(' [Expressions] ')'
 ```
 
 A single expression enclosed in parentheses yields the result of that expression.
@@ -1985,7 +1985,7 @@ An optional comma may follow the final pair.
 ```text
 DictExpr = '{' [Entries [',']] '}' .
 Entries  = Entry {',' Entry} .
-Entry    = Test ':' Test .
+Entry    = Expression ':' Expression .
 ```
 
 Examples:
@@ -2010,7 +2010,7 @@ enclosed in square brackets, and it yields a new list object.
 An optional comma may follow the last element expression.
 
 ```text
-ListExpr = '[' [Expression [',']] ']' .
+ListExpr = '[' [Expressions [',']] ']' .
 ```
 
 Element expressions are evaluated in left-to-right order.
@@ -2029,10 +2029,10 @@ There are four unary operators, all appearing before their operand:
 `+`, `-`, `~`, and `not`.
 
 ```text
-UnaryExpr = '+' Test
-          | '-' Test
-          | '~' Test
-          | 'not' Test
+UnaryExpr = '+' Expression
+          | '-' Expression
+          | '~' Expression
+          | 'not' Expression
           .
 ```
 
@@ -2099,7 +2099,7 @@ so the parser will not accept `0 <= i < n`.
 All other binary operators of equal precedence associate to the left.
 
 ```text
-BinaryExpr = Test {Binop Test} .
+BinaryExpr = Expression {Binop Expression} .
 
 Binop = 'or'
       | 'and'
@@ -2409,7 +2409,7 @@ If it's true, it evaluates `a` and yields its value;
 otherwise it yields the value of `b`.
 
 ```text
-IfExpr = Test 'if' Test 'else' Test .
+IfExpr = Expression 'if' Expression 'else' Expression .
 ```
 
 Example:
@@ -2453,11 +2453,11 @@ A sequence of `for` and `if` clauses acts like a nested sequence of
 `for` and `if` statements.
 
 ```text
-ListComp = '[' Test {CompClause} ']'.
+ListComp = '[' Expression {CompClause} ']'.
 DictComp = '{' Entry {CompClause} '}' .
 
-CompClause = 'for' LoopVariables 'in' Test
-           | 'if' Test .
+CompClause = 'for' LoopVariables 'in' Expression
+           | 'if' Expression .
 
 LoopVariables = PrimaryExpr {',' PrimaryExpr} .
 ```
@@ -2510,7 +2510,7 @@ print(x)                        # 1
 CallSuffix = '(' [Arguments [',']] ')' .
 
 Arguments = Argument {',' Argument} .
-Argument  = Test | identifier '=' Test | '*' Test | '**' Test .
+Argument  = Expression | identifier '=' Expression | '*' Expression | '**' Expression .
 ```
 
 A value `f` of type `function` may be called using the expression `f(...)`.
@@ -2577,9 +2577,7 @@ value in the range -`n` ≤ `i` < `n`, where `n` is `len(a)`; any other
 index results in an error.
 
 ```text
-SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
-            | '[' Expression ']'
-            .
+SliceSuffix = '[' Expressions ']' .
 ```
 
 A valid negative index `i` behaves like the non-negative index `n+i`,
@@ -2620,9 +2618,7 @@ subsequence of `a`, which must be an indexable sequence such as string,
 bytes, tuple, list, or range.
 
 ```text
-SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
-            | '[' Expression ']'
-            .
+SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
 ```
 
 Each of the `start`, `stop`, and `stride` operands is optional;
@@ -2676,7 +2672,7 @@ the creation of a new list and copying of the necessary elements.
 A `lambda` expression yields a new function value.
 
 ```grammar {.good}
-LambdaExpr = 'lambda' [Parameters] ':' Test .
+LambdaExpr = 'lambda' [Parameters] ':' Expression .
 ```
 
 Syntactically, a lambda expression consists of the keyword `lambda`,
@@ -2755,7 +2751,7 @@ expression on the right-hand side then assigns its value (or values) to
 the variable (or variables) on the left-hand side.
 
 ```text
-AssignStmt = Expression '=' Expression .
+AssignStmt = Expressions '=' Expressions .
 ```
 
 The expression on the left-hand side is called a _target_.  The
@@ -2798,7 +2794,7 @@ variable `lhs` by applying a binary arithmetic operator `op` (one of
 previous value of `lhs` and the value of `rhs`.
 
 ```text
-AssignStmt = Expression ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expression .
+AssignStmt = Expressions ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expressions .
 ```
 
 The left-hand side must be a simple target:
@@ -2943,7 +2939,7 @@ A `return` statement ends the execution of a function and returns a
 value to the caller of the function.
 
 ```text
-ReturnStmt = 'return' [Expression] .
+ReturnStmt = 'return' [Expressions] .
 ```
 
 A return statement may have zero, one, or more
@@ -2963,7 +2959,7 @@ return 1, 2             # returns (1, 2)
 An expression statement evaluates an expression and discards its result.
 
 ```text
-ExprStmt = Expression .
+ExprStmt = Expressions .
 ```
 
 Any expression may be used as a statement, but an expression statement is
@@ -2980,7 +2976,7 @@ the truth value of the condition is `True`, executes a list of
 statements.
 
 ```text
-IfStmt = 'if' Test ':' Suite {'elif' Test ':' Suite} ['else' ':' Suite] .
+IfStmt = 'if' Expression ':' Suite {'elif' Expression ':' Suite} ['else' ':' Suite] .
 ```
 
 Example:
@@ -3027,7 +3023,7 @@ the successive element values to one or more variables and executes a
 list of statements, the _loop body_.
 
 ```text
-ForStmt = 'for' LoopVariables 'in' Expression ':' Suite .
+ForStmt = 'for' LoopVariables 'in' Expressions ':' Suite .
 ```
 
 Example:
@@ -4700,15 +4696,15 @@ DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
 Parameters = Parameter {',' Parameter}.
 
 Parameter  = identifier
-           | identifier '=' Test
+           | identifier '=' Expression
            | '*'
            | '*' identifier
            | '**' identifier
            .
 
-IfStmt = 'if' Test ':' Suite {'elif' Test ':' Suite} ['else' ':' Suite] .
+IfStmt = 'if' Expression ':' Suite {'elif' Expression ':' Suite} ['else' ':' Suite] .
 
-ForStmt = 'for' LoopVariables 'in' Expression ':' Suite .
+ForStmt = 'for' LoopVariables 'in' Expressions ':' Suite .
 
 Suite = [newline indent {Statement} outdent] | SimpleStmt .
 
@@ -4722,18 +4718,18 @@ SmallStmt = ReturnStmt
           | LoadStmt
           .
 
-ReturnStmt   = 'return' [Expression] .
+ReturnStmt   = 'return' [Expressions] .
 BreakStmt    = 'break' .
 ContinueStmt = 'continue' .
 PassStmt     = 'pass' .
-AssignStmt   = Expression ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expression .
-ExprStmt     = Expression .
+AssignStmt   = Expressions ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expressions .
+ExprStmt     = Expressions .
 
 LoadStmt = 'load' '(' string {',' [identifier '='] string} [','] ')' .
 
-Test = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
+Expression = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
 
-IfExpr = Test 'if' Test 'else' Test .
+IfExpr = Expression 'if' Expression 'else' Expression .
 
 PrimaryExpr = Operand
             | PrimaryExpr DotSuffix
@@ -4745,35 +4741,35 @@ Operand = identifier
         | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
-        | '(' [Expression [',']] ')'
+        | '(' [Expressions [',']] ')'
         .
 
 DotSuffix   = '.' identifier .
-SliceSuffix = '[' [Expression] ':' [Test] [':' [Test]] ']'
-            | '[' Expression ']'
+SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']'
+            | '[' Expressions ']'
             .
 CallSuffix  = '(' [Arguments [',']] ')' .
 
 Arguments = Argument {',' Argument} .
-Argument  = Test | identifier '=' Test | '*' Test | '**' Test .
+Argument  = Expression | identifier '=' Expression | '*' Expression | '**' Expression .
 
-ListExpr = '[' [Expression [',']] ']' .
-ListComp = '[' Test {CompClause} ']'.
+ListExpr = '[' [Expressions [',']] ']' .
+ListComp = '[' Expression {CompClause} ']'.
 
 DictExpr = '{' [Entries [',']] '}' .
 DictComp = '{' Entry {CompClause} '}' .
 Entries  = Entry {',' Entry} .
-Entry    = Test ':' Test .
+Entry    = Expression ':' Expression .
 
-CompClause = 'for' LoopVariables 'in' Test | 'if' Test .
+CompClause = 'for' LoopVariables 'in' Expression | 'if' Expression .
 
-UnaryExpr = '+' Test
-          | '-' Test
-          | '~' Test
-          | 'not' Test
+UnaryExpr = '+' Expression
+          | '-' Expression
+          | '~' Expression
+          | 'not' Expression
           .
 
-BinaryExpr = Test {Binop Test} .
+BinaryExpr = Expression {Binop Expression} .
 
 Binop = 'or'
       | 'and'
@@ -4786,9 +4782,9 @@ Binop = 'or'
       | '*' | '%' | '/' | '//'
       .
 
-LambdaExpr = 'lambda' [Parameters] ':' Test .
+LambdaExpr = 'lambda' [Parameters] ':' Expression .
 
-Expression = Test {',' Test} .
+Expressions = Expression {',' Expression} .
 # NOTE: trailing comma permitted only when within [...] or (...).
 
 LoopVariables = PrimaryExpr {',' PrimaryExpr} .
