@@ -611,7 +611,7 @@ but Booleans are not numbers.
 
 ### Integers
 
-The Starlark integer type represents integers.  Its type `int`.
+The Starlark integer type represents integers. Its type is `int`.
 
 Integers may be positive or negative, and arbitrarily large.
 Integer arithmetic is exact.
@@ -874,7 +874,7 @@ TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 ### Lists
 
 A list is a mutable sequence of values.
-The type of a list is `list[E]`.
+The type of a list is `list[E]`, where `E` is the type of each of its elements.
 
 Lists are indexable sequences: the elements of a list may be iterated
 over by `for`-loops, list comprehensions, and various built-in
@@ -935,7 +935,8 @@ A list value has these methods:
 ### Tuples
 
 A tuple is an immutable sequence of values.
-The type of a tuple is `tuple[A,B,C,...]`.
+The type of a tuple is `tuple[A,B,C,...]`, where `A`, `B`, `C`, ... is the type
+of its element with the corresponding position in the sequence.
 
 Tuples are constructed using parenthesized list notation:
 
@@ -988,7 +989,8 @@ non-empty.
 ### Dictionaries
 
 A dictionary is a mutable mapping from keys to values.
-The type of a dictionary is `dict[K,V]`.
+The type of a dictionary is `dict[K,V]`, where `K` is the type of each key and
+`V` the type of each value.
 
 Dictionaries provide constant-time operations to insert an element, to
 look up the value for a key, or to remove an element.  Dictionaries
@@ -1103,7 +1105,7 @@ A dictionary value has these methods:
 ### Sets
 
 A set is a mutable, iterable collection of unique values - the set's *elements*.
-The type of a set is `set[E]`.
+The type of a set is `set[E]`, where `E` is the type of each of its elements.
 
 Sets provide constant-time operations to insert, remove, or check for the
 presence of a value. Sets are implemented using a hash table, and therefore,
@@ -1237,7 +1239,10 @@ A set has the following methods:
 ### Functions
 
 A function value represents a function defined in Starlark.
-Its type is `Callable[[A,B,C,...], R]`.
+Its type is `Callable[[A,B,C,...], R]`, where `A`, `B`, `C`, ... is the type of
+each of its parameters with corresponding position and `R` is the type function
+returns.
+
 A function value used in a Boolean context is always considered true.
 
 Functions defined by a [`def` statement](#function-definitions) are named;
@@ -3368,7 +3373,7 @@ provided `default` value instead of failing.
 
 ### hash
 
-`hash(/, x: str) -> int`
+`hash(x: str, /) -> int`
 
 `hash(x)` returns an integer hash of a string or bytes x
 such that two equal values have the same hash.
