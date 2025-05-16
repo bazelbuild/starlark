@@ -60,6 +60,7 @@ interact with the environment.
     * [Bytes literals](#bytes-literals)
     * [Special tokens](#special-tokens)
   * [Data types](#data-types)
+    * [object](#object)
     * [None](#none)
     * [Booleans](#booleans)
     * [Integers](#integers)
