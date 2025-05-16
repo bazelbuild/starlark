@@ -538,6 +538,7 @@ TODO: define indent, outdent, semicolon, newline, eof
 These are the main data types built in to the interpreter:
 
 ```text
+object                 # the parent type of all Stalark values
 None                   # the type of None
 bool                   # True or False
 int                    # a signed integer of arbitrary magnitude
@@ -559,18 +560,21 @@ which the interpreter is embedded, and those data types may
 participate in basic operations of the language such as arithmetic,
 comparison, indexing, and function calls.
 
-<!-- We needn't mention the stringIterable type here. -->
-
-Some operations can be applied to any Starlark value.  For example,
-every value has a type string that can be obtained with the expression
-`type(x)`, and any value may be converted to a string using the
-expression `str(x)`, or to a Boolean truth value using the expression
-`bool(x)`.  Other operations apply only to certain types.  For
+Other operations apply only to certain types.  For
 example, the indexing operation `a[i]` works only with strings, bytes values, lists,
 and tuples, and any application-defined types that are _indexable_.
 The [_value concepts_](#value-concepts) section explains the groupings of
 types by the operators they support.
 
+<!-- We needn't mention the stringIterable type here. -->
+
+### object
+
+Some operations can be applied to any Starlark value. For example,
+every value has a type string that can be obtained with the expression
+`type(x)`, and any value may be converted to a string using the
+expression `str(x)`, or to a Boolean truth value using the expression
+`bool(x)`.
 
 ### None
 
@@ -3224,6 +3228,8 @@ If the iterable is empty, it returns `True`.
 
 ### bool
 
+`bool(x: object, /) -> bool`
+
 `bool(x)` interprets `x` as a Boolean value---`True` or `False`.
 With no argument, `bool()` returns `False`.
 
@@ -3354,6 +3360,8 @@ With no argument, `float()` returns `0.0`.
 
 ### getattr
 
+`getattr(x: object, name: str, default: object = Unbound, /) -> Any`
+
 `getattr(x, name[, default])` returns the value of the attribute (field or method) of x named `name`
 if it exists. If not, it either returns `default` (if specified) or raises an error.
 
@@ -3368,6 +3376,8 @@ The three-argument form `getattr(x, name, default)` returns the
 provided `default` value instead of failing.
 
 ### hasattr
+
+`hasattr(x: object, name: str, /) -> bool`
 
 `hasattr(x, name)` reports whether x has an attribute (field or method) named `name`.
 
@@ -3544,6 +3554,8 @@ number.
 
 ### repr
 
+`repr: (x: object, /) -> str`
+
 `repr(x)` formats its argument as a string.
 
 All strings in the result are double-quoted.
@@ -3614,6 +3626,8 @@ sorted(["two", "three", "four"], key=len, reverse=True)    # ["three", "four", "
 
 ### str
 
+`str(x: object, /) -> str`
+
 `str(x)` formats its argument as a string.
 
 If x is a string, the result is x (without quotation).
@@ -3638,6 +3652,8 @@ UTF-K encoding of the replacement character, U+FFFD.
 With no arguments, `tuple()` returns the empty tuple.
 
 ### type
+
+`type(x: object, /) -> str`
 
 `type(x)` returns a string describing the type of its operand.
 
