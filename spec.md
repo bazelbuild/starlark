@@ -881,7 +881,7 @@ TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 ### Unions
 
 Some functions may accept parameters of multiple types. In this
-case parameter is annotated with a union type `A|B`.
+case the parameter is annotated with a union type `A|B`.
 
 User functions are limited to optional types, that is `None|A`,
 where `A` is another type.
