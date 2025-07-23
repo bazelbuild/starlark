@@ -883,7 +883,7 @@ TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 Some functions may accept parameters of multiple types. In this
 case the parameter is annotated with a union type `A|B`.
 
-User functions are limited to optional types, that is `None|A`,
+User defined function is limited to optional types, that is `None|A`,
 where `A` is another type.
 
 ### Lists
