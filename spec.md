@@ -4782,7 +4782,7 @@ Type = identifier
      | identifier TypeArguments
      .
 
-TypeArguments = '[' TypeArgument {',' TypeArgument} ']'.
+TypeArguments = '[' [ TypeArgument {',' TypeArgument} ] ']'.
 
 TypeArgument = TypeExpr
              | ListOfTypes
