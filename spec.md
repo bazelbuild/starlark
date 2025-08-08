@@ -1770,7 +1770,8 @@ operations they support.
   Examples: `list`, `tuple`, `string`, `bytes`, but not `dict` or `set`.
 * `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
   element at a given integer index. Example: `list`.
-* `Mapping`: a mapping is an association of keys to values. Example: `dict`.
+* `Mapping`: a mapping is an association of keys to values. Values are identified
+  and indexed by keys, that are not necessarily an integer. Example: `dict`.
 
 Although all of Starlark's core data types for sequences implement at
 least the `Sequence` contract, it's possible for an application
