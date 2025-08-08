@@ -548,11 +548,10 @@ float                  # an IEEE 754 double-precision floating-point number
 str                    # a text string, with Unicode encoded as UTF-8 or UTF-16
 bytes                  # a byte string
 A|B                    # A union type
-<!-- TODO: re-review collections and function types when this TODO is removed -->
 list[E]                # a fixed-length sequence of values
-tuple[A,B,...]         # a fixed-length sequence of values, unmodifiable
-dict[K,V]              # a mapping from values to values
-set[E]                 # a collection of unique values
+tuple[A,B,...]         # an immutable fixed-length sequence of values
+dict[K,V]              # a mapping from keys to values
+set[E]                 # a collection of unique hashable values
 Callable[[A,B,...],R]  # a function
 ```
 
@@ -1782,8 +1781,8 @@ contexts dictionaries act like a sequence of their keys.
 We can classify different kinds of sequence types based on the
 operations they support.
 
-* `Iterable`: an _iterable_ value lets us process each of its elements in a fixed order.
-  Examples: `dict`, `list`, `tuple`, `set`, but not `str` or `bytes`.
+* `Iterable[E]`: an _iterable_ value lets us process each of its elements in a fixed order.
+  Examples: `dict[E,V]`, `list[E]`, `tuple[E, ...]`, `set[E]`, but not `str` or `bytes`.
 * `Sequence`: a _sequence of known length_ lets us know how many elements it
   contains without processing them.
   Examples: `dict`, `list`, `tuple`, `set`, but not `str` or `bytes`.
@@ -1819,7 +1818,6 @@ def increment_values(dict):
 dict = {"one": 1, "two": 2}
 increment_values(dict)
 ```
-
 
 ### Indexing
 
