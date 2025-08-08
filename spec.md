@@ -566,7 +566,7 @@ every value has a type string that can be obtained with the expression
 expression `str(x)`, or to a Boolean truth value using the expression
 `bool(x)`.  Other operations apply only to certain types.  For
 example, the indexing operation `a[i]` works only with strings, bytes values, lists,
-and tuples, and any application-defined sequences.
+and tuples, and any application-defined sequences or mappings.
 The [_value concepts_](#value-concepts) section explains the groupings of
 types by the operators they support.
 
@@ -2594,9 +2594,9 @@ sequence.
 ("zero", "one", "two")[-1]      # "two"
 ```
 
-An index expression `d[key]` may also be applied to a dictionary `d`,
+An index expression `m[key]` may also be applied to a mapping `m`,
 to obtain the value associated with the specified key.  It is an error
-if the dictionary contains no such key.
+if the mapping contains no such key.
 
 An index expression appearing on the left side of an assignment causes
 the specified list or dictionary element to be updated:
