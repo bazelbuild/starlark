@@ -3227,10 +3227,14 @@ The parameter names serve merely as documentation.
 
 ### any
 
+`any: (Iterable[object], /) -> bool`
+
 `any(x)` returns `True` if any element of the iterable sequence x is true.
 If the iterable is empty, it returns `False`.
 
 ### all
+
+`all: (Iterable[object], /) -> bool`
 
 `all(x)` returns `False` if any element of the iterable sequence x is false.
 If the iterable is empty, it returns `True`.
@@ -3289,6 +3293,8 @@ With no arguments, `dict()` returns a new empty dictionary.
 `dict(x)` where x is a dictionary returns a new copy of x.
 
 ### dir
+
+`dir: (object, /) -> list[str]`
 
 `dir(x)` returns a new sorted list of the names of the attributes (fields and methods) of its operand.
 The attributes of a value `x` are the names `f` such that `x.f` is a valid expression.
