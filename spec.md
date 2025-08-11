@@ -67,6 +67,7 @@ interact with the environment.
     * [Floating-point numbers](#floating-point-numbers)
     * [Strings](#strings)
     * [Bytes](#bytes)
+    * [Unions](#unions)
     * [Lists](#lists)
     * [Tuples](#tuples)
     * [Dictionaries](#dictionaries)
@@ -546,6 +547,7 @@ int                    # a signed integer of arbitrary magnitude
 float                  # an IEEE 754 double-precision floating-point number
 str                    # a text string, with Unicode encoded as UTF-8 or UTF-16
 bytes                  # a byte string
+A|B                    # A union type
 <!-- TODO: re-review collections and function types when this TODO is removed -->
 list[E]                # a fixed-length sequence of values
 tuple[A,B,...]         # a fixed-length sequence of values, unmodifiable
@@ -875,6 +877,14 @@ TODO: encode, decode methods?
 TODO: ord, chr.
 TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 ```
+
+### Unions
+
+Some functions may accept parameters of multiple types. In this
+case the parameter is annotated with a union type `A|B`.
+
+User defined functions are limited to optional types, that is `None|A`,
+where `A` is another type.
 
 ### Lists
 
@@ -3340,6 +3350,8 @@ See https://github.com/bazelbuild/starlark/issues/47.
 
 ### float
 
+`float(x: str|bool|int|float, /) -> float`
+
 `float(x)` interprets its argument as a floating-point number.
 
 If x is a `float`, the result is x.
@@ -3402,6 +3414,8 @@ s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
 ```
 
 ### int
+
+`int(x: str|bool|int|float, /, base: int = 10) -> int`
 
 `int(x[, base])` interprets its argument as an integer.
 
