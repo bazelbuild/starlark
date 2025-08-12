@@ -45,8 +45,8 @@ API documentation for a constant may be provided in
 [Sphinx-style](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#doc-comments-and-docstrings)
 *doc comments*, which start with `#:` optionally followed by a space.
 
-An uninterrupted block of doc comments attaches to the identifier on the left
-hand side of the immediately following assignment statement:
+An uninterrupted block of doc comments attaches to the symbol on the left hand
+side of the immediately following assignment statement:
 
 ```python
 #: List of allowed configuration names
