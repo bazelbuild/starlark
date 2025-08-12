@@ -8,8 +8,9 @@ Starlark (formerly known as Skylark) is a language intended for use as a
 configuration language. It was designed for the [Bazel](https://bazel.build/)
 build system, but may be useful for other projects as well. This repository is
 where Starlark features are proposed, discussed, and specified. It contains
-information about the language, including the [specification](spec.md). There
-are [multiple implementations of Starlark](https://github.com/laurentlb/awesome-starlark).
+information about the language, including the [specification](spec.md) and
+[recommended conventions](conventions.md). There are [multiple implementations
+of Starlark](https://github.com/laurentlb/awesome-starlark).
 
 
 Starlark is a dialect of [Python](https://www.python.org/). Like Python, it is a
