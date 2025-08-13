@@ -7,22 +7,18 @@ Starlark.
 
 ### Docstrings
 
-API documentation for a function should be provided in a [Python-style
-docstring](https://peps.python.org/pep-0257/) - a string literal which is the
-first line of the function's body.
+API documentation for a Starlark module or function should be provided in a
+*docstring* - a string literal which is the first line of the module or of the
+function's body.
 
 By convention, this string should consist of an optional newline, followed by
 a 1-line, 1-sentence summary, optionally followed by a blank line and blank-line
 delimited paragraphs of additional documentation text.
 
-If a string literal is the first statement in a Starlark source file, it is
-treated as the documentation for that file; the conventions are the same as for
-a function's docstring.
-
 For example:
 
 ```python
-"""A collection of useful utilities"""
+"""A collection of useful utilities."""
 
 def is_valid(config):
     """
@@ -35,23 +31,28 @@ def is_valid(config):
     ...
 ```
 
-Documentation processors should take care to dedent common leading whitespace
-from a multiline docstring's lines (note that the first line could have no
-leading whitespace).
+No particular markup format for the text is prescribed, but Markdown and HTML
+are commonly used in practice. Documentation processors - especially if
+interpreting docstrings as Markdown-formatted - should take care to dedent
+common leading whitespace from a multiline docstring's lines (note that the
+first line could have no leading whitespace).
 
 ### Doc comments
 
-API documentation for a constant may be provided in
-[Sphinx-style](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#doc-comments-and-docstrings)
-*doc comments*, which start with `#:` optionally followed by a space.
+API documentation for a global variable may be provided in [Sphinx
+autodoc-style](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#doc-comments-and-docstrings)
+*doc comments*, which start with `#:` optionally followed by one space.
 
-An uninterrupted block of doc comments attaches to the symbol on the left hand
-side of the immediately following assignment statement:
+An uninterrupted block of doc comments attaches to the symbol(s) on the left
+hand side of the immediately following assignment statement:
 
 ```python
 #: List of allowed configuration names
-#: in an unspecified order
+#: in priority order
 ALLOWED_CONFIGS = ["foo", "bar"]
+
+#: Default foo map
+FOO_MAP, _ = generate_foo_and_bar_maps()
 ```
 
 Alternatively, a one-line trailing doc comment may be given inline after the end
@@ -63,6 +64,3 @@ DEFAULT_TAGS = {
     "bar": ["local", "manual"],
 } #: Default list of tags for each configuration
 ```
-
-If both the leading and trailing doc comment is specified, the trailing doc
-comment takes precedence.
