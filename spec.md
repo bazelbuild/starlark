@@ -1768,8 +1768,6 @@ operations they support.
   contains without processing them and provides efficient
   random access to its elements, which are identified by integer indices.
   Examples: `list`, `tuple`, `string`, `bytes`, but not `dict` or `set`.
-* `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
-  element at a given integer index. Example: `list`.
 * `Mapping`: a mapping is an association of keys to values. Values are identified
   and indexed by keys, that are not necessarily an integer. Example: `dict`.
 
