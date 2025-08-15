@@ -8,8 +8,8 @@ Starlark.
 ### Docstrings
 
 API documentation for a Starlark module or function should be provided in a
-*docstring* - a string literal which is the first line of the module or of the
-function's body.
+*docstring* - a string literal which is the first statement of the module or of
+the function's body.
 
 By convention, this string should consist of an optional newline, followed by
 a 1-line, 1-sentence summary, optionally followed by a blank line and blank-line
@@ -31,11 +31,14 @@ def is_valid(config):
     ...
 ```
 
-No particular markup format for the text is prescribed, but Markdown and HTML
-are commonly used in practice. Documentation processors - especially if
-interpreting docstrings as Markdown-formatted - should take care to dedent
-common leading whitespace from a multiline docstring's lines (note that the
-first line could have no leading whitespace).
+No particular markup format for the text is prescribed; we observe that Markdown
+and HTML are commonly used in practice. Of course, projects and organizations
+can specify additional guidelines for their documentation formatting.
+
+Documentation processing tools - especially if interpreting docstrings as
+Markdown-formatted - should take care to dedent common leading whitespace from a
+multiline docstring's lines (note that the first line could have no leading
+whitespace).
 
 ### Doc comments
 
@@ -43,8 +46,10 @@ API documentation for a global variable may be provided in [Sphinx
 autodoc-style](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#doc-comments-and-docstrings)
 *doc comments*, which start with `#:` optionally followed by one space.
 
-An uninterrupted block of doc comments attaches to the symbol(s) on the left
-hand side of the immediately following assignment statement:
+An uninterrupted sequence of one or more lines which contain *only* doc comments
+(optionally preceded by whitespace before the `#:`) forms a *doc comment block*.
+Such a doc comment block attaches to the symbol(s) on the left hand side of the
+assignment statement that starts on the immediately following line:
 
 ```python
 #: List of allowed configuration names
@@ -64,3 +69,8 @@ DEFAULT_TAGS = {
     "bar": ["local", "manual"],
 } #: Default list of tags for each configuration
 ```
+
+Doc comments attach to variables, not to values. For example, if a global
+variable whose value happens to be `True` has a doc comment, documentation
+processing tools should take care not to attach the doc comment's text to
+unrelated occurrences of `True` in other parts of the code.
