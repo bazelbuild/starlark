@@ -70,7 +70,11 @@ DEFAULT_TAGS = {
 } #: Default list of tags for each configuration
 ```
 
+Documentation processing tools may treat multiple doc comments attached to the
+same variable as an error (for example, if a variable has both a preceding doc
+comment block and a trailing in-line doc comment).
+
 Doc comments attach to variables, not to values. For example, if a global
 variable whose value happens to be `True` has a doc comment, documentation
-processing tools should take care not to attach the doc comment's text to
-unrelated occurrences of `True` in other parts of the code.
+processing tools shouldn't attach the doc comment's text to unrelated
+occurrences of `True` in other parts of the code.
