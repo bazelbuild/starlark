@@ -566,7 +566,7 @@ every value has a type string that can be obtained with the expression
 expression `str(x)`, or to a Boolean truth value using the expression
 `bool(x)`.  Other operations apply only to certain types.  For
 example, the indexing operation `a[i]` works only with strings, bytes values, lists,
-and tuples, and any application-defined collections.
+and tuples, and any application-defined sequences.
 The [_value concepts_](#value-concepts) section explains the groupings of
 types by the operators they support.
 
