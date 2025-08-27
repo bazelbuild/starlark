@@ -77,7 +77,7 @@ interact with the environment.
     * [Identity and mutation](#identity-and-mutation)
     * [Freezing a value](#freezing-a-value)
     * [Hashing](#hashing)
-    * [Sequence types](#sequence-types)
+    * [Collection types](#collection-types)
     * [Indexing](#indexing)
   * [Expressions](#expressions)
     * [Identifiers](#identifiers)
@@ -566,7 +566,7 @@ every value has a type string that can be obtained with the expression
 expression `str(x)`, or to a Boolean truth value using the expression
 `bool(x)`.  Other operations apply only to certain types.  For
 example, the indexing operation `a[i]` works only with strings, bytes values, lists,
-and tuples, and any application-defined sequences or mappings.
+and tuples, and any application-defined collections.
 The [_value concepts_](#value-concepts) section explains the groupings of
 types by the operators they support.
 
@@ -875,8 +875,8 @@ TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 A list is a mutable sequence of values.
 The [type](#type) of a list is `"list"`.
 
-Lists are sequences: the elements of a list may be iterated
-over by `for`-loops, list comprehensions, and various built-in
+Lists are sequences: the elements of a list may be indexed by an integer,
+iterated over by `for`-loops, list comprehensions, and various built-in
 functions.
 
 List may be constructed using bracketed list notation:
@@ -1753,22 +1753,22 @@ are compared by reference identity (see [Comparisons](#comparisons)),
 so their hash values are derived from their identity.
 
 
-### Sequence types
+### Collection types
 
-Many Starlark data types represent a _sequence_ of values: lists
-and tuples are sequences of arbitrary values, and in many
-contexts dictionaries act like a sequence of their keys.
+Many Starlark data types represent a _collection_ of values: lists
+and tuples are collections of arbitrary values, and in many
+contexts dictionaries act like a collection of their keys.
 
-We can classify different kinds of sequence types based on the
+We can classify different kinds of collection types based on the
 operations they support.
 
-* `Iterable`: an _iterable_ value lets us process itself (its elements or keys) in a fixed order.
-  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
-* `Sequence`: a _sequence of fixed length_ lets us know how many elements it
-  contains without processing them and provides efficient
-  random access to its elements, which are identified by integer indices.
+* `Collection`: a data structure of a defined length that contains multiple elements. 
+  Element membership can be tested using the `in` operator.
+* `Iterable`: a collection of elements, that can be processed in a `for` loop or comprehension.
+  Examples: `list`, `tuple`, `set`, `dict` (elements are keys), but not `string` or `bytes`.
+* `Sequence`: a collection of elements, that can be accessed with an integer index  
   Examples: `list`, `tuple`, `string`, `bytes`, but not `dict` or `set`.
-* `Mapping`: a mapping is an association of keys to values. Values are identified
+* `Mapping`: an iterable collection of keys associated to values. Values are identified
   and indexed by keys, that are not necessarily an integer. Example: `dict`.
 
 Although all of Starlark's core data types for sequences implement at
@@ -3417,7 +3417,7 @@ int("0x1234")      # error (invalid base 10 number)
 
 `len(x)` returns the number of elements in its argument.
 
-It is a dynamic error if its argument is not an iterable or a sequence.
+It is a dynamic error if its argument is not a collection.
 
 ### list
 
