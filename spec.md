@@ -1771,11 +1771,6 @@ operations they support.
 * `Mapping`: an iterable collection of keys associated to values. Values are identified
   and indexed by keys, that are not necessarily an integer. Example: `dict`.
 
-Although all of Starlark's core data types for sequences implement at
-least the `Sequence` contract, it's possible for an application
-that embeds the Starlark interpreter to define additional data types
-representing sequences of unknown length that implement only the `Iterable` contract.
-
 Strings and bytes values are not iterable, though they do support the `len(s)` and
 `s[i]` operations. Starlark deviates from Python here to avoid a common
 pitfall in which a string is used by mistake where a list containing a
