@@ -1762,11 +1762,11 @@ contexts dictionaries act like a collection of their keys.
 We can classify different kinds of collection types based on the
 operations they support.
 
-* `Collection`: a data structure of a defined length that contains multiple elements. 
+* `Collection`: a data structure of a defined length that contains multiple elements.
   Element membership can be tested using the `in` operator.
 * `Iterable`: a collection of elements, that can be processed in a `for` loop or comprehension.
   Examples: `list`, `tuple`, `set`, `dict` (elements are keys), but not `string` or `bytes`.
-* `Sequence`: a collection of elements, that can be accessed with an integer index  
+* `Sequence`: a collection of elements, that can be accessed with an integer index.
   Examples: `list`, `tuple`, `string`, `bytes`, but not `dict` or `set`.
 * `Mapping`: an iterable collection of keys associated to values. Values are identified
   and indexed by keys, that are not necessarily an integer. Example: `dict`.
