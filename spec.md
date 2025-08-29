@@ -3412,7 +3412,7 @@ int("0x1234")      # error (invalid base 10 number)
 
 `len(x)` returns the number of elements in its argument.
 
-It is a dynamic error if its argument is not a collection.
+It is a dynamic error if its argument is not a collection or a string.
 
 ### list
 
