@@ -1767,7 +1767,7 @@ operations they support.
   Elements can be processed in a `for` loop or comprehension.
   Examples: `list`, `tuple`, `set`, `dict` (elements are keys), but not `string` or `bytes`.
 * `Sequence`: a collection, where its elements that can be accessed with an integer index.
-  Examples: `list`, `tuple`, `string`, `bytes`, but not `dict` or `set`.
+  Examples: `list`, `tuple`, `bytes`, but not `string`, `dict` or `set`.
 * `Mapping`: a collection of keys associated to values. Values are identified
   and indexed by keys, that are not necessarily an integer. Example: `dict`.
 
