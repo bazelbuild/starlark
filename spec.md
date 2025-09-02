@@ -77,7 +77,7 @@ interact with the environment.
     * [Identity and mutation](#identity-and-mutation)
     * [Freezing a value](#freezing-a-value)
     * [Hashing](#hashing)
-    * [Sequence types](#sequence-types)
+    * [Collection types](#collection-types)
     * [Indexing](#indexing)
   * [Expressions](#expressions)
     * [Identifiers](#identifiers)
@@ -566,7 +566,7 @@ every value has a type string that can be obtained with the expression
 expression `str(x)`, or to a Boolean truth value using the expression
 `bool(x)`.  Other operations apply only to certain types.  For
 example, the indexing operation `a[i]` works only with strings, bytes values, lists,
-and tuples, and any application-defined types that are _indexable_.
+and tuples, and any application-defined sequences.
 The [_value concepts_](#value-concepts) section explains the groupings of
 types by the operators they support.
 
@@ -875,8 +875,8 @@ TODO: string.elems(), string.elem_ords(), string.codepoint_ords()
 A list is a mutable sequence of values.
 The [type](#type) of a list is `"list"`.
 
-Lists are indexable sequences: the elements of a list may be iterated
-over by `for`-loops, list comprehensions, and various built-in
+Lists are sequences: the elements of a list may be indexed by an integer,
+iterated over by `for`-loops, list comprehensions, and various built-in
 functions.
 
 List may be constructed using bracketed list notation:
@@ -1753,31 +1753,23 @@ are compared by reference identity (see [Comparisons](#comparisons)),
 so their hash values are derived from their identity.
 
 
-### Sequence types
+### Collection types
 
-Many Starlark data types represent a _sequence_ of values: lists
-and tuples are sequences of arbitrary values, and in many
-contexts dictionaries act like a sequence of their keys.
+Many Starlark data types represent a _collection_ of values: lists
+and tuples are collections of arbitrary values, and in many
+contexts dictionaries act like a collection of their keys.
 
-We can classify different kinds of sequence types based on the
+We can classify different kinds of collection types based on the
 operations they support.
 
-* `Iterable`: an _iterable_ value lets us process each of its elements in a fixed order.
-  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
-* `Sequence`: a _sequence of known length_ lets us know how many elements it
-  contains without processing them.
-  Examples: `dict`, `list`, `tuple`, `set`, but not `string` or `bytes`.
-* `Indexable`: an _indexed_ type has a fixed length and provides efficient
-  random access to its elements, which are identified by integer indices.
-  Examples: `string`, `bytes`, `tuple`, and `list`, but not `dict` or `set`.
-* `SetIndexable`: a _settable indexed type_ additionally allows us to modify the
-  element at a given integer index. Example: `list`.
-* `Mapping`: a mapping is an association of keys to values. Example: `dict`.
-
-Although all of Starlark's core data types for sequences implement at
-least the `Sequence` contract, it's possible for an an application
-that embeds the Starlark interpreter to define additional data types
-representing sequences of unknown length that implement only the `Iterable` contract.
+* `Collection`: a data structure of a defined length that contains multiple elements.
+  Element membership can be tested using the `in` operator.
+  Elements can be processed in a `for` loop or comprehension.
+  Examples: `list`, `tuple`, `set`, `dict` (elements are keys), but not `string` or `bytes`.
+* `Sequence`: a collection, where its elements that can be accessed with an integer index.
+  Examples: `list`, `tuple`, `bytes`, but not `string`, `dict` or `set`.
+* `Mapping`: a collection of keys associated to values. Values are identified
+  and indexed by keys, that are not necessarily an integer. Example: `dict`.
 
 Strings and bytes values are not iterable, though they do support the `len(s)` and
 `s[i]` operations. Starlark deviates from Python here to avoid a common
@@ -2572,7 +2564,7 @@ f("n")                                          # 2
 
 ### Index expressions
 
-An index expression `a[i]` yields the `i`th element of an _indexable_
+An index expression `a[i]` yields the `i`th element of a sequence
 type such as a string, bytes, tuple, list, or range.  The index `i` must be an `int`
 value in the range -`n` ≤ `i` < `n`, where `n` is `len(a)`; any other
 index results in an error.
@@ -2595,9 +2587,9 @@ sequence.
 ("zero", "one", "two")[-1]      # "two"
 ```
 
-An index expression `d[key]` may also be applied to a dictionary `d`,
+An index expression `m[key]` may also be applied to a mapping `m`,
 to obtain the value associated with the specified key.  It is an error
-if the dictionary contains no such key.
+if the mapping contains no such key.
 
 An index expression appearing on the left side of an assignment causes
 the specified list or dictionary element to be updated:
@@ -2615,7 +2607,7 @@ type, such as a tuple or string, or a frozen value of a mutable type.
 ### Slice expressions
 
 A slice expression `a[start:stop:stride]` yields a new value containing a
-subsequence of `a`, which must be an indexable sequence such as string,
+subsequence of `a`, which must be a sequence such as string,
 bytes, tuple, list, or range.
 
 ```text
@@ -3420,7 +3412,7 @@ int("0x1234")      # error (invalid base 10 number)
 
 `len(x)` returns the number of elements in its argument.
 
-It is a dynamic error if its argument is not a sequence.
+It is a dynamic error if its argument is not a collection or a string.
 
 ### list
 
