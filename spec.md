@@ -91,7 +91,7 @@ interact with the environment.
     * [Comprehensions](#comprehensions)
     * [Function and method calls](#function-and-method-calls)
     * [Dot expressions](#dot-expressions)
-    * [Index expressions](#index-expressions)
+    * [Subscript expressions](#subscript-expressions)
     * [Slice expressions](#slice-expressions)
     * [Lambda expressions](#lambda-expressions)
   * [Statements](#statements)
@@ -772,12 +772,11 @@ The built-in `len` function returns the number of elements in a string.
 
 Strings may be concatenated with the `+` operator.
 
-The substring expression `s[i:j]` returns the substring of `s` from
-element index `i` up to index `j`.
+Strings support [indexing](#subscript-expressions) and
+[slicing](#slice-expressions). The result of both operations is another string
+(with length 1, in the case of indexing).
 <!-- TODO: The Rust implementation of s[i:j] may fail if it cuts a
      UTF-8 sequence in half. Need to accommodate that here. -->
-The index expression `s[i]` returns the
-1-element substring `s[i:i+1]`.
 
 Strings are hashable, and thus may be used as keys in a dictionary.
 
@@ -845,12 +844,15 @@ The built-in `len` function returns the number of elements (bytes) in a `bytes`.
 
 Two bytes values may be concatenated with the `+` operator.
 
-The slice expression `b[i:j]` returns the subsequence of `b`
-from index `i` up to but not including index `j`.
-The index expression `b[i]` returns the int value of the ith element.
+Bytes may be [indexed](#subscript-expressions) and [sliced](#slice-expressions).
+The result of indexing is the value of the byte at the given position, as an
+integer. The result of slicing is another bytes object.
 
-The `in` operator may be used to test for the presence of one bytes
-as a subsequence of another, or for the presence of a single `int` byte value.
+The comparison `x in b`, where `b` is a bytes value and `x` is an integer in
+the range [0, 255], tests whether `x`'s value is an element of `b`. If `x` is
+instead another bytes value, the comparison tests whether `x` is contained as
+a consecutive subsequence of `b` (analogous to substrings of a string).
+It is an error if `x` is an out-of-range integer, or any other type of value.
 
 Like strings, bytes values are hashable, totally ordered, and not iterable,
 and are considered True if they are non-empty.
@@ -891,9 +893,8 @@ Lists can also be constructed from any iterable sequence by using the
 built-in `list` function.
 
 The built-in `len` function applied to a list returns the number of elements.
-The index expression `list[i]` returns the element at index i,
-and the slice expression `list[i:j]` returns a new list consisting of
-the elements at indices from i to j.
+Lists can be [indexed](#subscript-expressions) to retrieve a single element,
+and [sliced](#slice-expressions) to produce a new list.
 
 List elements may be added using the `append` or `extend` methods,
 removed using the `remove` method, or reordered by assignments such as
@@ -964,10 +965,8 @@ sorted(3, 1, 4, 1,)                             # ok
 Any iterable sequence may be converted to a tuple by using the
 built-in `tuple` function.
 
-Like lists, tuples are indexed sequences, so they may be indexed and
-sliced.  The index expression `tuple[i]` returns the tuple element at
-index i, and the slice expression `tuple[i:j]` returns a subsequence
-of a tuple.
+Like lists, tuples may be [indexed](#subscript-expressions) and
+[sliced](#slice-expressions) to retrieve an element or produce a new tuple.
 
 Tuples are iterable sequences, so they may be used as the operand of a
 `for`-loop, a list comprehension, or various built-in functions.
@@ -1884,7 +1883,7 @@ Expression = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
 PrimaryExpr = Operand
             | PrimaryExpr DotSuffix
             | PrimaryExpr CallSuffix
-            | PrimaryExpr SliceSuffix
+            | PrimaryExpr SubscriptSuffix
             .
 
 Operand = identifier
@@ -1894,11 +1893,11 @@ Operand = identifier
         | '(' [Expressions] [,] ')'
         .
 
-DotSuffix   = '.' identifier .
-CallSuffix  = '(' [Arguments [',']] ')' .
-SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']'
-            | '[' Expressions ']'
-            .
+DotSuffix       = '.' identifier .
+CallSuffix      = '(' [Arguments [',']] ')' .
+SubscriptSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']'
+                | '[' Expressions ']'
+                .
 ```
 
 ### Identifiers
@@ -2562,16 +2561,22 @@ f("a")                                          # 3
 f("n")                                          # 2
 ```
 
-### Index expressions
+### Subscript expressions
 
-An index expression `a[i]` yields the `i`th element of a sequence
-type such as a string, bytes, tuple, list, or range.  The index `i` must be an `int`
-value in the range -`n` ≤ `i` < `n`, where `n` is `len(a)`; any other
-index results in an error.
+A subscript expression `a[x]` retrieves a value identified by `x` from the
+value `a`.
 
 ```text
-SliceSuffix = '[' Expressions ']' .
+SubscriptSuffix = '[' Expressions ']' .
 ```
+
+There are two main cases: indexing a sequence, and retrieving values of a
+mapping.
+
+When `a` is a `Sequence` (such as a `list` or `tuple`), or another indexable
+object like `string` or `bytes`, the expression `a[i]` yields the `i`th element
+of `a`. Here, `i` must be an `int` value in the range `-n` ≤ `i` < `n`, where
+`n` is `len(a)`; any other index results in an error.
 
 A valid negative index `i` behaves like the non-negative index `n+i`,
 allowing for convenient indexing relative to the end of the
@@ -2587,43 +2592,52 @@ sequence.
 ("zero", "one", "two")[-1]      # "two"
 ```
 
-An index expression `m[key]` may also be applied to a mapping `m`,
-to obtain the value associated with the specified key.  It is an error
-if the mapping contains no such key.
+For a subscript expression `m[k]`, where the value of `m` is a `Mapping`
+(most commonly a `dict`) or any other mapping-like object, the expression
+retrieves the value that `m` associates with `k`. It is an error if `m`
+contains no such key `k`.
 
-An index expression appearing on the left side of an assignment causes
-the specified list or dictionary element to be updated:
+A subscript expression appearing on the left side of an assignment causes
+the specified sequence element or mapping value to be updated:
 
 ```python
-a = range(3)            # a == [0, 1, 2]
-a[2] = 7                # a == [0, 1, 7]
+a = range(10, 13)       # a == [10, 11, 12]
+a[2] = 7                # a == [10, 11, 7]
 
-coins["suzie b"] = 100
+coins = {}              # coins == {}
+coins["suzie b"] = 100  # coins == {"suzie b": 100}
 ```
 
 It is a dynamic error to attempt to update an element of an immutable
 type, such as a tuple or string, or a frozen value of a mutable type.
 
+Starlark does not have a `del` statement like Python. Deleting the value
+associated with an index or key requires calling a method on the container
+object.
+
 ### Slice expressions
 
-A slice expression `a[start:stop:stride]` yields a new value containing a
-subsequence of `a`, which must be a sequence such as string,
-bytes, tuple, list, or range.
+The slice expression acts as a sort of indexing subscript expression that
+retrieves a range of elements rather than a single element. It applies to types
+that can be indexed with an integer as above, such as `Sequence`s, `string`,
+and `bytes`.
 
 ```text
-SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
+SubscriptSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
 ```
 
-Each of the `start`, `stop`, and `stride` operands is optional;
-if present, and not `None`, each must be an integer.
-The `stride` value defaults to 1.
-If the stride is not specified, the colon preceding it may be omitted too.
-It is an error to specify a stride of zero.
+A slice expression `a[start:stop:stride]` yields a copy of `a` containing
+exactly the values whose indices are in the specified range. Conceptually,
+the range begins at `start`, progresses in increments of `stride`, and
+ends before reaching `stop`, without ever going out-of-bounds.
 
-Conceptually, these operands specify a sequence of values `i` starting
-at `start` and successively adding `stride` until `i` reaches or
-passes `stop`. The result consists of the concatenation of values of
-`a[i]` for which `i` is valid.`
+Each of the `start`, `stop`, and `stride` operands may be `None` or omitted
+entirely; otherwise, they must evaluate to integers. If `stride` is omitted
+then the second colon may optionally also be omitted. (The first colon is
+syntactically required in order to distinguish from a subscript expression.)
+
+If `stride` is omitted its value defaults to 1. It is an error to specify a
+`stride` of 0.
 
 The effective start and stop indices are computed from the three
 operands as follows.  Let `n` be the length of the sequence.
@@ -2650,8 +2664,8 @@ nearest value in the range -1 to `n`-1, inclusive.
 "banana"[4::-2]         # "nnb" (select alternate elements in reverse, starting at index 4)
 ```
 
-Unlike Python, Starlark does not allow a slice expression on the left
-side of an assignment.
+Unlike Python, Starlark does not allow a slice expression to be the target of
+an assignment, although it may appear as a subexpression in the target.
 
 Slicing a tuple, string, or bytes may be more efficient than slicing a list
 because tuple, string, and bytes values are immutable, so the result of the
@@ -2749,18 +2763,19 @@ AssignStmt = Expressions '=' Expressions .
 
 The expression on the left-hand side is called a _target_.  The
 simplest target is the name of a variable, but a target may also have
-the form of an index expression, to update the element of a list or
-dictionary, to update the field of an object:
+the form of a subscript expression to update the element of a list or
+dictionary, or the form of a dot expression to update the field of an
+object. These forms may be nested.
 
 ```python
 k = 1
 a[i] = v
-m.f = ""
+o.f = ""
+o.g(1)[2] = None
 ```
 
 Compound targets may consist of a comma-separated list of
-subtargets, optionally surrounded by parentheses or square brackets,
-and targets may be nested arbitarily in this way.
+subtargets, optionally surrounded by parentheses or square brackets. These too may be nested.
 An assignment to a compound target checks that the right-hand value is a
 sequence with the same number of elements as the target.
 Each element of the sequence is then assigned to the corresponding
@@ -2791,7 +2806,7 @@ AssignStmt = Expressions ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' 
 ```
 
 The left-hand side must be a simple target:
-a name, an index expression, or a dot expression.
+a name, a subscript expression, or a dot expression.
 
 ```python
 x -= 1
@@ -4727,7 +4742,7 @@ IfExpr = Expression 'if' Expression 'else' Expression .
 PrimaryExpr = Operand
             | PrimaryExpr DotSuffix
             | PrimaryExpr CallSuffix
-            | PrimaryExpr SliceSuffix
+            | PrimaryExpr SubscriptSuffix
             .
 
 Operand = identifier
@@ -4738,9 +4753,9 @@ Operand = identifier
         .
 
 DotSuffix   = '.' identifier .
-SliceSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']'
-            | '[' Expressions ']'
-            .
+SubscriptSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']'
+                | '[' Expressions ']'
+                .
 CallSuffix  = '(' [Arguments [',']] ')' .
 
 Arguments = Argument {',' Argument} .
