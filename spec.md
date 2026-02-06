@@ -2642,7 +2642,7 @@ that can be indexed with an integer as above, such as `Sequence`s, `string`,
 and `bytes`.
 
 ```text
-SubscriptSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']' .
+SubscriptSuffix = '[' [Expressions] ':' [Expression] [':' [Expression]] ']' .
 ```
 
 A slice expression `a[start:stop:stride]` yields a copy of `a` containing
@@ -4779,7 +4779,7 @@ Operand = identifier
         .
 
 DotSuffix   = '.' identifier .
-SubscriptSuffix = '[' [Expressions] [':' Expression [':' Expression]] ']'
+SubscriptSuffix = '[' [Expressions] ':' [Expression] [':' [Expression]] ']'
                 | '[' Expressions ']'
                 .
 CallSuffix  = '(' [Arguments [',']] ')' .
