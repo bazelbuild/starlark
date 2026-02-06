@@ -3939,10 +3939,10 @@ x                                       # ["a", "b", "c", "d", "e"]
 ### list·pop
 
 `L.pop([index])` removes and returns the last element of the list L, or,
-if the optional index is provided, at that index.
+if the optional index is provided, at that index according to Starlark's
+[indexing conventions](#indexing).
 
-`pop` fails if the index is negative or not less than the length of
-the list, of if the list is frozen or has active iterators.
+`pop` fails if the list is frozen or has active iterators.
 
 ```python
 x = [1, 2, 3]
