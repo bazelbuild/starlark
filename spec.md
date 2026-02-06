@@ -1456,7 +1456,7 @@ Its [type](#type) is `"builtin_function_or_method"`.
 A built-in function value used in a Boolean context is always considered true.
 
 Many built-in functions are predeclared in the environment;
-see [Name Resolution](#name-resolution).
+see [Name Binding and Variables](#name-binding-and-variables).
 Some built-in functions such as `len` are _universal_, that is,
 available to all Starlark programs.
 The host application may predeclare additional built-in functions
