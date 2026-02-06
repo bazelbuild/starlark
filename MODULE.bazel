@@ -2,4 +2,5 @@ module(
     name = "bazelbuild_starlark",
 )
 
+bazel_dep(name = "rules_java", version = "9.3.0")
 bazel_dep(name = "rules_python", version = "1.2.0")

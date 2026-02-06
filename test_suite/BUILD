@@ -1,3 +1,5 @@
+load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_java//java:java_import.bzl", "java_import")
 load("@rules_python//python:defs.bzl", "py_test")
 load(":util.bzl", "format_test_name")
 
