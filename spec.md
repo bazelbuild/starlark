@@ -2620,8 +2620,8 @@ A subscript expression appearing on the left side of an assignment causes
 the specified sequence element or mapping value to be updated:
 
 ```python
-a = range(10, 13)       # a == [10, 11, 12]
-a[2] = 7                # a == [10, 11, 7]
+a = list(range(10, 13))   # a == [10, 11, 12]
+a[2] = 7                  # a == [10, 11, 7]
 
 coins = {}              # coins == {}
 coins["suzie b"] = 100  # coins == {"suzie b": 100}
