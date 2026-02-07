@@ -2308,8 +2308,14 @@ these operators.
 #### Membership tests
 
 ```text
-      any in     sequence		(list, tuple, dict, set, string, bytes, range)
-      any not in sequence
+      any in        sequence		(list, tuple, dict, set, range)
+      any not in    sequence
+      string in     string
+      string not in string
+      bytes in      bytes
+      int in        bytes
+      bytes not in  bytes
+      int not in    bytes
 ```
 
 The `in` operator reports whether its first operand is a member of its
