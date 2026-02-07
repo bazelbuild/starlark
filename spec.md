@@ -2356,9 +2356,10 @@ it is immediately followed by another `%`, in which cases both
 characters together denote a single literal percent sign.
 
 The conversion's operand is the next element of `args`,
-which must be a tuple with exactly one component per conversion,
-unless the format string contains only a single conversion, in which
-case `args` itself is its operand.
+which must be a tuple with exactly one component per conversion.
+If a single conversion is required, `args` may be a single non-tuple object.
+In order to format a single component with a single tuple,
+`args` must be a tuple whose only element is the tuple to be represented.
 
 Starlark does not support the flag, width, and padding specifiers
 supported by Python's `%` and other variants of C's `printf`.
