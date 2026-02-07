@@ -3719,7 +3719,7 @@ print(x)                                # {}
 If the dictionary contains no such value, `get` returns `None`, or the
 value of the optional `default` parameter if present.
 
-`get` fails if `key` is unhashable, or the dictionary is frozen or has active iterators.
+`get` fails if `key` is unhashable.
 
 ```python
 x = {"one": 1, "two": 2}
