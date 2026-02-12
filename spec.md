@@ -2379,7 +2379,7 @@ E       number          float exponential format, uppercase (1.230000E+12)
 f       number          float decimal format                (1230000000000.000000)
 F       number          same as %f
 g       number          compact format, lowercase           (0.0, 1.1, 1200, 1e+45, 1.2e+12)
-G       number          compact format, uppercase           (0.0, 1.1, 1200, 1e+45, 1.2E+12)
+G       number          compact format, uppercase           (0.0, 1.1, 1200, 1E+45, 1.2E+12)
 ```
 
 The compact form `%g` is also used by `str(float)`.
