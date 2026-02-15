@@ -3459,10 +3459,17 @@ With no argument, `list()` returns a new empty list.
 
 ### max
 
-`max(x)` returns the greatest element in the collection `x`.
+`max(x)` returns the greatest element.
 
-It is an error if any element does not support ordered comparison,
-or if the collection is empty.
+When called with one positional argument, `max(x, key=None)` returns the greatest
+element in the iterable value x. It is an error if x is empty, not iterable, or if
+any of its elements do not support ordered comparison with others.
+
+When called with 2 or more positional arguments, `max(key=None, *args)` returns
+the greatest of its positional args. It is an error if any of the positional
+arguments do not support ordered comparison with others.
+
+It is an error to call max with no positional arguments.
 
 The optional named parameter `key` specifies a function to be applied
 to each element, whose result is used for the comparison in place of
@@ -3476,10 +3483,17 @@ max("two", "three", "four", key=len)            # "three", the longest
 
 ### min
 
-`min(x)` returns the least element in the collection `x`.
+`min(x)` returns the smallest element.
 
-It is an error if any element does not support ordered comparison,
-or if the collection is empty.
+When called with one positional argument, `min(x, key=None)` returns the smallest
+element in the iterable value x. It is an error if x is empty, not iterable, or if
+any of its elements do not support ordered comparison with others.
+
+When called with 2 or more positional arguments, `min(key=None, *args)` returns
+the smallest of its positional args. It is an error if any of the positional
+arguments do not support ordered comparison with others.
+
+It is an error to call min with no positional arguments.
 
 The optional named parameter `key` specifies a function to be applied
 to each element, whose result is used for the comparison in place of
