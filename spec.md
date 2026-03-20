@@ -4545,7 +4545,7 @@ If the suffix string is not found then it returns the original string.
 
 `S.replace(old, new[, count])` returns a copy of string S with all
 occurrences of substring `old` replaced by `new`. If the optional
-argument `count`, which must be an `int`, is non-negative, it
+argument `count`, which must be an `int`, if non-negative, it
 specifies a maximum number of occurrences to replace.
 
 ```python
