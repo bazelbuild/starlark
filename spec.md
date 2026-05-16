@@ -427,7 +427,7 @@ or is greater than U+10FFFF.
 ```python
 '\u0041'		# "A", an ASCII letter (U+0041)
 '\u0414' 		# "Д", a Cyrillic capital letter (U+0414)
-'\u754c                 # "界", a Chinese character (U+754C)
+'\u754c'                # "界", a Chinese character (U+754C)
 '\U0001F600'            # "😀", an Emoji (U+1F600)
 ```
 
