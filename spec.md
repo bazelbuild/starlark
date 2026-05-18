@@ -962,8 +962,8 @@ Starlark, unlike Python, does not permit a trailing comma to appear in
 an unparenthesized tuple expression:
 
 ```python
-for k, v, in dict.items(): pass                 # syntax error at 'in'
-_ = [(v, k) for k, v, in dict.items()]          # syntax error at 'in'
+for k, v, in dict().items(): pass               # syntax error at 'in'
+_ = [(v, k) for k, v, in dict().items()]        # syntax error at 'in'
 
 sorted(3, 1, 4, 1,)                             # ok
 [1, 2, 3, ]                                     # ok
