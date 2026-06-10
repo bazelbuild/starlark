@@ -309,10 +309,13 @@ has integer, floating-point, string, and bytes literals.
 123                             # decimal int
 0x7f                            # hexadecimal int
 0o755                           # octal int
+0b1011                          # binary int
+1_000_000       0xFFFF_FFFF     # underscores may separate digits
 
 0.0     0.       .0             # float
 1e10    1e+10    1e-10
 1.1e10  1.1e+10  1.1e-10
+1_000.000_1                     # underscores may separate digits
 
 "hello"      'hello'            # string
 '''hello'''  """hello"""        # triple-quoted string
@@ -326,22 +329,35 @@ rb'hello'    br"hello"          # raw bytes literal
 Integer and floating-point literal tokens are defined by the following grammar:
 
 ```text
-int         = decimal_lit | octal_lit | hex_lit | 0 .
-decimal_lit = ('1' … '9') {decimal_digit} .
-octal_lit   = '0' ('o' | 'O') octal_digit {octal_digit} .
-hex_lit     = '0' ('x' | 'X') hex_digit {hex_digit} .
+int         = decimal_lit | octal_lit | hex_lit | binary_lit | 0 .
+decimal_lit = ('1' … '9') {['_'] decimal_digit} .
+octal_lit   = '0' ('o' | 'O') ['_'] octal_digit {['_'] octal_digit} .
+hex_lit     = '0' ('x' | 'X') ['_'] hex_digit {['_'] hex_digit} .
+binary_lit  = '0' ('b' | 'B') ['_'] binary_digit {['_'] binary_digit} .
 
 float     = decimals '.' [decimals] [exponent]
           | decimals exponent
           | '.' decimals [exponent]
           .
-decimals  = decimal_digit {decimal_digit} .
+decimals  = decimal_digit {['_'] decimal_digit} .
 exponent  = ('e'|'E') ['+'|'-'] decimals .
 
 decimal_digit = '0' … '9' .
 octal_digit   = '0' … '7' .
 hex_digit     = '0' … '9' | 'A' … 'F' | 'a' … 'f' .
+binary_digit  = '0' | '1' .
 ```
+
+As in Python ([PEP 515](https://peps.python.org/pep-0515/)), a single
+underscore (`_`) may appear between two digits of a number literal, or
+between the base prefix and the first digit. Underscores serve only to
+group digits for readability and have no effect on the value of the
+literal.
+
+It is a static error if the digits of a number literal are immediately
+followed by a decimal digit that is not valid in the literal's base:
+for example, `0o12345678` is an error rather than the two tokens
+`0o1234567` and `8`.
 
 It is a static error if a floating-point literal denotes a value whose
 magnitude is too large to be represented as a finite `float` value.
@@ -3419,10 +3435,6 @@ specified base, decimal by default.
 If `base` is zero, x is interpreted like an integer literal,
 the base being inferred from an optional base prefix such as
 `0b`, `0o`, or `0x` preceding the first digit.
-<!-- Note: the spec does not currently support 0b literals, but
-     int("0b...") works in both implementation;
-     see bazelbuild/starlark#117.
--->
 
 When a nonzero `base` is provided explicitly,
 its value must be between 2 and 36.
