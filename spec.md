@@ -4486,7 +4486,7 @@ are strings.
 <a id='string·lstrip'></a>
 ### string·lstrip
 
-`S.lstrip([cutset])` returns a copy of the string S with leading whitespace removed.
+`S.lstrip([chars])` returns a copy of the string S with leading whitespace removed.
 
 Like `strip`, it accepts an optional string parameter that specifies an
 alternative set of Unicode code points to remove.
@@ -4604,7 +4604,7 @@ rightmost splits.
 <a id='string·rstrip'></a>
 ### string·rstrip
 
-`S.rstrip([cutset])` returns a copy of the string S with trailing whitespace removed.
+`S.rstrip([chars])` returns a copy of the string S with trailing whitespace removed.
 
 Like `strip`, it accepts an optional string parameter that specifies an
 alternative set of Unicode code points to remove.
@@ -4686,11 +4686,11 @@ function reports whether any one of them is a prefix.
 <a id='string·strip'></a>
 ### string·strip
 
-`S.strip([cutset])` returns a copy of the string S with leading and trailing whitespace removed.
+`S.strip([chars])` returns a copy of the string S with leading and trailing whitespace removed.
 
 It accepts an optional string argument,
-`cutset`, which instead removes all leading
-and trailing Unicode code points contained in `cutset`.
+`chars`, which instead removes all leading
+and trailing Unicode code points contained in `chars`.
 
 ```python
 "\rhello\t ".strip()                    # "hello"
