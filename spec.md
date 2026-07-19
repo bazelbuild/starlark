@@ -965,7 +965,7 @@ an unparenthesized tuple expression:
 for k, v, in dict.items(): pass                 # syntax error at 'in'
 _ = [(v, k) for k, v, in dict.items()]          # syntax error at 'in'
 
-sorted(3, 1, 4, 1,)                             # ok
+max(3, 1, 4, 1,)                                # ok
 [1, 2, 3, ]                                     # ok
 {1: 2, 3:4, }                                   # ok
 ```
