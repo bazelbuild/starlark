@@ -1484,7 +1484,7 @@ Four Starlark constructs bind names, as illustrated in the example below:
 `load` statements (`a` and `b`),
 `def` statements (`c`),
 function parameters (`d`),
-and assignments (`e`, `h`, including the augmented assignment `e += h`).
+and assignments (`e`, `h`, including the augmented assignment `e += 1`).
 Variables may be assigned or re-assigned explicitly (`e`, `h`), or implicitly, as
 in a `for` statement (`f`) or comprehension `for` clause (`g`, `i`).
 
