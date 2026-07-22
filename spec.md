@@ -2909,7 +2909,7 @@ A non-variadic function may also declare keyword-only parameters,
 by using a bare `*` in place of the `*args` parameter.
 This form does not declare a parameter but marks the boundary
 between the earlier parameters and the keyword-only parameters.
-This form must be followed by at least one optional parameter.
+This form must be followed by at least one keyword-only parameter.
 
 ```python
 def f(a, *, b=2, c):
