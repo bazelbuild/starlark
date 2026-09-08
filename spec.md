@@ -269,8 +269,9 @@ identifiers:
 and            else           load
 break          for            not
 continue       if             or
-def            in             pass
-elif           lambda         return
+cast           in             pass
+def            isinstance     return
+elif           lambda
 ```
 
 The tokens below also may not be used as identifiers although they do not
@@ -1536,9 +1537,15 @@ The sets of names bound in the file block and in the module block do not overlap
 it is an error for a load statement to bind the name of a global,
 or for a top-level statement to bind a name bound by a load statement.
 
-A file block contains a _function_ block for each top-level
+A file block contains a _function_ block for each non-generic top-level
 function, and a _comprehension_ block for each top-level comprehension.
-Bindings in either of these kinds of block,
+There is a _type parameter_ block for each type alias statement that takes
+type parameters; and for each generic function, a type parameter block
+with a function block nested in it (the type parameter block includes the
+type parameter list, and the function block includes everything that follows
+the type parameter list).
+
+Bindings in any of these 3 kinds of block,
 and in the file block itself, are called _local_.
 (In the example, the bindings for `e`, `f`, `g`, and `i` are all local.)
 Additional functions and comprehensions, and their blocks, may be
@@ -1909,6 +1916,7 @@ Operand = identifier
         | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
+        | CastExpr | IsInstanceExpr
         | '(' [Expressions] [,] ')'
         .
 
@@ -2810,6 +2818,26 @@ a, b = 2, 3
 The same process for assigning a value to a target expression is used
 in `for` statements and in comprehension `for` clauses.
 
+#### Typed assignments
+
+A typed assignment statement may be viewed as syntactic sugar for a [var
+statement](#var-statements) immediately followed by a simple assignment
+statement; it informs the type checker of a new variable's type and assigns the
+variable an initial value:
+
+```text
+AssignStmt = identifier ':' TypeExpr '=' Expressions.
+```
+
+A variable may only be associated with a type at the point in code where it is
+bound. Thus, a var statement or a typed assignment statement may only be used
+on a new binding:
+
+```python
+def f():
+    x = 123
+    x: int = 456  # static error: type annotation on x may only appear at its first declaration
+```
 
 ### Augmented assignments
 
@@ -2853,7 +2881,7 @@ a[i] = a[i] * 2
 A `def` statement creates a named function and assigns it to a variable.
 
 ```text
-DefStmt = 'def' identifier '(' [Parameters [',']] ')' ':' Suite .
+DefStmt = 'def' identifier {'[' TypeParams [','] ']'} '(' [Parameters [',']] ')' {'->' TypeExpr} ':' Suite .
 ```
 
 Example:
@@ -2867,9 +2895,16 @@ twice(2)                # 4
 twice("two")            # "twotwo"
 ```
 
-The function's name is preceded by the `def` keyword and followed by
-the parameter list (which is enclosed in parentheses), a colon, and
-then an indented block of statements which form the body of the function.
+The function's name is preceded by the `def` keyword, is optionally followed by
+the type parameter list (which is enclosed in square brackets), and then is
+followed by the parameter list (which is enclosed in parentheses), optionally an
+arrow and the return type, then a colon, and then an indented block of
+statements which form the body of the function.
+
+The type parameter list is optional. If it is present, it is a non-empty
+comma-separated list of simple identifiers denoting types which may then be used
+in type annotations in the parameter list, in the return type annotation, or the
+function's body. A function with a type parameter list is a *generic function*.
 
 The parameter list is a comma-separated list whose elements are of
 several kinds.  First come zero or more required parameters, which are
@@ -2925,6 +2960,16 @@ This is called the _keyword arguments_ parameter, and accumulates in a
 dictionary any surplus `name=value` arguments that do not match a
 prior parameter. It is conventionally named `**kwargs`.
 
+The name of any parameter in the parameter list except for the bare `*` may
+optionally be followed by a type annotation (a `:` followed by a [type
+expression](#type-expressions)). For ordinary parameters (required, optional, or
+keyword-only), this type expression denotes the type of the parameter itself.
+For the `*args` and `**kwargs` parameters, the type annotations denote the type
+of individual values accumulated by `*args` or `**kwargs` respectively.
+
+Finally, between the parameter list and the `:`, the function may optionally
+annotate its return type by an *arrow* `->` followed by a type expression.
+
 Here are some example parameter lists:
 
 ```python
@@ -2935,6 +2980,14 @@ def f(a, b, c=1, *args): pass
 def f(a, b, c=1, *args, **kwargs): pass
 def f(**kwargs): pass
 def f(a, b, c=1, *, d=1): pass
+```
+
+And some examples of functions declared with type annotations:
+
+```python
+def f() -> None: pass
+def f(a: int, b: list | None = None, *, c=0, **kwargs: str): pass
+def f[T](a: list[T]) -> T: return a[0]
 ```
 
 Execution of a `def` statement creates a new function object.  The
@@ -3152,6 +3205,205 @@ load("module.sky", "x", y2="y", "z")    # assigns x, y2, and z
 
 A load statement within a function is a static error.
 
+## Type annotations
+
+Type annotations are used to inform static type checkers for Starlark. The
+semantics of type checking are not specified by this document, but are intended
+to be broadly similar to those of Mypy.
+
+Identifiers in type expressions are resolved statically, following the same
+rules as in value expressions.
+
+Type annotations described below are evaluated statically. However, most code
+(with the exception of the `...` ellipsis token) that may be parsed as a type
+expression may also be parsed as a value expression, and then evaluated
+dynamically.
+
+### Type expressions
+
+Type expressions consist of one or more *type atoms* separated by the `|`
+operator:
+
+```
+TypeExpr = TypeAtom
+         | TypeExpr '|' TypeAtom
+         .
+```
+
+Semantically, `|` in a type expression means "or" (a union type). For example,
+`int | float | None` denotes "integer or float or `None`".
+
+A type atom can be a plain *type name* (an identifier or a sequence of
+identifiers separated by `.` for namespacing), a *type application* with type
+arguments in square brackets, or a *parenthesized tuple* of type expressions
+(or a single parenthesized type expression).
+
+The rules for parsing parenthesized type expressions and parenthesized tuples
+are identical to those for parsing parenthesized tuples and parenthesized
+expressions in value syntax.
+
+```
+TypeAtom = TypeName
+         | TypeApplication
+         | '(' [TypeExprs [',']] ')'
+         .
+
+TypeExprs = TypeExpr {',' TypeExpr}.
+
+TypeName = identifier
+         | TypeName DotSuffix
+         .
+
+TypeApplication = TypeName '[' TypeArguments ']'.
+```
+
+The *type arguments* of a type application is a non-empty sequence of type
+expressions, lists of type expressions, string-keyed dicts with type expression
+values, strings or integer literals, and/or the special *ellipsis* token(s)
+`...`.
+
+For compatibility with subscript expression syntax, typearguments _cannot_
+have a trailing comma.
+
+```
+TypeArguments = TypeArgument
+              | TypeArgument ',' TypeArguments
+              .
+
+TypeArgument = TypeExpr
+             | TypeList
+             | TypeDict
+             | string
+             | int
+             | '...'
+             .
+
+TypeList = '[' [TypeExpr [',']] ']'.
+
+TypeDict = '{' [TypeDictEntry [',']] '}'.
+
+TypeDictEntry = string ':' TypeExpr.
+```
+
+Semantically, a type application means a parametrized type; most commonly, a
+type derived from other types. For example `dict[str, int]` denotes "dictionary
+with string keys and integer values", and `Callable[..., bool]` denotes
+"function taking arbitrary arguments and returning a boolean".
+
+### Type alias statements
+
+A type alias statement binds a type expression to a name in the current module.
+Type alias statements must be top-level statements; they are prohibited in
+functions and `for` and `if`/`elif`/`else` bodies.
+
+Syntactically, a type alias looks like `type`, followed by the alias's name with
+optional type parameters, an `=` sign, and the type's definition:
+
+```
+TypeAlisStmt = 'type' identifier {'[' TypeParams [','] ']'} '=' TypeExpr.
+
+TypeParams = identifier {',' TypeParams}.
+```
+
+Examples:
+
+```python
+type Numeric = int | float
+type OptionalDict[K, V] = dict[K, V] | None
+```
+
+Evaluation of a type alias statement introduces a new global variable with an
+implementation-defined marker value.
+
+Just as for assignment statements, it is a static error for a type alias to bind
+a global variable already explicitly bound in the file:
+
+```python
+int_or_str = True
+type int_or_str = int | str  # static error: cannot reassign global int_or_str declared on line 1
+```
+
+### Var statements
+
+A var statement binds a name in the current block and informs the type checker
+of its type, but doesn't assign it a value.
+
+Syntactically, a var statement looks a required function parameter with a type
+annotation:
+
+```
+VarStmt = identifier ':' TypeExpr.
+```
+
+Examples:
+
+```python
+x: int
+y: list[int]
+```
+
+A variable may only be associated with a type at the point in code where it is
+bound. Thus, a var statement or a typed assignment statement may only be used
+on a new binding:
+
+```python
+def f():
+    x = 42
+    x: int  # static error: type annotation on x may only appear at its first declaration
+```
+
+It is a dynamic error to evaluate a reference to a variable that has been bound
+by a var statement before it has been assigned a value by an assignment
+statement:
+
+```python
+def f():
+    x: int
+    print(x)  # dynamic error: local variable x referenced before assignment
+    x = 42
+```
+
+### Cast expressions
+
+A `cast` expression informs the type checker of an expression's type, but at
+evaluation time, returns the expression's value unchanged.
+
+Syntactically, a `cast` expression looks like a call expression with 2 arguments
+\- a type expression and an ordinary argument expression:
+
+```
+CastExpr = 'cast' '(' TypeExpr ',' [','] Argument [','] ')'
+```
+
+Example:
+
+```python
+def f(l: list[int], y: int | None):
+    if x:
+        l.append(cast(int, c))
+```
+
+### Isinstance expressions
+
+An `isinstance` expression evaluates to `True` if a value's data type matches a
+given type annotation, and to `False` otherwise.
+
+Syntactically, an `isinstance` expression looks like a call expression with 2
+arguments - an ordinary argument expression and a type expression (the opposite
+order from `cast` expressions):
+
+```
+IsInstanceExpr = 'isinstance' '(' Argument ',' [','] TypeExpr [','] ')'
+```
+
+For efficiency reasons, it is a static error to use `isinstance` with collection
+type annotations that specify the types of elements, keys, or values:
+
+```python
+isinstance(x, list)               # ok
+isinstance(x, list | dict | str)  # ok
+isinstance(x, list[int])          # static error: isinstance cannot be used with 'list[int]'
+```
 
 ## Module execution
 
@@ -4720,6 +4972,8 @@ Letters are converted to uppercase at the start of words, lowercase elsewhere.
 
 ## Grammar reference
 
+In Wirth syntax notation:
+
 ```text
 File = {Statement | newline} eof .
 
@@ -4750,16 +5004,25 @@ SmallStmt = ReturnStmt
           | AssignStmt
           | ExprStmt
           | LoadStmt
+          | TypeAliasStmt
+          | VarStmt
           .
 
 ReturnStmt   = 'return' [Expressions] .
 BreakStmt    = 'break' .
 ContinueStmt = 'continue' .
 PassStmt     = 'pass' .
-AssignStmt   = Expressions ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expressions .
+AssignStmt   = Expressions ('=' | '+=' | '-=' | '*=' | '/=' | '//=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=') Expressions
+             | identifier ':' TypeExpr '=' Expressions
+             .
 ExprStmt     = Expressions .
 
 LoadStmt = 'load' '(' string {',' [identifier '='] string} [','] ')' .
+
+TypeAliasStmt = 'type' identifier {'[' TypeParams [','] ']'} '=' TypeExpr.
+# NOTE: allowed only at the top level of a file.
+
+VarStmt = identifier ':' TypeExpr.
 
 Expression = IfExpr | PrimaryExpr | UnaryExpr | BinaryExpr | LambdaExpr .
 
@@ -4775,6 +5038,7 @@ Operand = identifier
         | int | float | string | bytes
         | ListExpr | ListComp
         | DictExpr | DictComp
+        | CastExpr | IsInstanceExpr
         | '(' [Expressions [',']] ')'
         .
 
@@ -4822,6 +5086,45 @@ Expressions = Expression {',' Expression} .
 # NOTE: trailing comma permitted only when within [...] or (...).
 
 LoopVariables = PrimaryExpr {',' PrimaryExpr} .
+
+TypeExpr = TypeAtom
+         | TypeAtom '|' TypeExpr
+         .
+
+TypeExprs = TypeExpr {',' TypeExpr}.
+
+TypeAtom = TypeName
+         | TypeApplication
+         | '(' [TypeExprs [',']] ')'
+         .
+
+TypeName = identifier
+         | TypeName DotSuffix
+         .
+
+TypeApplication = TypeName '[' TypeArguments ']'.
+
+TypeArguments = TypeArgument
+              | TypeArgument ',' TypeArguments
+              .
+
+TypeArgument = TypeExpr
+             | TypeList
+             | TypeDict
+             | string
+             | int
+             | '...'
+             .
+
+TypeList = '[' [TypeExpr [',']] ']' .
+
+TypeDict = '{' [TypeDictEntry [',']] '}' .
+
+TypeDictEntry = string ':' TypeExpr .
+
+CastExpr = 'cast' '(' TypeExpr ',' [','] Argument [','] ')'
+
+IsInstanceExpr = 'isinstance' '(' Argument ',' [','] TypeExpr [','] ')'
 ```
 
 Tokens:
