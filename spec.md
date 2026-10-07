@@ -58,6 +58,7 @@ interact with the environment.
   * [Lexical elements](#lexical-elements)
     * [String literals](#string-literals)
     * [Bytes literals](#bytes-literals)
+    * [Formatted string literals](#formatted-string-literals)
     * [Special tokens](#special-tokens)
   * [Data types](#data-types)
     * [None](#none)
@@ -83,6 +84,7 @@ interact with the environment.
   * [Expressions](#expressions)
     * [Identifiers](#identifiers)
     * [Literals](#literals)
+    * [Formatted strings](#formatted-strings)
     * [Parenthesized expressions](#parenthesized-expressions)
     * [Dictionary expressions](#dictionary-expressions)
     * [List expressions](#list-expressions)
@@ -303,6 +305,9 @@ x       index   starts_with     arg0
 
 *Literals*: literals are tokens that denote specific values.  Starlark
 has integer, floating-point, string, and bytes literals.
+It also has [formatted string literals](#formatted-string-literals),
+which, unlike other literals, do not have a fixed value: the value of
+an f-string is computed from expressions embedded in it.
 
 ```text
 0                               # int
@@ -321,6 +326,9 @@ r'hello'     r"hello"           # raw string literal
 b"hello"     b'hello'           # bytes
 b'''hello''' b"""hello"""       # triple-quoted bytes
 rb'hello'    br"hello"          # raw bytes literal
+
+f"hello {name}"                 # formatted string literal (f-string)
+rf'{x}\.bzl'  fr"{x}\.bzl"      # raw formatted string literal
 ```
 
 Integer and floating-point literal tokens are defined by the following grammar:
@@ -523,6 +531,167 @@ with the following differences:
 Any valid string literal that, with a `b` prefix, is also a
 valid bytes literal is equivalent in the sense that
 the bytes value is the UTF-8 encoding of the string value.
+
+### Formatted string literals
+
+A *formatted string literal*, or *f-string*, has the form of a string
+literal prefixed by the letter `f`, and its text may contain
+*replacement fields*: expressions enclosed in braces.
+An f-string yields a string value, computed when the f-string is
+evaluated: each replacement field is replaced by the value of its
+expression, converted to a string using the same rules as the
+[`format`](#string·format) method.
+This section defines the lexical structure of f-strings;
+their evaluation is described under
+[Formatted strings](#formatted-strings).
+
+```python
+f"Hello, {name}!"               # "Hello, Alice!" if name is "Alice"
+f'{x} + {y} = {x + y}'          # "1 + 2 = 3" if x is 1 and y is 2
+f"{{not a field}}"              # "{not a field}"
+f'''{len(items)} items:
+{', '.join(items)}'''           # "2 items:\na, b" if items is ["a", "b"]
+rf"^{name}\.bzl$"               # raw f-string: "^foo\\.bzl$" if name is "foo"
+```
+
+An f-string may use any of the forms of an ordinary string literal
+(single-quoted, double-quoted, triple-quoted, or raw), and its
+*literal text* (the text outside its replacement fields) follows the
+same rules for escapes, newlines, and line endings as that form.
+A raw f-string is written with the prefix `rf` or `fr`.
+There is no formatted bytes literal.
+
+An f-string is delimited exactly as an ordinary string literal of the
+same form: it ends where that literal would end, regardless of the
+replacement fields it contains.
+Consequently, a tool that does not interpret replacement fields, such
+as a formatter, can find the extent of an f-string exactly as it does
+for an ordinary string literal.
+
+In the grammar, an f-string is a single token, `fstring`, distinct
+from `string` even when it contains no replacement fields; it may not
+appear where the grammar requires a `string`, such as the operands of
+a [load statement](#load-statements).
+Its text between the quotation marks consists of literal text and
+replacement fields:
+
+```text
+fstring_content   = {literal_char | '{{' | '}}' | replacement_field} .
+replacement_field = '{' Expression '}' .
+# NOTE: literal_char is any character other than '{' or '}'; '{{' and
+# '}}' are recognized in preference to a single '{' or '}'.
+```
+
+The text of each replacement field is tokenized and parsed as an
+[expression](#expressions), subject to the restrictions below.
+Within a replacement field, a newline (which may occur only in a
+triple-quoted f-string) and any white space at the start of the line
+that follows it are ordinary white space, as they are between
+parentheses: they may delimit tokens but never form `newline`,
+`indent`, or `outdent` tokens.
+The expression of a replacement field in a triple-quoted f-string may
+therefore span several source lines.
+
+Within literal text, the pair `{{` denotes a single `{` character and
+the pair `}}` denotes a single `}` character; pairs are formed from
+left to right, so in `{{{n}}}` the first two braces form a pair and
+the third begins a replacement field.
+Any other `{` begins a replacement field, which extends to the first
+`}` that is neither inside a nested string or bytes literal nor inside
+a pair of parentheses, brackets, or braces opened within the field;
+parentheses, brackets, and braces inside a nested string or bytes
+literal have no such effect.
+It is a static error for a `}` to appear in literal text other than
+as part of the pair `}}`, or for a replacement field to be
+unterminated.
+Braces are recognized in the source text of the literal, before
+escape sequences are interpreted: a brace written as an escape
+sequence, such as `\x7b`, is literal text that neither begins a
+replacement field nor needs to be doubled.
+
+A replacement field contains a single expression (an `Expression`,
+not a comma-separated `Expressions`), optionally surrounded by white
+space.
+The following restrictions apply to a replacement field, and
+violating any of them is a static error:
+
+- It must contain an expression; a field that is empty or contains
+  only white space is a static error.
+- It must not contain a backslash, even within a nested string or
+  bytes literal.
+- It must not contain a `#` character outside of a nested string or
+  bytes literal; consequently it cannot contain a comment.
+- It must not contain a newline unless the f-string is triple-quoted.
+
+Because an f-string ends where an ordinary string literal of the same
+form would end, a replacement field cannot contain the f-string's
+closing quotation mark (or triple of quotation marks), even inside a
+nested string or bytes literal, and the rule above excludes escaping
+it with a backslash.
+A string literal nested within a replacement field of an f-string that
+is not triple-quoted must therefore use the other kind of quotation
+mark and must not itself contain the f-string's quotation mark:
+`f"{d['k']}"` is valid, but `f"{d["k"]}"` and `f"{'"'}"` are static
+errors, since each f-string ends at its second `"`.
+Within a triple-quoted f-string a nested literal may use either kind
+of quotation mark, as in the triple-quoted example above.
+
+A replacement field may itself contain an f-string.
+For the rules of this section the inner f-string is a nested string
+literal, and no further restriction applies to it: its text, including
+any braces within it, has no effect on the extent of the enclosing
+field, and it must not contain the closing delimiter of the outer
+f-string.
+Thus `f"{f'{x}'}"` and `f"""{f"{x}"}"""` are permitted, but
+`f"{f"{x}"}"` and `f"{rf"{x}"}"` are static errors: the outer f-string
+ends at the second quotation mark.
+
+These restrictions, and the rule for nested f-strings, are those of
+f-strings in Python 3.6 through 3.11; Python 3.12 relaxed them,
+permitting the enclosing quotation mark, backslashes, newlines, and
+comments within a replacement field.
+Starlark retains them so that the extent of an f-string never depends
+on the contents of its replacement fields.
+
+Within a replacement field, the expression ends at the first `!` or
+`:` that is neither part of the `!=` operator, nor inside a nested
+string or bytes literal, nor inside a pair of parentheses, brackets,
+or braces opened within the field.
+In Python such a `!` begins a conversion (`{x!r}`) and such a `:`
+begins a format specification (`{x:>10}`); Starlark defines neither,
+and it is a static error for a replacement field to contain either.
+Any such feature would have to be defined together with the
+[`format`](#string·format) method, so that the two remain equivalent.
+A `lambda` expression within a replacement field must therefore be
+parenthesized.
+
+Python's self-documenting form `f"{x=}"` is not supported: the text
+`x=` is not an expression, so such a field is a static error.
+A `=` that is part of an expression, as in `f"{a == b}"` or
+`f"{f(a=1)}"`, is permitted.
+
+Starlark, unlike Python, does not accept an unparenthesized tuple as
+the expression of a replacement field: `f"{a, b}"` and `f"{a,}"` are
+static errors.
+Such a tuple must be parenthesized, as in `f"{(a, b)}"`.
+
+Because `{{` denotes a literal brace, an expression that begins with a
+brace must be preceded by white space:
+
+```python
+f"{ {'a': 1}['a'] }"            # "1"
+f"{{'a': 1}['a']}"              # static error: single '}' in literal text
+f"{ {1: 2}}"                    # "{1: 2}": the first } closes the dict, the second ends the field
+f"\x7b{n}\x7d"                  # "{3}" if n is 3: escaped braces are literal text
+rf"\{x}"                        # "\\1" if x is 1: the backslash is literal text
+f"\{x}"                         # static error: \{ is not an escape sequence
+f"""{d["k"]}"""                 # "1" if d is {"k": 1}
+f"{d["k"]}"                     # static error: the f-string ends at the second quotation mark
+f"""{x +
+  1}"""                         # "6" if x is 5: a newline within a field is white space
+f"{(a, b)}"                     # "(1, 2)" if a is 1 and b is 2
+f"{a, b}"                       # static error: unparenthesized tuple; write f"{(a, b)}"
+```
 
 ### Special tokens
 
@@ -796,8 +965,9 @@ from Python here to avoid a common pitfall in which a single string is
 mistakenly used where a list of strings was intended, resulting in exploding
 the string into its individual characters.)
 
-Any value may formatted as a string using the `str` or `repr` built-in
-functions, the `str % tuple` operator, or the `str.format` method.
+Any value may be formatted as a string using the `str` or `repr` built-in
+functions, the `str % tuple` operator, the `str.format` method, or a
+[formatted string literal](#formatted-string-literals).
 
 A string used in a Boolean context is considered true if it is
 non-empty.
@@ -1906,7 +2076,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | float | string | bytes
+        | int | float | string | bytes | fstring
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expressions] [,] ')'
@@ -1938,7 +2108,69 @@ Operand = int | float | string | bytes
 ```
 
 Evaluation of an int, float, string, or bytes literal yields the value of that literal.
-See [Literals](#lexical elements) for details.
+See [Literals](#lexical-elements) and
+[Formatted string literals](#formatted-string-literals) for details.
+
+### Formatted strings
+
+```text
+Operand = fstring
+```
+
+A [formatted string literal](#formatted-string-literals) is an
+expression that yields a string.
+The expressions of its replacement fields are evaluated once each,
+from left to right in source order.
+After all of them have been evaluated, the resulting values are
+converted to strings in the same order, using the conversion rules
+of the [`format`](#string·format) method: a string value is used
+unchanged, and any other value is converted as if by the built-in
+[`repr`](#repr) function.
+This conversion is intrinsic and does not depend on bindings named
+`str` or `repr` in the program.
+The result is the concatenation, in source order, of the strings
+denoted by the literal text portions and the converted values.
+A literal text portion denotes the string it would denote in an
+ordinary string literal of the same form, except that the pairs `{{`
+and `}}` denote single braces.
+Unlike Python, which converts each value to a string as soon as its
+expression has been evaluated, Starlark evaluates every field's
+expression before converting any value, so that an f-string is
+exactly equivalent to the `format` call shown below.
+A later field's expression may therefore mutate a value reachable
+from an earlier field's value before the earlier value is converted.
+
+Each replacement field's expression is an ordinary expression of the
+enclosing program: its names follow the usual lexical scope rules at
+that location, including any scopes introduced by the expression (see
+[Name binding and variables](#name-binding-and-variables)) and it is
+subject to the same static checks as any other expression, so a
+reference to an undefined name within a replacement field is a static
+error.
+
+```python
+name = "Alice"
+n = 3
+l = []
+f"Hello, {name}!"                      # "Hello, Alice!"
+f"{n} file{'s' if n != 1 else ''}"     # "3 files"
+f"{{{n}}}"                             # "{3}"
+f"{name.upper()}: {len(name)}"         # "ALICE: 5"
+[f"{i}" for i in range(2)]             # ["0", "1"]: i is the comprehension's variable
+f"{l}{l.append(1)}"                    # "[1]None": every field is evaluated before any is converted
+```
+
+An f-string therefore has the same value as a call of the
+[`format`](#string·format) method whose receiver is formed from the
+f-string by writing `{}` in place of each replacement field and, in
+place of each literal text portion, the string that portion denotes
+with every `{` and `}` in it doubled, and whose positional arguments
+are the fields' expressions:
+
+```python
+f"a{x}b{{c}}{y}"                       # same as "a{}b{{c}}{}".format(x, y)
+f"\x7b{n}\x7d"                         # same as "{{{}}}".format(n)
+```
 
 ### Parenthesized expressions
 
@@ -4361,6 +4593,10 @@ If all the numeric field names form the sequence 0, 1, 2, and so on,
 they may be omitted and those values will be implied; however,
 the explicit and implicit forms may not be mixed.
 
+Each field is replaced by the selected argument converted to a
+string: a string is inserted unchanged; any other value is converted
+as if by the built-in [`repr`](#repr) function.
+
 ```python
 "a{x}b{y}c{}".format(1, x=2, y=3)               # "a2b3c1"
 "a{}b{}c".format(1, 2)                          # "a1b2c"
@@ -4772,7 +5008,7 @@ PrimaryExpr = Operand
             .
 
 Operand = identifier
-        | int | float | string | bytes
+        | int | float | string | bytes | fstring
         | ListExpr | ListComp
         | DictExpr | DictComp
         | '(' [Expressions [',']] ')'
@@ -4828,7 +5064,7 @@ Tokens:
 
 - spaces: newline, eof, indent, outdent.
 - identifier.
-- literals: string, bytes, int, float.
+- literals: string, bytes, fstring, int, float.
 - plus all quoted tokens such as '+=', 'return'.
 
 Notes:
